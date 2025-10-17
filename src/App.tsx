@@ -1,25 +1,30 @@
-import { Route, Routes } from 'react-router-dom'
-import ProtectedRoute from '@/components/routing/ProtectedRoute.tsx'
-import DashboardPage from '@/pages/DashboardPage.tsx'
-import HomePage from '@/pages/HomePage.tsx'
-import LoginPage from '@/pages/LoginPage.tsx'
-import NotFoundPage from '@/pages/NotFoundPage.tsx'
+import { Route, Routes, useLocation } from "react-router"
+import SiteHeader from "@/components/layout/SiteHeader.tsx"
+import { fallbackRoute, protectedRoutes, publicRoutes } from "@/routes"
 
 function App() {
+  const location = useLocation()
+
+  const hideNavigation = ["/login", "/register"].some((route) =>
+    location.pathname.startsWith(route),
+  )
+
   return (
-    <Routes>
-      <Route path="/" element={<HomePage />} />
-      <Route path="/login" element={<LoginPage />} />
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardPage />
-          </ProtectedRoute>
-        }
-      />
-      <Route path="*" element={<NotFoundPage />} />
-    </Routes>
+    <>
+      {!hideNavigation && <SiteHeader />}
+      <Routes>
+        {publicRoutes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+        {protectedRoutes.map(({ path, element }) => (
+          <Route key={path} path={path} element={element} />
+        ))}
+        <Route
+          path={fallbackRoute.path}
+          element={fallbackRoute.element}
+        />
+      </Routes>
+    </>
   )
 }
 
