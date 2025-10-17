@@ -1,10 +1,10 @@
 import type { ReactNode } from "react"
-import CartsPage from "@/pages/CartsPage.tsx"
 import LoginPage from "@/pages/LoginPage.tsx"
 import NotFoundPage from "@/pages/NotFoundPage.tsx"
-import ProfilePage from "@/pages/ProfilePage.tsx"
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx"
 import ProductsPage from "@/pages/ProductsPage.tsx"
+import CartsPage from "@/pages/CartsPage.tsx"
+import ProfilePage from "@/pages/ProfilePage.tsx"
 
 export type AppRoute = {
   path: string
@@ -24,6 +24,9 @@ export const publicRoutes: AppRoute[] = [
     path: "/products/:productId",
     element: <ProductDetailPage />,
   },
+]
+
+export const protectedRoutes: AppRoute[] = [
   {
     path: "/carts",
     element: <CartsPage />,
@@ -33,8 +36,6 @@ export const publicRoutes: AppRoute[] = [
     element: <ProfilePage />,
   },
 ]
-
-export const protectedRoutes: AppRoute[] = []
 
 export const fallbackRoute: AppRoute = {
   path: "*",

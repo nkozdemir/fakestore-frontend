@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { Link, NavLink, useNavigate } from "react-router"
 import { ModeToggle } from "@/components/mode-toggle.tsx"
@@ -12,16 +13,33 @@ import {
 } from "@/components/ui/dropdown-menu.tsx"
 import { useTheme } from "@/components/theme-provider.tsx"
 import { cn } from "@/lib/utils.ts"
+import useAuth from "@/hooks/useAuth.ts"
 
 const navItems = [
-  { label: "Products", to: "/", end: true },
-  { label: "Carts", to: "/carts" },
-  { label: "Profile", to: "/profile" },
+  { label: "Products", to: "/", end: true, requiresAuth: false },
+  { label: "Carts", to: "/carts", requiresAuth: true },
+  { label: "Profile", to: "/profile", requiresAuth: true },
 ] as const
 
 export default function SiteHeader() {
   const navigate = useNavigate()
   const { setTheme } = useTheme()
+  const { isAuthenticated, user, logout, isLoading } = useAuth()
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+
+  const visibleNavItems = navItems.filter(
+    (item) => !item.requiresAuth || isAuthenticated,
+  )
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      await logout()
+      navigate("/login")
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <header className="border-b bg-background">
@@ -31,7 +49,7 @@ export default function SiteHeader() {
         </Link>
         <div className="flex items-center gap-3">
           <nav className="hidden items-center gap-1 sm:flex">
-            {navItems.map(({ end, ...item }) => (
+            {visibleNavItems.map(({ end, ...item }) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -53,6 +71,35 @@ export default function SiteHeader() {
           <div className="hidden sm:block">
             <ModeToggle />
           </div>
+          {!isLoading && (
+            <>
+              {isAuthenticated ? (
+                <div className="hidden items-center gap-3 sm:flex">
+                  {user?.firstName && (
+                    <span className="text-sm font-medium text-muted-foreground">
+                      {user.firstName}
+                    </span>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                  >
+                    Log out
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  className="hidden sm:inline-flex"
+                  size="sm"
+                  onClick={() => navigate("/login")}
+                >
+                  Sign in
+                </Button>
+              )}
+            </>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -66,7 +113,7 @@ export default function SiteHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Navigate</DropdownMenuLabel>
-              {navItems.map((item) => (
+              {visibleNavItems.map((item) => (
                 <DropdownMenuItem
                   key={item.to}
                   onSelect={() => navigate(item.to)}
@@ -85,6 +132,26 @@ export default function SiteHeader() {
               <DropdownMenuItem onSelect={() => setTheme("system")}>
                 System
               </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              {!isLoading && (
+                <>
+                  {isAuthenticated ? (
+                    <DropdownMenuItem
+                      onSelect={(event) => {
+                        event.preventDefault()
+                        void handleLogout()
+                      }}
+                      disabled={isLoggingOut}
+                    >
+                      Log out
+                    </DropdownMenuItem>
+                  ) : (
+                    <DropdownMenuItem onSelect={() => navigate("/login")}>
+                      Sign in
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
