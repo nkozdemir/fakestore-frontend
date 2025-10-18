@@ -10,6 +10,7 @@ export type AuthMeResponse = {
   first_name: string
   last_name: string
   last_login: string | null
+  date_joined: string
   is_staff: boolean
   is_superuser: boolean
 }
@@ -43,6 +44,7 @@ export type AuthUser = {
   firstName: string
   lastName: string
   lastLogin: string | null
+  dateJoined: string
   isStaff: boolean
   isSuperuser: boolean
   phone?: string

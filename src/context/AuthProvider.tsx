@@ -49,6 +49,7 @@ async function fetchAuthenticatedUser(accessToken: string): Promise<AuthUser> {
     firstName: profile?.name?.first_name ?? me.first_name,
     lastName: profile?.name?.last_name ?? me.last_name,
     lastLogin: me.last_login,
+    dateJoined: me.date_joined,
     isStaff: me.is_staff,
     isSuperuser: me.is_superuser,
     phone: profile?.phone,
