@@ -11,6 +11,7 @@ import type {
   AuthTokens,
   AuthUser,
   LoginCredentials,
+  RegisterPayload,
   UserProfileResponse,
 } from "@/types/auth.ts"
 
@@ -201,6 +202,65 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     [applyTokens],
   )
 
+  const register = useCallback(
+    async (payload: RegisterPayload) => {
+      const response = await fetch(buildApiUrl("/auth/register/"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: payload.username,
+          email: payload.email,
+          password: payload.password,
+          first_name: payload.firstName,
+          last_name: payload.lastName,
+        }),
+      })
+
+      let parsedBody: unknown = null
+
+      try {
+        parsedBody = await response.json()
+      } catch {
+        parsedBody = null
+      }
+
+      if (!response.ok) {
+        const detail =
+          typeof parsedBody === "object" &&
+          parsedBody !== null &&
+          "detail" in parsedBody &&
+          typeof (parsedBody as { detail: unknown }).detail === "string"
+            ? (parsedBody as { detail: string }).detail
+            : null
+
+        const fallbackMessage =
+          response.status === 400
+            ? "We couldn’t create your account with those details. Please review the form and try again."
+            : "We ran into a problem while creating your account. Please try again in a few moments."
+
+        const friendlyMessage = detail ?? fallbackMessage
+
+        throw new Error(friendlyMessage)
+      }
+
+      try {
+        await login({
+          username: payload.username,
+          password: payload.password,
+        })
+      } catch (error) {
+        throw error instanceof Error
+          ? error
+          : new Error(
+              "Your account was created, but we couldn’t sign you in automatically. Try logging in manually.",
+            )
+      }
+    },
+    [login],
+  )
+
   const logout = useCallback(async () => {
     if (refreshToken) {
       try {
@@ -228,10 +288,11 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       isAuthenticated: Boolean(accessToken && user),
       isLoading,
       login,
+      register,
       logout,
       refreshUser,
     }),
-    [accessToken, isLoading, login, logout, refreshToken, refreshUser, user],
+    [accessToken, isLoading, login, logout, refreshToken, refreshUser, register, user],
   )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

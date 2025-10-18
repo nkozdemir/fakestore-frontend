@@ -1,5 +1,9 @@
 import { createContext } from "react"
-import type { AuthUser, LoginCredentials } from "@/types/auth.ts"
+import type {
+  AuthUser,
+  LoginCredentials,
+  RegisterPayload,
+} from "@/types/auth.ts"
 
 export type AuthContextValue = {
   user: AuthUser | null
@@ -8,6 +12,7 @@ export type AuthContextValue = {
   isAuthenticated: boolean
   isLoading: boolean
   login: (credentials: LoginCredentials) => Promise<void>
+  register: (payload: RegisterPayload) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
 }

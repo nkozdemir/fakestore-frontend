@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import { type FieldErrors, type Resolver, useForm } from "react-hook-form"
 import { z } from "zod"
 import { CircleAlert } from "lucide-react"
@@ -160,6 +160,13 @@ export default function LoginPage() {
               Sign in
             </Button>
           </form>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Need an account?{" "}
+            <Link className="font-medium text-primary hover:underline" to="/register">
+              Create one
+            </Link>
+            .
+          </p>
         </CardContent>
       </Card>
     </main>

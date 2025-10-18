@@ -53,3 +53,16 @@ export type LoginCredentials = {
   username: string
   password: string
 }
+
+export type RegisterPayload = {
+  username: string
+  email: string
+  password: string
+  firstName: string
+  lastName: string
+}
+
+export type UsernameAvailabilityResponse = {
+  username: string
+  available: boolean
+}

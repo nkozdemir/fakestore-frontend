@@ -1,5 +1,6 @@
 import type { ReactNode } from "react"
 import LoginPage from "@/pages/LoginPage.tsx"
+import RegisterPage from "@/pages/RegisterPage.tsx"
 import NotFoundPage from "@/pages/NotFoundPage.tsx"
 import ProductDetailPage from "@/pages/ProductDetailPage.tsx"
 import ProductsPage from "@/pages/ProductsPage.tsx"
@@ -19,6 +20,10 @@ export const publicRoutes: AppRoute[] = [
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
   },
   {
     path: "/products/:productId",
