@@ -2,6 +2,7 @@ import { Route, Routes, useLocation } from "react-router"
 import SiteHeader from "@/components/layout/SiteHeader.tsx"
 import ProtectedRoute from "@/components/routing/ProtectedRoute.tsx"
 import { fallbackRoute, protectedRoutes, publicRoutes } from "@/routes"
+import { Toaster } from "@/components/ui/sonner.tsx"
 
 function App() {
   const location = useLocation()
@@ -29,6 +30,7 @@ function App() {
           element={fallbackRoute.element}
         />
       </Routes>
+      <Toaster />
     </>
   )
 }

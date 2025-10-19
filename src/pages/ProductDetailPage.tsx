@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router"
+import { Link, useNavigate, useParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
 import {
@@ -11,11 +11,28 @@ import {
 import { fetchJson } from "@/lib/api.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import type { Product } from "@/types/catalog.ts"
+import useAuth from "@/hooks/useAuth.ts"
+import useCart from "@/hooks/useCart.ts"
+import { toast } from "sonner"
 
 export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
+  const navigate = useNavigate()
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { addItem, isUpdating: isCartUpdating } = useCart()
+  const normalizedProductId = productId ?? ""
 
-  if (!productId) {
+  const {
+    data: product,
+    isPending,
+    error,
+  } = useQuery<Product, Error>({
+    queryKey: ["product", normalizedProductId],
+    queryFn: () => fetchJson<Product>(`products/${normalizedProductId}/`),
+    enabled: Boolean(normalizedProductId),
+  })
+
+  if (!normalizedProductId) {
     return (
       <main className="min-h-screen bg-background">
         <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
@@ -30,14 +47,30 @@ export default function ProductDetailPage() {
     )
   }
 
-  const {
-    data: product,
-    isPending,
-    error,
-  } = useQuery<Product, Error>({
-    queryKey: ["product", productId],
-    queryFn: () => fetchJson<Product>(`products/${productId}/`),
-  })
+  const handleAddToCart = (currentProduct: Product) => {
+    if (!isAuthenticated) {
+      toast.info("Sign in to add items to your cart.", {
+        action: {
+          label: "Sign in",
+          onClick: () => navigate("/login"),
+        },
+      })
+      return
+    }
+
+    void addItem(currentProduct.id, 1)
+      .then(() => {
+        toast.success(`Added “${currentProduct.title}” to your cart.`)
+      })
+      .catch((addError) => {
+        console.error(addError)
+        toast.error(
+          addError instanceof Error
+            ? addError.message
+            : "We couldn’t add that product to your cart.",
+        )
+      })
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -98,8 +131,13 @@ export default function ProductDetailPage() {
                       ${product.price}
                     </p>
                   </div>
-                  <Button className="w-full sm:w-auto" size="lg">
-                    Add to cart
+                  <Button
+                    className="w-full sm:w-auto"
+                    size="lg"
+                    disabled={isAuthLoading || isCartUpdating}
+                    onClick={() => handleAddToCart(product)}
+                  >
+                    {isCartUpdating ? "Updating cart..." : "Add to cart"}
                   </Button>
                 </CardContent>
               </div>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Link } from "react-router"
+import { Link, useNavigate } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
 import {
@@ -31,12 +31,18 @@ import { Spinner } from "@/components/ui/spinner.tsx"
 import { fetchJson } from "@/lib/api.ts"
 import { cn } from "@/lib/utils.ts"
 import type { Category, ProductResponse } from "@/types/catalog.ts"
+import useAuth from "@/hooks/useAuth.ts"
+import useCart from "@/hooks/useCart.ts"
+import { toast } from "sonner"
 
 const PAGE_SIZE = 5
 
 export default function ProductsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [page, setPage] = useState(1)
+  const navigate = useNavigate()
+  const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
+  const { addItem, isUpdating: isCartUpdating } = useCart()
 
   const {
     data: productsData,
@@ -133,6 +139,31 @@ export default function ProductsPage() {
     }
 
     setSelectedCategory(value)
+  }
+
+  const handleAddToCart = (productId: number, productTitle: string) => {
+    if (!isAuthenticated) {
+      toast.info("Sign in to add items to your cart.", {
+        action: {
+          label: "Sign in",
+          onClick: () => navigate("/login"),
+        },
+      })
+      return
+    }
+
+    void addItem(productId, 1)
+      .then(() => {
+        toast.success(`Added “${productTitle}” to your cart.`)
+      })
+      .catch((error) => {
+        console.error(error)
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "We couldn’t add that product to your cart.",
+        )
+      })
   }
 
   const showPagination =
@@ -257,9 +288,22 @@ export default function ProductsPage() {
                     {product.description}
                   </p>
                 </CardContent>
-                <CardFooter className="mt-auto flex items-center justify-between gap-4">
-                  <span className="text-lg font-semibold">${product.price}</span>
-                  <Button asChild>
+                <CardFooter className="mt-auto flex flex-col gap-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-lg font-semibold">
+                      ${product.price}
+                    </span>
+                    <Button
+                      size="sm"
+                      disabled={isAuthLoading || isCartUpdating}
+                      onClick={() =>
+                        handleAddToCart(product.id, product.title)
+                      }
+                    >
+                      Add to cart
+                    </Button>
+                  </div>
+                  <Button asChild variant="outline" size="sm">
                     <Link to={`/products/${product.id}`}>View details</Link>
                   </Button>
                 </CardFooter>
