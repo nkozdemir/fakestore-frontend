@@ -15,6 +15,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react"
+import { toast } from "sonner"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -316,6 +317,7 @@ export default function ProfilePage() {
 
       await refreshUser()
       setProfileDialogOpen(false)
+      toast.success("Profile updated successfully.")
     },
     [authorizedRequest, refreshUser, user],
   )
@@ -325,6 +327,8 @@ export default function ProfilePage() {
       if (!user) {
         throw new Error("We couldn't find your profile. Please sign in again.")
       }
+
+      const isEditMode = addressDialogState?.mode === "edit"
 
       const payload = {
         street: values.street.trim(),
@@ -357,6 +361,11 @@ export default function ProfilePage() {
       }
 
       await refreshUser()
+      toast.success(
+        isEditMode
+          ? "Address updated successfully."
+          : "Address added successfully.",
+      )
       setAddressDialogState(null)
     },
     [addressDialogState, authorizedRequest, refreshUser, user],
@@ -376,6 +385,7 @@ export default function ProfilePage() {
         method: "DELETE",
       })
       await refreshUser()
+      toast.success("Address removed successfully.")
       setAddressToDelete(null)
     } catch (error) {
       const message =
@@ -383,6 +393,7 @@ export default function ProfilePage() {
           ? error.message
           : "We couldn't remove that address right now. Please try again."
       setDeleteAddressError(message)
+      toast.error(message)
     } finally {
       setIsDeletingAddress(false)
     }
@@ -402,6 +413,7 @@ export default function ProfilePage() {
       })
 
       setPasswordDialogOpen(false)
+      toast.success("Password updated successfully.")
     },
     [authorizedRequest, user],
   )
@@ -418,6 +430,7 @@ export default function ProfilePage() {
       await authorizedRequest(`/users/${user.id}/`, {
         method: "DELETE",
       })
+      toast.success("Your account has been deleted.")
       setDeleteDialogOpen(false)
       await logout()
       navigate("/", { replace: true })
@@ -427,6 +440,7 @@ export default function ProfilePage() {
           ? error.message
           : "We couldn't delete your account right now. Please try again."
       setDeleteError(message)
+      toast.error(message)
     } finally {
       setIsDeleting(false)
     }
@@ -797,6 +811,7 @@ function ProfileDetailsDialog({
         type: "server",
         message,
       })
+      toast.error(message)
     }
   })
 
@@ -969,6 +984,7 @@ function AddressDialog({
         type: "server",
         message,
       })
+      toast.error(message)
     }
   })
 
@@ -1195,6 +1211,7 @@ function ChangePasswordDialog({
         type: "server",
         message,
       })
+      toast.error(message)
     }
   })
 

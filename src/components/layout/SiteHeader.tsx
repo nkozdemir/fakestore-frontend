@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { Link, NavLink, useNavigate } from "react-router"
 import { ModeToggle } from "@/components/mode-toggle.tsx"
@@ -11,25 +11,29 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
-import { useTheme } from "@/components/theme-provider.tsx"
 import { cn } from "@/lib/utils.ts"
 import useAuth from "@/hooks/useAuth.ts"
 
 const navItems = [
-  { label: "Products", to: "/", end: true, requiresAuth: false },
-  { label: "Carts", to: "/carts", requiresAuth: true },
-  { label: "Profile", to: "/profile", requiresAuth: true },
+  { label: "Products", to: "/", end: true },
+  { label: "Cart", to: "/carts" },
 ] as const
 
 export default function SiteHeader() {
   const navigate = useNavigate()
-  const { setTheme } = useTheme()
   const { isAuthenticated, user, logout, isLoading } = useAuth()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
-
-  const visibleNavItems = navItems.filter(
-    (item) => !item.requiresAuth || isAuthenticated,
-  )
+  const displayName = useMemo(() => {
+    const name = user?.firstName?.trim()
+    if (name && name.length > 0) {
+      return name
+    }
+    const username = user?.username?.trim()
+    if (username && username.length > 0) {
+      return username
+    }
+    return "Account"
+  }, [user?.firstName, user?.username])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -47,9 +51,9 @@ export default function SiteHeader() {
         <Link to="/" className="text-lg font-semibold tracking-tight">
           Fakestore
         </Link>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <nav className="hidden items-center gap-1 sm:flex">
-            {visibleNavItems.map(({ end, ...item }) => (
+            {navItems.map(({ end, ...item }) => (
               <NavLink
                 key={item.to}
                 to={item.to}
@@ -68,38 +72,48 @@ export default function SiteHeader() {
               </NavLink>
             ))}
           </nav>
-          <div className="hidden sm:block">
-            <ModeToggle />
-          </div>
-          {!isLoading && (
-            <>
-              {isAuthenticated ? (
-                <div className="hidden items-center gap-3 sm:flex">
-                  {user?.firstName && (
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {user.firstName}
-                    </span>
-                  )}
+          {!isLoading &&
+            (isAuthenticated ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     size="sm"
-                    onClick={handleLogout}
+                    className="max-w-[10rem] truncate font-medium"
+                  >
+                    {displayName}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      navigate("/profile")
+                    }}
+                  >
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => {
+                      void handleLogout()
+                    }}
                     disabled={isLoggingOut}
                   >
                     Log out
-                  </Button>
-                </div>
-              ) : (
-                <Button
-                  className="hidden sm:inline-flex"
-                  size="sm"
-                  onClick={() => navigate("/login")}
-                >
-                  Sign in
-                </Button>
-              )}
-            </>
-          )}
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button
+                size="sm"
+                variant="outline"
+                className="hidden sm:inline-flex"
+                onClick={() => navigate("/login")}
+              >
+                Sign in
+              </Button>
+            ))}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -113,7 +127,7 @@ export default function SiteHeader() {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuLabel>Navigate</DropdownMenuLabel>
-              {visibleNavItems.map((item) => (
+              {navItems.map((item) => (
                 <DropdownMenuItem
                   key={item.to}
                   onSelect={() => navigate(item.to)}
@@ -121,32 +135,30 @@ export default function SiteHeader() {
                   {item.label}
                 </DropdownMenuItem>
               ))}
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel>Theme</DropdownMenuLabel>
-              <DropdownMenuItem onSelect={() => setTheme("light")}>
-                Light
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setTheme("dark")}>
-                Dark
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => setTheme("system")}>
-                System
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               {!isLoading && (
                 <>
                   {isAuthenticated ? (
-                    <DropdownMenuItem
-                      onSelect={(event) => {
-                        event.preventDefault()
-                        void handleLogout()
-                      }}
-                      disabled={isLoggingOut}
-                    >
-                      Log out
-                    </DropdownMenuItem>
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
+                      <DropdownMenuItem
+                        onSelect={() => navigate("/profile")}
+                      >
+                        Profile
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => {
+                          void handleLogout()
+                        }}
+                        disabled={isLoggingOut}
+                      >
+                        Log out
+                      </DropdownMenuItem>
+                    </>
                   ) : (
-                    <DropdownMenuItem onSelect={() => navigate("/login")}>
+                    <DropdownMenuItem
+                      onSelect={() => navigate("/login")}
+                    >
                       Sign in
                     </DropdownMenuItem>
                   )}
@@ -154,6 +166,7 @@ export default function SiteHeader() {
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+          <ModeToggle />
         </div>
       </div>
     </header>
