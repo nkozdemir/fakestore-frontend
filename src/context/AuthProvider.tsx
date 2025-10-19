@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react"
+import { useNavigate } from "react-router"
 import { AuthContext } from "@/context/auth-context.ts"
 import { buildApiUrl, fetchJson } from "@/lib/api.ts"
 import {
@@ -6,6 +14,7 @@ import {
   readStoredTokens,
   storeTokens,
 } from "@/lib/auth-storage.ts"
+import { getJwtExpiry } from "@/lib/jwt.ts"
 import type {
   AuthMeResponse,
   AuthTokens,
@@ -22,6 +31,11 @@ type AuthProviderProps = {
 const AUTH_HEADERS = (accessToken: string) => ({
   Authorization: `Bearer ${accessToken}`,
 })
+
+const REFRESH_LEEWAY_MS = 60_000
+const MIN_EXPIRY_BUFFER_MS = 5_000
+const MIN_REFRESH_INTERVAL_MS = 1_000
+const FALLBACK_REFRESH_INTERVAL_MS = 5 * 60_000
 
 async function fetchAuthenticatedUser(accessToken: string): Promise<AuthUser> {
   const me = await fetchJson<AuthMeResponse>("/auth/me/", {
@@ -61,19 +75,79 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const [tokens, setTokens] = useState<AuthTokens | null>(null)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const navigate = useNavigate()
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const isRefreshingRef = useRef(false)
+
+  const clearRefreshTimeout = useCallback(() => {
+    if (refreshTimeoutRef.current !== null) {
+      clearTimeout(refreshTimeoutRef.current)
+      refreshTimeoutRef.current = null
+    }
+  }, [])
 
   const accessToken = tokens?.access ?? null
   const refreshToken = tokens?.refresh ?? null
 
-  const applyTokens = useCallback((nextTokens: AuthTokens | null) => {
-    setTokens(nextTokens)
+  const applyTokens = useCallback(
+    (nextTokens: AuthTokens | null) => {
+      clearRefreshTimeout()
+      setTokens(nextTokens)
 
-    if (nextTokens) {
-      storeTokens(nextTokens)
-    } else {
-      clearStoredTokens()
+      if (nextTokens) {
+        storeTokens(nextTokens)
+      } else {
+        clearStoredTokens()
+      }
+    },
+    [clearRefreshTimeout],
+  )
+
+  const handleRefreshFailure = useCallback(() => {
+    applyTokens(null)
+    setUser(null)
+    navigate("/login", { replace: true })
+  }, [applyTokens, navigate])
+
+  const refreshAccessToken = useCallback(async () => {
+    if (!refreshToken || isRefreshingRef.current) {
+      return
     }
-  }, [])
+
+    isRefreshingRef.current = true
+
+    try {
+      const response = await fetch(buildApiUrl("/auth/refresh/"), {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ refresh: refreshToken }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Refresh failed with status ${response.status}`)
+      }
+
+      const parsedBody = (await response.json()) as { access?: unknown }
+
+      if (typeof parsedBody.access !== "string") {
+        throw new Error("Refresh response missing access token")
+      }
+
+      const updatedTokens: AuthTokens = {
+        access: parsedBody.access,
+        refresh: refreshToken,
+      }
+
+      applyTokens(updatedTokens)
+    } catch (error) {
+      console.warn("Access token refresh failed", error)
+      handleRefreshFailure()
+    } finally {
+      isRefreshingRef.current = false
+    }
+  }, [applyTokens, handleRefreshFailure, refreshToken])
 
   const refreshUser = useCallback(async () => {
     if (!accessToken) {
@@ -112,6 +186,55 @@ export default function AuthProvider({ children }: AuthProviderProps) {
       setIsLoading(false)
     }
   }, [applyTokens])
+
+  useEffect(() => {
+    clearRefreshTimeout()
+
+    if (!accessToken || !refreshToken) {
+      return
+    }
+
+    const expiryTime = getJwtExpiry(accessToken)
+
+    if (!expiryTime) {
+      refreshTimeoutRef.current = setTimeout(() => {
+        void refreshAccessToken()
+      }, FALLBACK_REFRESH_INTERVAL_MS)
+      return
+    }
+
+    const now = Date.now()
+    const timeUntilExpiry = expiryTime - now
+
+    if (timeUntilExpiry <= MIN_REFRESH_INTERVAL_MS) {
+      void refreshAccessToken()
+      return
+    }
+
+    if (timeUntilExpiry <= REFRESH_LEEWAY_MS) {
+      const bufferAdjusted = timeUntilExpiry - MIN_EXPIRY_BUFFER_MS
+      const cappedDelay = Math.min(
+        bufferAdjusted,
+        timeUntilExpiry - MIN_REFRESH_INTERVAL_MS,
+      )
+      const delay = Math.max(cappedDelay, MIN_REFRESH_INTERVAL_MS)
+
+      refreshTimeoutRef.current = setTimeout(() => {
+        void refreshAccessToken()
+      }, delay)
+      return
+    }
+
+    const delay = timeUntilExpiry - REFRESH_LEEWAY_MS
+
+    refreshTimeoutRef.current = setTimeout(() => {
+      void refreshAccessToken()
+    }, delay)
+
+    return () => {
+      clearRefreshTimeout()
+    }
+  }, [accessToken, clearRefreshTimeout, refreshAccessToken, refreshToken])
 
   useEffect(() => {
     void bootstrapSession()
