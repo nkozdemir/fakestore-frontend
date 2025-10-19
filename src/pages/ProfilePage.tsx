@@ -6,7 +6,15 @@ import {
   useForm,
 } from "react-hook-form"
 import { z } from "zod"
-import { Check, Circle, CircleAlert, Loader2, Pencil, Plus } from "lucide-react"
+import {
+  Check,
+  Circle,
+  CircleAlert,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -200,6 +208,13 @@ export default function ProfilePage() {
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [addressToDelete, setAddressToDelete] = useState<UserAddress | null>(
+    null,
+  )
+  const [isDeletingAddress, setIsDeletingAddress] = useState(false)
+  const [deleteAddressError, setDeleteAddressError] = useState<string | null>(
+    null,
+  )
 
   const profileInitialValues = useMemo<ProfileDetailsFormValues>(
     () => ({
@@ -346,6 +361,32 @@ export default function ProfilePage() {
     },
     [addressDialogState, authorizedRequest, refreshUser, user],
   )
+
+  const handleDeleteAddress = useCallback(async () => {
+    const currentAddress = addressToDelete
+
+    if (!currentAddress) {
+      return
+    }
+
+    try {
+      setDeleteAddressError(null)
+      setIsDeletingAddress(true)
+      await authorizedRequest(`/users/addresses/${currentAddress.id}/`, {
+        method: "DELETE",
+      })
+      await refreshUser()
+      setAddressToDelete(null)
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "We couldn't remove that address right now. Please try again."
+      setDeleteAddressError(message)
+    } finally {
+      setIsDeletingAddress(false)
+    }
+  }, [addressToDelete, authorizedRequest, refreshUser])
 
   const handlePasswordSubmit = useCallback(
     async (values: PasswordFormValues) => {
@@ -525,19 +566,33 @@ export default function ProfilePage() {
                           Coordinates: {address.latitude}, {address.longitude}
                         </p>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          setAddressDialogState({
-                            mode: "edit",
-                            address,
-                          })
-                        }
-                      >
-                        <Pencil className="mr-2 size-4" aria-hidden />
-                        Edit
-                      </Button>
+                      <div className="flex items-center gap-2 self-end sm:self-auto">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setAddressDialogState({
+                              mode: "edit",
+                              address,
+                            })
+                          }
+                        >
+                          <Pencil className="mr-2 size-4" aria-hidden />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-destructive hover:text-destructive focus-visible:text-destructive"
+                          onClick={() => {
+                            setDeleteAddressError(null)
+                            setAddressToDelete(address)
+                          }}
+                          aria-label={`Remove address at ${address.street} ${address.number}`}
+                        >
+                          <Trash2 className="size-4" aria-hidden />
+                        </Button>
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -547,6 +602,59 @@ export default function ProfilePage() {
                 You haven't saved any addresses yet.
               </p>
             )}
+            <AlertDialog
+              open={Boolean(addressToDelete)}
+              onOpenChange={(isOpen) => {
+                if (!isOpen) {
+                  setDeleteAddressError(null)
+                  setAddressToDelete(null)
+                }
+              }}
+            >
+              {addressToDelete && (
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Remove this address?
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      We'll remove {addressToDelete.street}{" "}
+                      {addressToDelete.number} from your saved addresses. You
+                      can add it again at any time.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  {deleteAddressError && (
+                    <Alert variant="destructive">
+                      <CircleAlert className="size-5" aria-hidden />
+                      <AlertTitle>Address removal failed</AlertTitle>
+                      <AlertDescription>
+                        {deleteAddressError}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={isDeletingAddress}>
+                      Cancel
+                    </AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(event) => {
+                        event.preventDefault()
+                        void handleDeleteAddress()
+                      }}
+                      disabled={isDeletingAddress}
+                      className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                    >
+                      {isDeletingAddress ? (
+                        <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+                      ) : (
+                        <Trash2 className="mr-2 size-4" aria-hidden />
+                      )}
+                      Remove
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              )}
+            </AlertDialog>
           </CardContent>
         </Card>
 

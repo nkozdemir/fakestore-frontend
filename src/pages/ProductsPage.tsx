@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react"
-import { Link, useNavigate } from "react-router"
+import { Link, useNavigate, useSearchParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
 import {
@@ -36,13 +36,31 @@ import useCart from "@/hooks/useCart.ts"
 import { toast } from "sonner"
 
 const PAGE_SIZE = 5
+const TITLE_CHAR_LIMIT = 60
+const DESCRIPTION_CHAR_LIMIT = 160
+
+function shortenText(value: string, limit: number): string {
+  const normalized = value.trim()
+
+  if (normalized.length <= limit) {
+    return normalized
+  }
+
+  return `${normalized.slice(0, Math.max(0, limit - 3)).trimEnd()}...`
+}
 
 export default function ProductsPage() {
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useSearchParams()
   const [page, setPage] = useState(1)
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
+
+  const selectedCategoryParam = searchParams.get("category")
+  const selectedCategory =
+    selectedCategoryParam && selectedCategoryParam !== "all"
+      ? selectedCategoryParam
+      : null
 
   const {
     data: productsData,
@@ -133,12 +151,15 @@ export default function ProductsPage() {
 
   const handleCategoryChange = (value: string) => {
     setPage(1)
+    const nextParams = new URLSearchParams(searchParams)
+
     if (value === "all") {
-      setSelectedCategory(null)
-      return
+      nextParams.delete("category")
+    } else {
+      nextParams.set("category", value)
     }
 
-    setSelectedCategory(value)
+    setSearchParams(nextParams, { replace: true })
   }
 
   const handleAddToCart = (productId: number, productTitle: string) => {
@@ -154,14 +175,14 @@ export default function ProductsPage() {
 
     void addItem(productId, 1)
       .then(() => {
-        toast.success(`Added “${productTitle}” to your cart.`)
+        toast.success(`Added "${productTitle}" to your cart.`)
       })
       .catch((error) => {
         console.error(error)
         toast.error(
           error instanceof Error
             ? error.message
-            : "We couldn’t add that product to your cart.",
+            : "We couldn't add that product to your cart.",
         )
       })
   }
@@ -262,53 +283,67 @@ export default function ProductsPage() {
           </div>
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {products.map((product) => (
-              <Card key={product.id} className="flex h-full flex-col">
-                <CardHeader className="gap-1">
-                  <CardTitle className="text-xl font-semibold">
-                    {product.title}
-                  </CardTitle>
-                  <CardDescription>
-                    {product.rate
-                      ? `Rated ${product.rate}`
-                      : "Rating unavailable"}{" "}
-                    • {product.count ?? 0} reviews
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="flex flex-1 flex-col gap-4">
-                  <div className="overflow-hidden rounded-lg border bg-muted/20">
-                    <img
-                      alt={product.title}
-                      src={product.image}
-                      className="h-60 w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    {product.description}
-                  </p>
-                </CardContent>
-                <CardFooter className="mt-auto flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="text-lg font-semibold">
-                      ${product.price}
-                    </span>
-                    <Button
-                      size="sm"
-                      disabled={isAuthLoading || isCartUpdating}
-                      onClick={() =>
-                        handleAddToCart(product.id, product.title)
-                      }
-                    >
-                      Add to cart
-                    </Button>
-                  </div>
-                  <Button asChild variant="outline" size="sm">
-                    <Link to={`/products/${product.id}`}>View details</Link>
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+            {products.map((product) => {
+              const shortenedTitle = shortenText(product.title, TITLE_CHAR_LIMIT)
+              const shortenedDescription = shortenText(
+                product.description,
+                DESCRIPTION_CHAR_LIMIT,
+              )
+
+              return (
+                <Link
+                  key={product.id}
+                  to={`/products/${product.id}`}
+                  className="group block h-full"
+                >
+                  <Card className="flex h-full flex-col transition duration-200 hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg">
+                    <CardHeader className="gap-1">
+                      <CardTitle className="text-xl font-semibold">
+                        <span title={product.title}>{shortenedTitle}</span>
+                      </CardTitle>
+                      <CardDescription>
+                        {product.rate
+                          ? `Rated ${product.rate}`
+                          : "Rating unavailable"}{" "}
+                        • {product.count ?? 0} reviews
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="flex flex-1 flex-col gap-4">
+                      <div className="overflow-hidden rounded-lg border bg-muted/20">
+                        <img
+                          alt={product.title}
+                          src={product.image}
+                          className="h-60 w-full object-cover transition duration-200 group-hover:scale-[1.02]"
+                          loading="lazy"
+                        />
+                      </div>
+                      <p
+                        className="text-sm text-muted-foreground"
+                        title={product.description}
+                      >
+                        {shortenedDescription}
+                      </p>
+                    </CardContent>
+                    <CardFooter className="mt-auto flex items-center justify-between gap-2">
+                      <span className="text-lg font-semibold">
+                        ${product.price}
+                      </span>
+                      <Button
+                        size="sm"
+                        disabled={isAuthLoading || isCartUpdating}
+                        onClick={(event) => {
+                          event.preventDefault()
+                          event.stopPropagation()
+                          handleAddToCart(product.id, product.title)
+                        }}
+                      >
+                        Add to cart
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </Link>
+              )
+            })}
           </div>
         )}
 
