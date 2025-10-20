@@ -1,6 +1,6 @@
 # Fakestore-Frontend
 
-A modern Vite + React storefront for the FakeStore sample API. It implements browsing, authentication-protected actions, and a polished shopping experience by combining reusable UI primitives with robust data fetching.
+A modern Vite + React storefront for the [FakeStore API](https://github.com/nkozdemir/fakestore-backend). It implements browsing, authentication-protected actions, and a polished shopping experience by combining reusable UI primitives with robust data fetching.
 
 ## Features
 - Product catalogue with category filtering, pagination, skeleton loading states, and lightweight caching via TanStack Query.
@@ -38,6 +38,17 @@ A modern Vite + React storefront for the FakeStore sample API. It implements bro
 - `npm run lint` — run ESLint across the project.
 - `npm run build` — type-check and produce a production build.
 - `npm run preview` — serve the built assets locally.
+- `npm test` — run Vitest unit suites (hooks, utilities) with MSW-powered API mocks.
+
+## Testing
+Vitest is configured with a jsdom environment and Testing Library helpers. We mock the Django API via MSW so the auth and cart hooks exercise realistic network flows without needing to boot the backend. Run the suites in watch mode with:
+```bash
+npm test
+```
+Or execute once (useful for CI) with:
+```bash
+npm test -- --run
+```
 
 ## Environment variables
 - `VITE_API_BASE_URL` — base URL of the FakeStore backend (`/` suffix optional); used for all REST requests.
@@ -48,5 +59,3 @@ A modern Vite + React storefront for the FakeStore sample API. It implements bro
 - `src/hooks/` — reusable domain hooks (auth, cart) built on TanStack Query.
 - `src/lib/` — API helpers, query client configuration, and shared utilities.
 - `src/components/` — design system primitives and layout pieces (header, mode toggle, toasts).
-
-The frontend expects a FakeStore-compatible backend that exposes `products/`, `categories/`, `auth/`, and `carts/` endpoints. Once the API is reachable and the environment variable set, the app boots with complete browsing, rating, and cart flows.
