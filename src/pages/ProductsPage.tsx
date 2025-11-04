@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
@@ -11,15 +11,6 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx"
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination.tsx"
-import {
   Select,
   SelectContent,
   SelectItem,
@@ -28,14 +19,14 @@ import {
 } from "@/components/ui/select.tsx"
 import { Skeleton } from "@/components/ui/skeleton.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
+import PaginationControls from "@/components/pagination/PaginationControls.tsx"
 import { fetchJson } from "@/lib/api.ts"
-import { cn } from "@/lib/utils.ts"
 import type { Category, ProductResponse } from "@/types/catalog.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
 import { toast } from "sonner"
 
-const PAGE_SIZE = 5
+const PAGE_SIZE = 8
 const TITLE_CHAR_LIMIT = 60
 const DESCRIPTION_CHAR_LIMIT = 160
 
@@ -124,29 +115,6 @@ export default function ProductsPage() {
     if (page > totalPages) {
       setPage(totalPages)
     }
-  }, [page, totalPages])
-
-  const paginationItems = useMemo<(number | "ellipsis")[]>(() => {
-    if (totalPages <= 5) {
-      return Array.from({ length: totalPages }, (_, index) => index + 1)
-    }
-
-    if (page <= 3) {
-      return [1, 2, 3, 4, "ellipsis", totalPages]
-    }
-
-    if (page >= totalPages - 2) {
-      return [
-        1,
-        "ellipsis",
-        totalPages - 3,
-        totalPages - 2,
-        totalPages - 1,
-        totalPages,
-      ]
-    }
-
-    return [1, "ellipsis", page - 1, page, page + 1, "ellipsis", totalPages]
   }, [page, totalPages])
 
   const handleCategoryChange = (value: string) => {
@@ -255,7 +223,7 @@ export default function ProductsPage() {
         ) : null}
 
         {isInitialProductsLoading ? (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {Array.from({ length: PAGE_SIZE }).map((_, index) => (
               <Card key={`product-skeleton-${index}`} className="flex h-full flex-col">
                 <CardHeader className="gap-2">
@@ -282,7 +250,7 @@ export default function ProductsPage() {
             No products found for the selected filters.
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {products.map((product) => {
               const shortenedTitle = shortenText(product.title, TITLE_CHAR_LIMIT)
               const shortenedDescription = shortenText(
@@ -357,62 +325,15 @@ export default function ProductsPage() {
                 </div>
               ) : null}
             </div>
-            <Pagination>
-              <PaginationContent>
-                <PaginationItem>
-                  <PaginationPrevious
-                    href="#"
-                    onClick={(event) => {
-                      event.preventDefault()
-                      if (canGoPrevious) {
-                        setPage((current) => Math.max(1, current - 1))
-                      }
-                    }}
-                    className={cn(
-                      !canGoPrevious && "pointer-events-none opacity-50",
-                    )}
-                    aria-disabled={!canGoPrevious}
-                  />
-                </PaginationItem>
-                {paginationItems.map((item, index) =>
-                  item === "ellipsis" ? (
-                    <PaginationItem key={`ellipsis-${index}`}>
-                      <PaginationEllipsis />
-                    </PaginationItem>
-                  ) : (
-                    <PaginationItem key={item}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(event) => {
-                          event.preventDefault()
-                          if (item !== page) {
-                            setPage(item)
-                          }
-                        }}
-                        isActive={item === page}
-                      >
-                        {item}
-                      </PaginationLink>
-                    </PaginationItem>
-                  ),
-                )}
-                <PaginationItem>
-                  <PaginationNext
-                    href="#"
-                    onClick={(event) => {
-                      event.preventDefault()
-                      if (canGoNext) {
-                        setPage((current) => current + 1)
-                      }
-                    }}
-                    className={cn(
-                      !canGoNext && "pointer-events-none opacity-50",
-                    )}
-                    aria-disabled={!canGoNext}
-                  />
-                </PaginationItem>
-              </PaginationContent>
-            </Pagination>
+            <PaginationControls
+              currentPage={page}
+              totalPages={totalPages}
+              canGoPrevious={canGoPrevious}
+              canGoNext={canGoNext}
+              onPageChange={(nextPage) => {
+                setPage(nextPage)
+              }}
+            />
           </div>
         ) : null}
       </section>
