@@ -359,8 +359,8 @@ export default function ProductDetailPage() {
 
   if (!normalizedProductId) {
     return (
-      <main className="min-h-screen bg-background">
-        <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
+      <main className="bg-background">
+        <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-6 px-6">
           <Button asChild variant="outline" className="w-fit">
             <Link to="/">← Back to products</Link>
           </Button>
@@ -448,8 +448,8 @@ export default function ProductDetailPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-6 py-12">
+    <main className="bg-background">
+      <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-6 px-6">
         <Button asChild variant="outline" className="w-fit">
           <Link to="/">← Back to products</Link>
         </Button>

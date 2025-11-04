@@ -12,7 +12,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-white text-sm text-slate-500">
+      <div className="flex min-h-with-header items-center justify-center bg-white text-sm text-slate-500">
         Checking session...
       </div>
     )

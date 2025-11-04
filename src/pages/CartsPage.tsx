@@ -48,8 +48,8 @@ export default function CartsPage() {
   const hasItems = cartItems.length > 0
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-6 py-12">
+    <main className="bg-background">
+      <section className="page-section mx-auto flex w-full max-w-5xl flex-col gap-6 px-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Your Cart

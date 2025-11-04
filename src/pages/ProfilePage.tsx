@@ -448,27 +448,31 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background">
-        <Spinner className="size-6 text-muted-foreground" />
+      <main className="bg-background">
+        <div className="page-section flex items-center justify-center px-6">
+          <Spinner className="size-6 text-muted-foreground" />
+        </div>
       </main>
     )
   }
 
   if (!user) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-background px-6">
-        <Card className="w-full max-w-xl">
-          <CardHeader>
-            <CardTitle>Profile unavailable</CardTitle>
-            <CardDescription>
-              We couldn't load your profile details. Please sign in again to
-              continue.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Button onClick={() => navigate("/login")}>Go to sign in</Button>
-          </CardContent>
-        </Card>
+      <main className="bg-background">
+        <div className="page-section flex items-center justify-center px-6">
+          <Card className="w-full max-w-xl">
+            <CardHeader>
+              <CardTitle>Profile unavailable</CardTitle>
+              <CardDescription>
+                We couldn't load your profile details. Please sign in again to
+                continue.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button onClick={() => navigate("/login")}>Go to sign in</Button>
+            </CardContent>
+          </Card>
+        </div>
       </main>
     )
   }
@@ -476,8 +480,8 @@ export default function ProfilePage() {
   const isAddressDialogOpen = Boolean(addressDialogState)
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto flex w-full max-w-4xl flex-col gap-8 px-6 py-12">
+    <main className="bg-background">
+      <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-8 px-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
             Profile

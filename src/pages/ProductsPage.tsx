@@ -200,8 +200,8 @@ export default function ProductsPage() {
   const formattedTotalCount = Math.max(0, Math.round(displayTotalCount))
 
   return (
-    <main className="min-h-screen bg-background">
-      <section className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-12">
+    <main className="bg-background">
+      <section className="page-section mx-auto flex w-full max-w-6xl flex-col gap-8 px-6">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div className="space-y-2">
             <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">

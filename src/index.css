@@ -42,6 +42,7 @@
 }
 
 :root {
+  --header-height: 4rem;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);
@@ -116,5 +117,37 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .min-h-with-header {
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  @supports (height: 100dvh) {
+    .min-h-with-header {
+      min-height: calc(100dvh - var(--header-height));
+    }
+  }
+
+  .page-section {
+    --page-section-block-padding: 3rem;
+    min-height: max(
+      0px,
+      calc(100vh - var(--header-height) - 2 * var(--page-section-block-padding))
+    );
+    padding-block: var(--page-section-block-padding);
+  }
+
+  @supports (height: 100dvh) {
+    .page-section {
+      min-height: max(
+        0px,
+        calc(
+          100dvh - var(--header-height) - 2 * var(--page-section-block-padding)
+        )
+      );
+    }
   }
 }
