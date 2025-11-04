@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useNavigate, useSearchParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
@@ -111,11 +111,27 @@ export default function ProductsPage() {
       selectedCategory
     : null
 
+  const scrollToTop = useCallback(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" })
+    }
+  }, [])
+
   useEffect(() => {
     if (page > totalPages) {
       setPage(totalPages)
     }
   }, [page, totalPages])
+
+  const hasScrolledInitialRef = useRef(false)
+
+  useEffect(() => {
+    if (!hasScrolledInitialRef.current) {
+      hasScrolledInitialRef.current = true
+      return
+    }
+    scrollToTop()
+  }, [page, scrollToTop])
 
   const handleCategoryChange = (value: string) => {
     setPage(1)
@@ -128,6 +144,7 @@ export default function ProductsPage() {
     }
 
     setSearchParams(nextParams, { replace: true })
+    scrollToTop()
   }
 
   const handleAddToCart = (productId: number, productTitle: string) => {

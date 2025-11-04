@@ -1,14 +1,8 @@
+import { env } from "@/config/env.ts"
+
 type QueryValue = string | number | boolean | null | undefined
 
-export const API_BASE_URL = (() => {
-  const value = import.meta.env.VITE_API_BASE_URL
-
-  if (!value) {
-    throw new Error("VITE_API_BASE_URL is not defined")
-  }
-
-  return value.endsWith("/") ? value : `${value}/`
-})()
+export const API_BASE_URL = env.apiBaseUrl as string
 
 export function buildApiUrl(
   path: string,
