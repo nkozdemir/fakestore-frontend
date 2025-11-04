@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from "react-router"
-import { type FieldErrors, type Resolver, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { CircleAlert } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
@@ -13,53 +13,20 @@ import {
 } from "@/components/ui/card.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { Label } from "@/components/ui/label.tsx"
+import UsernameField from "@/components/auth/UsernameField.tsx"
 import useAuth from "@/hooks/useAuth.ts"
+import { createZodResolver } from "@/lib/create-zod-resolver.ts"
+import { usernameRequiredSchema } from "@/lib/username-policy.ts"
 
 const loginSchema = z.object({
-  username: z
-    .string()
-    .min(1, "Username is required"),
+  username: usernameRequiredSchema,
   password: z
     .string()
     .nonempty("Password is required"),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
-
-const loginResolver: Resolver<LoginFormValues> = async (values) => {
-  const result = loginSchema.safeParse(values)
-
-  if (result.success) {
-    return {
-      values: result.data,
-      errors: {},
-    }
-  }
-
-  const fieldErrors = result.error.flatten()
-  const errors: FieldErrors<LoginFormValues> = {}
-
-  Object.entries(fieldErrors.fieldErrors).forEach(([key, messages]) => {
-    if (messages && messages.length > 0) {
-      errors[key as keyof LoginFormValues] = {
-        type: "manual",
-        message: messages[0],
-      }
-    }
-  })
-
-  if (fieldErrors.formErrors.length > 0) {
-    errors.root = {
-      type: "manual",
-      message: fieldErrors.formErrors[0],
-    }
-  }
-
-  return {
-    values: {},
-    errors,
-  }
-}
+const loginResolver = createZodResolver(loginSchema)
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -77,6 +44,8 @@ export default function LoginPage() {
     },
     resolver: loginResolver,
   })
+
+  const usernameRegistration = register("username")
 
   const from =
     (location.state as { from?: string } | null)?.from ?? "/"
@@ -114,21 +83,13 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
-            <div className="space-y-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                {...register("username")}
-                placeholder="Enter your username"
-                required
-                autoComplete="username"
-                aria-invalid={errors.username ? "true" : "false"}
-              />
-              {errors.username?.message && (
-                <p className="text-sm text-destructive">{errors.username.message}</p>
-              )}
-            </div>
+            <UsernameField
+              registration={usernameRegistration}
+              placeholder="Enter your username"
+              autoComplete="username"
+              required
+              error={errors.username?.message}
+            />
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input

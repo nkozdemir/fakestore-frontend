@@ -1,14 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
-import {
-  type FieldErrors,
-  type Resolver,
-  useForm,
-} from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
-  Check,
-  Circle,
   CircleAlert,
   Loader2,
   Pencil,
@@ -49,13 +43,16 @@ import { Label } from "@/components/ui/label.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { buildApiUrl } from "@/lib/api.ts"
+import { authorizationHeader } from "@/lib/auth-headers.ts"
+import {
+  PASSWORD_REGEX,
+  PASSWORD_REQUIREMENT_MESSAGE,
+} from "@/lib/password-policy.ts"
+import { createZodResolver } from "@/lib/create-zod-resolver.ts"
 import type { UserAddress } from "@/types/auth.ts"
-
-const usernameRule = z
-  .string()
-  .trim()
-  .min(4, "Username must be at least 4 characters.")
-  .regex(/^[A-Za-z0-9]+$/, "Username can only contain letters and numbers")
+import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
+import UsernameField from "@/components/auth/UsernameField.tsx"
+import { usernameStrictSchema } from "@/lib/username-policy.ts"
 
 const profileDetailsSchema = z.object({
   firstName: z
@@ -75,7 +72,7 @@ const profileDetailsSchema = z.object({
     .string()
     .trim()
     .optional(),
-  username: usernameRule,
+  username: usernameStrictSchema,
 })
 
 const addressSchema = z.object({
@@ -110,18 +107,12 @@ const addressSchema = z.object({
     .min(1, "Longitude is required."),
 })
 
-const passwordRequirement =
-  "Password must be at least 6 characters and include uppercase, lowercase, number, and special character."
-
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
-
 const passwordSchema = z
   .object({
     password: z
       .string()
-      .min(6, passwordRequirement)
-      .regex(passwordRegex, passwordRequirement),
+      .min(6, PASSWORD_REQUIREMENT_MESSAGE)
+      .regex(PASSWORD_REGEX, PASSWORD_REQUIREMENT_MESSAGE),
     confirmPassword: z
       .string()
       .min(1, "Please confirm your new password."),
@@ -138,48 +129,9 @@ type ProfileDetailsFormValues = z.infer<typeof profileDetailsSchema>
 type AddressFormValues = z.infer<typeof addressSchema>
 type PasswordFormValues = z.infer<typeof passwordSchema>
 
-function createResolver<TSchema extends z.ZodTypeAny>(
-  schema: TSchema,
-): Resolver<z.infer<TSchema>> {
-  return async (values) => {
-    const parsed = schema.safeParse(values)
-
-    if (parsed.success) {
-      return {
-        values: parsed.data,
-        errors: {},
-      }
-    }
-
-    const fieldErrors = parsed.error.flatten()
-    const errors: FieldErrors<z.infer<TSchema>> = {}
-
-    Object.entries(fieldErrors.fieldErrors).forEach(([key, value]) => {
-      if (value?.length) {
-        errors[key as keyof z.infer<TSchema>] = {
-          type: "manual",
-          message: value[0],
-        }
-      }
-    })
-
-    if (fieldErrors.formErrors.length) {
-      errors.root = {
-        type: "manual",
-        message: fieldErrors.formErrors[0],
-      }
-    }
-
-    return {
-      values: {},
-      errors,
-    }
-  }
-}
-
-const profileResolver = createResolver(profileDetailsSchema)
-const addressResolver = createResolver(addressSchema)
-const passwordResolver = createResolver(passwordSchema)
+const profileResolver = createZodResolver(profileDetailsSchema)
+const addressResolver = createZodResolver(addressSchema)
+const passwordResolver = createZodResolver(passwordSchema)
 
 type AddressDialogState =
   | {
@@ -259,7 +211,7 @@ export default function ProfilePage() {
       const response = await fetch(buildApiUrl(path), {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          ...authorizationHeader(accessToken),
           ...init.headers,
         },
         ...init,
@@ -894,22 +846,13 @@ function ProfileDetailsDialog({
                 </p>
               )}
             </div>
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="username">Username</Label>
-              <Input
-                id="username"
-                type="text"
-                {...register("username")}
-                autoComplete="username"
-                required
-                aria-invalid={errors.username ? "true" : "false"}
-              />
-              {errors.username?.message && (
-                <p className="text-sm text-destructive">
-                  {errors.username.message}
-                </p>
-              )}
-            </div>
+            <UsernameField
+              registration={register("username")}
+              autoComplete="username"
+              required
+              error={errors.username?.message}
+              containerClassName="space-y-2 sm:col-span-2"
+            />
           </div>
           {errors.root?.message && (
             <Alert variant="destructive">
@@ -1167,38 +1110,7 @@ function ChangePasswordDialog({
     }
   }, [open, reset])
 
-  const passwordValue = watch("password")
-  const passwordChecks = useMemo(
-    () => [
-      {
-        id: "length",
-        label: "At least 6 characters",
-        met: passwordValue.length >= 6,
-      },
-      {
-        id: "uppercase",
-        label: "Contains an uppercase letter (A-Z)",
-        met: /[A-Z]/.test(passwordValue),
-      },
-      {
-        id: "lowercase",
-        label: "Contains a lowercase letter (a-z)",
-        met: /[a-z]/.test(passwordValue),
-      },
-      {
-        id: "number",
-        label: "Contains a number (0-9)",
-        met: /\d/.test(passwordValue),
-      },
-      {
-        id: "special",
-        label: "Contains a special character (!@#$%^&*)",
-        met: /[^A-Za-z0-9]/.test(passwordValue),
-      },
-    ],
-    [passwordValue],
-  )
-
+  const passwordValue = watch("password") ?? ""
   const submitHandler = handleSubmit(async (values) => {
     try {
       await onSubmit(values)
@@ -1262,22 +1174,7 @@ function ChangePasswordDialog({
                 </p>
               )}
             </div>
-            <ul className="grid gap-1 text-sm">
-              {passwordChecks.map(({ id, label, met }) => (
-                <li key={id} className="flex items-center gap-2">
-                  {met ? (
-                    <Check className="size-4 text-emerald-600" aria-hidden />
-                  ) : (
-                    <Circle className="size-4 text-muted-foreground" aria-hidden />
-                  )}
-                  <span
-                    className={met ? "text-emerald-600" : "text-muted-foreground"}
-                  >
-                    {label}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <PasswordRequirements password={passwordValue} />
           </div>
           {errors.root?.message && (
             <Alert variant="destructive">

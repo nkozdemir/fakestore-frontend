@@ -1,8 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { Link, useLocation, useNavigate } from "react-router"
-import { type FieldErrors, type Resolver, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Check, Circle, CircleAlert, Loader2 } from "lucide-react"
+import { CircleAlert, Loader2 } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import {
@@ -14,31 +14,25 @@ import {
 } from "@/components/ui/card.tsx"
 import { Input } from "@/components/ui/input.tsx"
 import { Label } from "@/components/ui/label.tsx"
+import UsernameField, { type UsernameStatus } from "@/components/auth/UsernameField.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { fetchJson } from "@/lib/api.ts"
+import { PASSWORD_REGEX, PASSWORD_REQUIREMENT_MESSAGE } from "@/lib/password-policy.ts"
+import { usernameStrictSchema } from "@/lib/username-policy.ts"
+import { createZodResolver } from "@/lib/create-zod-resolver.ts"
+import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
 import type { UsernameAvailabilityResponse } from "@/types/auth.ts"
-import { Spinner } from "@/components/ui/spinner.tsx"
-
-const passwordRequirement =
-  "Password must be at least 6 characters and include uppercase, lowercase, number, and special character."
-
-const passwordRegex =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
 
 const registerSchema = z.object({
-  username: z
-    .string()
-    .min(1, "Username is required")
-    .regex(/^[A-Za-z0-9]+$/, "Username can only contain letters and numbers")
-    .min(4, "Username must be at least 4 characters"),
+  username: usernameStrictSchema,
   email: z
     .string()
     .min(1, "Email is required")
     .email("Enter a valid email address"),
   password: z
     .string()
-    .min(6, passwordRequirement)
-    .regex(passwordRegex, passwordRequirement),
+    .min(6, PASSWORD_REQUIREMENT_MESSAGE)
+    .regex(PASSWORD_REGEX, PASSWORD_REQUIREMENT_MESSAGE),
   firstName: z
     .string()
     .min(1, "First name is required"),
@@ -49,42 +43,7 @@ const registerSchema = z.object({
 
 type RegisterFormValues = z.infer<typeof registerSchema>
 
-const registerResolver: Resolver<RegisterFormValues> = async (values) => {
-  const result = registerSchema.safeParse(values)
-
-  if (result.success) {
-    return {
-      values: result.data,
-      errors: {},
-    }
-  }
-
-  const fieldErrors = result.error.flatten()
-  const errors: FieldErrors<RegisterFormValues> = {}
-
-  Object.entries(fieldErrors.fieldErrors).forEach(([key, messages]) => {
-    if (messages && messages.length > 0) {
-      errors[key as keyof RegisterFormValues] = {
-        type: "manual",
-        message: messages[0],
-      }
-    }
-  })
-
-  if (fieldErrors.formErrors.length > 0) {
-    errors.root = {
-      type: "manual",
-      message: fieldErrors.formErrors[0],
-    }
-  }
-
-  return {
-    values: {},
-    errors,
-  }
-}
-
-type UsernameStatus = "idle" | "checking" | "available" | "unavailable" | "error"
+const registerResolver = createZodResolver(registerSchema)
 
 export default function RegisterPage() {
   const navigate = useNavigate()
@@ -119,37 +78,6 @@ export default function RegisterPage() {
   }, [])
 
   const passwordValue = watch("password") ?? ""
-
-  const passwordChecks = useMemo(
-    () => [
-      {
-        id: "length",
-        label: "At least 6 characters",
-        met: passwordValue.length >= 6,
-      },
-      {
-        id: "uppercase",
-        label: "Contains an uppercase letter (A-Z)",
-        met: /[A-Z]/.test(passwordValue),
-      },
-      {
-        id: "lowercase",
-        label: "Contains a lowercase letter (a-z)",
-        met: /[a-z]/.test(passwordValue),
-      },
-      {
-        id: "number",
-        label: "Contains a number (0-9)",
-        met: /\d/.test(passwordValue),
-      },
-      {
-        id: "special",
-        label: "Contains a special character (!@#$%^&*)",
-        met: /[^A-Za-z0-9]/.test(passwordValue),
-      },
-    ],
-    [passwordValue],
-  )
 
   const checkUsernameAvailability = useCallback(async () => {
     const trimmed = getValues("username").trim()
@@ -263,43 +191,22 @@ export default function RegisterPage() {
         <CardContent>
           <form className="grid gap-6" onSubmit={handleSubmit(onSubmit)} noValidate>
             <div className="grid gap-4 md:grid-cols-2">
-              <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="username">Username</Label>
-                <div className="relative">
-                  <Input
-                    id="username"
-                    type="text"
-                    {...usernameField}
-                    placeholder="Choose a unique username"
-                    autoComplete="username"
-                    aria-invalid={errors.username ? "true" : "false"}
-                    required
-                    className={usernameStatus === "checking" ? "pr-10" : undefined}
-                  />
-                  {usernameStatus === "checking" && (
-                    <Spinner className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  )}
-                </div>
-                <div className="mt-1 text-xs">
-                  {usernameStatus === "checking" && (
-                    <span className="text-muted-foreground">
-                      Checking availability...
-                    </span>
-                  )}
-                  {usernameStatus === "available" && !errors.username && (
-                    <span className="text-emerald-600">Username available</span>
-                  )}
-                  {usernameStatus === "unavailable" && !errors.username && (
-                    <span className="text-destructive">Username is already taken</span>
-                  )}
-                  {usernameStatus === "error" && (
-                    <span className="text-destructive">Couldn't verify username</span>
-                  )}
-                </div>
-                {errors.username?.message && (
-                  <p className="text-xs text-destructive">{errors.username.message}</p>
-                )}
-              </div>
+              <UsernameField
+                registration={usernameField}
+                placeholder="Choose a unique username"
+                autoComplete="username"
+                required
+                status={usernameStatus}
+                error={errors.username?.message}
+                statusMessages={{
+                  checking: "Checking availability...",
+                  available: "Username available",
+                  unavailable: "Username is already taken",
+                  error: "Couldn't verify username",
+                }}
+                errorClassName="text-xs"
+                containerClassName="space-y-2 md:col-span-2"
+              />
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -330,22 +237,12 @@ export default function RegisterPage() {
                   <p className="text-xs text-muted-foreground">
                     Your password must meet all the requirements below.
                   </p>
-                  <ul className="grid gap-1 text-xs">
-                    {passwordChecks.map(({ id, label, met }) => (
-                      <li key={id} className="flex items-center gap-2">
-                        {met ? (
-                          <Check className="size-3 text-emerald-600" aria-hidden />
-                        ) : (
-                          <Circle className="size-3 text-muted-foreground" aria-hidden />
-                        )}
-                        <span
-                          className={met ? "text-emerald-600" : "text-muted-foreground"}
-                        >
-                          {label}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                  <PasswordRequirements
+                    password={passwordValue}
+                    className="grid gap-1 text-xs"
+                    metIconClassName="size-3"
+                    unmetIconClassName="size-3"
+                  />
                 </div>
                 {errors.password?.message && (
                   <p className="text-sm text-destructive">

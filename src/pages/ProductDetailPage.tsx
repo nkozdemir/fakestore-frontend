@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from "@/components/ui/card.tsx"
 import { fetchJson } from "@/lib/api.ts"
+import { authorizationHeader } from "@/lib/auth-headers.ts"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import type {
   Product,
@@ -81,7 +82,7 @@ export default function ProductDetailPage() {
       return fetchJson<RatingSummary>(`products/${normalizedProductId}/rating/`, {
         init: {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            ...authorizationHeader(accessToken),
           },
         },
       })
@@ -117,7 +118,7 @@ export default function ProductDetailPage() {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                Authorization: `Bearer ${accessToken}`,
+                ...authorizationHeader(accessToken),
               },
               body: JSON.stringify({ value }),
             },
@@ -197,7 +198,7 @@ export default function ProductDetailPage() {
             init: {
               method: "DELETE",
               headers: {
-                Authorization: `Bearer ${accessToken}`,
+                ...authorizationHeader(accessToken),
               },
             },
           },

@@ -7,13 +7,10 @@ import {
 } from "@tanstack/react-query"
 import { buildApiUrl, fetchJson } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
+import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
 import type { Cart, CartPatchPayload } from "@/types/cart.ts"
 
 const cartQueryKey = (userId?: number): QueryKey => ["cart", userId ?? "guest"]
-
-function createAuthorizationHeader(token: string | null) {
-  return token ? { Authorization: `Bearer ${token}` } : {}
-}
 
 export default function useCart() {
   const { user, accessToken, isAuthenticated } = useAuth()
@@ -32,7 +29,7 @@ export default function useCart() {
       },
       init: {
         headers: {
-          ...createAuthorizationHeader(accessToken),
+          ...optionalAuthorizationHeader(accessToken),
         },
       },
     })
@@ -84,7 +81,7 @@ export default function useCart() {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
-          ...createAuthorizationHeader(accessToken),
+          ...optionalAuthorizationHeader(accessToken),
         },
         body: JSON.stringify(payload satisfies CartPatchPayload),
       })

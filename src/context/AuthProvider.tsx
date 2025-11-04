@@ -15,6 +15,7 @@ import {
   storeTokens,
 } from "@/lib/auth-storage.ts"
 import { getJwtExpiry } from "@/lib/jwt.ts"
+import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type {
   AuthMeResponse,
   AuthTokens,
@@ -28,10 +29,6 @@ type AuthProviderProps = {
   children: ReactNode
 }
 
-const AUTH_HEADERS = (accessToken: string) => ({
-  Authorization: `Bearer ${accessToken}`,
-})
-
 const REFRESH_LEEWAY_MS = 60_000
 const MIN_EXPIRY_BUFFER_MS = 5_000
 const MIN_REFRESH_INTERVAL_MS = 1_000
@@ -40,7 +37,7 @@ const FALLBACK_REFRESH_INTERVAL_MS = 5 * 60_000
 async function fetchAuthenticatedUser(accessToken: string): Promise<AuthUser> {
   const me = await fetchJson<AuthMeResponse>("/auth/me/", {
     init: {
-      headers: AUTH_HEADERS(accessToken),
+      headers: authorizationHeader(accessToken),
     },
   })
 
@@ -49,7 +46,7 @@ async function fetchAuthenticatedUser(accessToken: string): Promise<AuthUser> {
   try {
     profile = await fetchJson<UserProfileResponse>(`/users/${me.id}/`, {
       init: {
-        headers: AUTH_HEADERS(accessToken),
+        headers: authorizationHeader(accessToken),
       },
     })
   } catch (error) {
