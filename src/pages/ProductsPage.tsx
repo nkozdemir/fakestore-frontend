@@ -248,7 +248,9 @@ export default function ProductsPage() {
                   <Skeleton className="h-4 w-1/2" />
                 </CardHeader>
                 <CardContent className="flex flex-1 flex-col gap-4">
-                  <Skeleton className="h-60 w-full" />
+                  <div className="flex h-60 items-center justify-center overflow-hidden rounded-lg border bg-muted/10">
+                    <Skeleton className="h-52 w-52" />
+                  </div>
                   <Skeleton className="h-16 w-full" />
                 </CardContent>
                 <CardFooter className="mt-auto flex items-center justify-between gap-4">
@@ -294,14 +296,14 @@ export default function ProductsPage() {
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="flex flex-1 flex-col gap-4">
-                      <div className="overflow-hidden rounded-lg border bg-muted/20">
-                        <img
-                          alt={product.title}
-                          src={product.image}
-                          className="h-60 w-full object-cover transition duration-200 group-hover:scale-[1.02]"
-                          loading="lazy"
-                        />
-                      </div>
+                    <div className="flex h-60 items-center justify-center overflow-hidden rounded-lg border bg-muted/10">
+                      <img
+                        alt={product.title}
+                        src={product.image}
+                        className="max-h-full max-w-full object-contain transition duration-200 group-hover:scale-[1.02]"
+                        loading="lazy"
+                      />
+                    </div>
                       <p
                         className="text-sm text-muted-foreground"
                         title={product.description}
