@@ -1,0 +1,206 @@
+import { useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { toast } from "sonner"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog.tsx"
+import { Label } from "@/components/ui/label.tsx"
+import { Input } from "@/components/ui/input.tsx"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
+import { Button } from "@/components/ui/button.tsx"
+import { Loader2, CircleAlert } from "lucide-react"
+import {
+  type AddressFormValues,
+  addressResolver,
+} from "@/lib/profile-schemas.ts"
+
+type AddressDialogProps = {
+  open: boolean
+  mode: "create" | "edit"
+  initialValues: AddressFormValues
+  onOpenChange: (open: boolean) => void
+  onSubmit: (values: AddressFormValues) => Promise<void>
+}
+
+export default function AddressDialog({
+  open,
+  mode,
+  initialValues,
+  onOpenChange,
+  onSubmit,
+}: AddressDialogProps) {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+    setError,
+  } = useForm<AddressFormValues>({
+    defaultValues: initialValues,
+    resolver: addressResolver,
+  })
+
+  useEffect(() => {
+    if (open) {
+      reset(initialValues)
+    }
+  }, [initialValues, open, reset])
+
+  const submitHandler = handleSubmit(async (values) => {
+    try {
+      await onSubmit(values)
+    } catch (error) {
+      const message =
+        error instanceof Error
+          ? error.message
+          : "We couldn't save that address right now. Please try again."
+      setError("root", {
+        type: "server",
+        message,
+      })
+      toast.error(message)
+    }
+  })
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent>
+        <form className="space-y-6" onSubmit={submitHandler} noValidate>
+          <DialogHeader>
+            <DialogTitle>
+              {mode === "edit" ? "Edit address" : "Add new address"}
+            </DialogTitle>
+            <DialogDescription>
+              Provide the full address details. All fields are required.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="street">Street</Label>
+              <Input
+                id="street"
+                type="text"
+                {...register("street")}
+                required
+                aria-invalid={errors.street ? "true" : "false"}
+              />
+              {errors.street?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.street.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="number">Number</Label>
+              <Input
+                id="number"
+                type="text"
+                inputMode="numeric"
+                {...register("number")}
+                required
+                aria-invalid={errors.number ? "true" : "false"}
+              />
+              {errors.number?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.number.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="city">City</Label>
+              <Input
+                id="city"
+                type="text"
+                {...register("city")}
+                required
+                aria-invalid={errors.city ? "true" : "false"}
+              />
+              {errors.city?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.city.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="zipcode">ZIP code</Label>
+              <Input
+                id="zipcode"
+                type="text"
+                {...register("zipcode")}
+                required
+                aria-invalid={errors.zipcode ? "true" : "false"}
+              />
+              {errors.zipcode?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.zipcode.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="latitude">Latitude</Label>
+              <Input
+                id="latitude"
+                type="text"
+                {...register("latitude")}
+                required
+                aria-invalid={errors.latitude ? "true" : "false"}
+              />
+              {errors.latitude?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.latitude.message}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="longitude">Longitude</Label>
+              <Input
+                id="longitude"
+                type="text"
+                {...register("longitude")}
+                required
+                aria-invalid={errors.longitude ? "true" : "false"}
+              />
+              {errors.longitude?.message && (
+                <p className="text-sm text-destructive">
+                  {errors.longitude.message}
+                </p>
+              )}
+            </div>
+          </div>
+          {errors.root?.message && (
+            <Alert variant="destructive">
+              <CircleAlert className="size-5" aria-hidden />
+              <AlertTitle>Address update failed</AlertTitle>
+              <AlertDescription>{errors.root.message}</AlertDescription>
+            </Alert>
+          )}
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
+                  Saving...
+                </>
+              ) : (
+                mode === "edit" ? "Update address" : "Add address"
+              )}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
