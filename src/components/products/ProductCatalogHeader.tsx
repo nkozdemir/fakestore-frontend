@@ -1,0 +1,56 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select.tsx"
+import type { Category } from "@/types/catalog.ts"
+
+export type ProductCatalogHeaderProps = {
+  categories: Category[]
+  selectedCategoryValue: string
+  onCategoryChange: (value: string) => void
+  isLoadingCategories: boolean
+}
+
+export default function ProductCatalogHeader({
+  categories,
+  selectedCategoryValue,
+  onCategoryChange,
+  isLoadingCategories,
+}: ProductCatalogHeaderProps) {
+  return (
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
+          Products
+        </h1>
+        <p className="text-muted-foreground">
+          Discover curated picks from our Fakestore catalog.
+        </p>
+      </div>
+      <Select
+        value={selectedCategoryValue}
+        onValueChange={onCategoryChange}
+        disabled={isLoadingCategories}
+      >
+        <SelectTrigger className="w-full sm:w-64">
+          <SelectValue
+            placeholder={
+              isLoadingCategories ? "Loading categories..." : "All categories"
+            }
+          />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All categories</SelectItem>
+          {categories.map((category) => (
+            <SelectItem key={category.id} value={category.name}>
+              {category.name}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </header>
+  )
+}
