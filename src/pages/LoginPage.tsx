@@ -11,7 +11,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card.tsx"
-import { Input } from "@/components/ui/input.tsx"
+import PasswordInput from "@/components/ui/password-input.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import UsernameField from "@/components/auth/UsernameField.tsx"
 import useAuth from "@/hooks/useAuth.ts"
@@ -92,9 +92,8 @@ export default function LoginPage() {
             />
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
-                type="password"
                 {...register("password")}
                 placeholder="Enter your password"
                 required

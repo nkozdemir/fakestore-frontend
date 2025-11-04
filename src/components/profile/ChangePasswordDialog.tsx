@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog.tsx"
 import { Label } from "@/components/ui/label.tsx"
-import { Input } from "@/components/ui/input.tsx"
+import PasswordInput from "@/components/ui/password-input.tsx"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
@@ -89,9 +89,8 @@ export default function ChangePasswordDialog({
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-password">New password</Label>
-              <Input
+              <PasswordInput
                 id="new-password"
-                type="password"
                 {...register("password")}
                 autoComplete="new-password"
                 required
@@ -105,9 +104,8 @@ export default function ChangePasswordDialog({
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm-password">Confirm password</Label>
-              <Input
+              <PasswordInput
                 id="confirm-password"
-                type="password"
                 {...register("confirmPassword")}
                 autoComplete="new-password"
                 required
