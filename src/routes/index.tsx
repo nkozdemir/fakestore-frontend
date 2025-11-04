@@ -6,6 +6,7 @@ import ProductDetailPage from "@/pages/ProductDetailPage.tsx"
 import ProductsPage from "@/pages/ProductsPage.tsx"
 import CartsPage from "@/pages/CartsPage.tsx"
 import ProfilePage from "@/pages/ProfilePage.tsx"
+import GuestRoute from "@/components/routing/GuestRoute.tsx"
 
 export type AppRoute = {
   path: string
@@ -19,11 +20,19 @@ export const publicRoutes: AppRoute[] = [
   },
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <GuestRoute>
+        <LoginPage />
+      </GuestRoute>
+    ),
   },
   {
     path: "/register",
-    element: <RegisterPage />,
+    element: (
+      <GuestRoute>
+        <RegisterPage />
+      </GuestRoute>
+    ),
   },
   {
     path: "/products/:productId",
