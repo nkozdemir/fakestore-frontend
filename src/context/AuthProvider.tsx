@@ -8,7 +8,13 @@ import {
 } from "react"
 import { useNavigate } from "react-router"
 import { AuthContext } from "@/context/auth-context.ts"
-import { buildApiUrl, fetchJson } from "@/lib/api.ts"
+import {
+  ApiError,
+  buildApiUrl,
+  fetchJson,
+  formatApiErrorMessage,
+  parseApiError,
+} from "@/lib/api.ts"
 import {
   clearStoredTokens,
   readStoredTokens,
@@ -114,26 +120,25 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     isRefreshingRef.current = true
 
     try {
-      const response = await fetch(buildApiUrl("/auth/refresh/"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const refreshResponse = await fetchJson<{ access?: unknown }>(
+        "/auth/refresh/",
+        {
+          init: {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ refresh: refreshToken }),
+          },
         },
-        body: JSON.stringify({ refresh: refreshToken }),
-      })
+      )
 
-      if (!response.ok) {
-        throw new Error(`Refresh failed with status ${response.status}`)
-      }
-
-      const parsedBody = (await response.json()) as { access?: unknown }
-
-      if (typeof parsedBody.access !== "string") {
+      if (typeof refreshResponse.access !== "string") {
         throw new Error("Refresh response missing access token")
       }
 
       const updatedTokens: AuthTokens = {
-        access: parsedBody.access,
+        access: refreshResponse.access,
         refresh: refreshToken,
       }
 
@@ -239,58 +244,62 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const login = useCallback(
     async (credentials: LoginCredentials) => {
-      const response = await fetch(buildApiUrl("/auth/login/"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(credentials),
-      })
+      const invalidCredentialsMessage =
+        "We couldn’t match that username and password. Double-check your details and try again."
+      const throttledMessage =
+        "Too many sign-in attempts. Please wait a moment and try again."
+      const defaultMessage =
+        "We ran into a problem while signing you in. Please try again in a few moments."
 
-      let parsedBody: unknown = null
+      let tokens: Partial<AuthTokens> | null = null
 
       try {
-        parsedBody = await response.json()
-      } catch {
-        parsedBody = null
-      }
-
-      if (!response.ok) {
-        const detail =
-          typeof parsedBody === "object" &&
-          parsedBody !== null &&
-          "detail" in parsedBody &&
-          typeof (parsedBody as { detail: unknown }).detail === "string"
-            ? (parsedBody as { detail: string }).detail
-            : null
-
-        console.warn("Login attempt failed", {
-          status: response.status,
-          detail,
+        tokens = await fetchJson<Partial<AuthTokens>>("/auth/login/", {
+          init: {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(credentials),
+          },
         })
+      } catch (error) {
+        if (error instanceof ApiError) {
+          if (error.code === "TOO_MANY_REQUESTS" || error.status === 429) {
+            throw new Error(
+              formatApiErrorMessage(error, throttledMessage, [
+                "Request was throttled",
+              ]),
+            )
+          }
 
-        let friendlyMessage: string
+          if (
+            ["VALIDATION_ERROR", "UNAUTHORIZED", "FORBIDDEN"].includes(
+              error.code,
+            ) ||
+            [400, 401, 403].includes(error.status)
+          ) {
+            throw new Error(
+              formatApiErrorMessage(error, invalidCredentialsMessage, [
+                "Validation failed",
+                "Authentication required",
+                "You do not have permission to perform this action",
+              ]),
+            )
+          }
 
-        switch (response.status) {
-          case 400:
-          case 401:
-          case 403:
-            friendlyMessage =
-              "We couldn’t match that username and password. Double-check your details and try again."
-            break
-          case 429:
-            friendlyMessage =
-              "Too many sign-in attempts. Please wait a moment and try again."
-            break
-          default:
-            friendlyMessage =
-              "We ran into a problem while signing you in. Please try again in a few moments."
+          throw new Error(
+            formatApiErrorMessage(error, defaultMessage, ["Request failed"]),
+          )
         }
 
-        throw new Error(friendlyMessage)
-      }
+        const message =
+          error instanceof Error && error.message.trim().length > 0
+            ? error.message
+            : defaultMessage
 
-      const tokens = parsedBody as Partial<AuthTokens> | null
+        throw new Error(message)
+      }
 
       if (
         !tokens ||
@@ -325,45 +334,45 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const register = useCallback(
     async (payload: RegisterPayload) => {
-      const response = await fetch(buildApiUrl("/auth/register/"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: payload.username,
-          email: payload.email,
-          password: payload.password,
-          first_name: payload.firstName,
-          last_name: payload.lastName,
-        }),
-      })
-
-      let parsedBody: unknown = null
+      let response: Response
 
       try {
-        parsedBody = await response.json()
-      } catch {
-        parsedBody = null
+        response = await fetch(buildApiUrl("/auth/register/"), {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            username: payload.username,
+            email: payload.email,
+            password: payload.password,
+            first_name: payload.firstName,
+            last_name: payload.lastName,
+          }),
+        })
+      } catch (networkError) {
+        const fallbackMessage =
+          "We ran into a problem while creating your account. Please try again in a few moments."
+        throw new Error(
+          networkError instanceof Error && networkError.message.trim().length > 0
+            ? networkError.message
+            : fallbackMessage,
+        )
       }
 
       if (!response.ok) {
-        const detail =
-          typeof parsedBody === "object" &&
-          parsedBody !== null &&
-          "detail" in parsedBody &&
-          typeof (parsedBody as { detail: unknown }).detail === "string"
-            ? (parsedBody as { detail: string }).detail
-            : null
-
+        const apiError = await parseApiError(response)
         const fallbackMessage =
-          response.status === 400
+          apiError.status === 400
             ? "We couldn’t create your account with those details. Please review the form and try again."
             : "We ran into a problem while creating your account. Please try again in a few moments."
 
-        const friendlyMessage = detail ?? fallbackMessage
-
-        throw new Error(friendlyMessage)
+        throw new Error(
+          formatApiErrorMessage(apiError, fallbackMessage, [
+            "Validation failed",
+            "Request failed",
+          ]),
+        )
       }
 
       try {

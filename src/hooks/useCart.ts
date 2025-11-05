@@ -5,19 +5,22 @@ import {
   useQueryClient,
   type QueryKey,
 } from "@tanstack/react-query"
-import { buildApiUrl, fetchJson } from "@/lib/api.ts"
+import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
 import type { Cart, CartPatchPayload } from "@/types/cart.ts"
 
 const cartQueryKey = (userId?: number): QueryKey => ["cart", userId ?? "guest"]
 
+const cartUpdateFallbackMessage = "Failed to update cart. Please try again."
+const cartValidationMessage =
+  "We couldn’t apply those cart changes. Please review and try again."
+
 export default function useCart() {
   const { user, accessToken, isAuthenticated } = useAuth()
   const queryClient = useQueryClient()
 
   const userId = user?.id
-
   const fetchCart = useCallback(async (): Promise<Cart> => {
     if (!userId || !accessToken) {
       throw new Error("You need to be signed in to access the cart.")
@@ -77,32 +80,32 @@ export default function useCart() {
 
       const cart = await ensureCartData()
 
-      const response = await fetch(buildApiUrl(`carts/${cart.id}/`), {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          ...optionalAuthorizationHeader(accessToken),
-        },
-        body: JSON.stringify(payload satisfies CartPatchPayload),
-      })
+      try {
+        const updatedCart = await fetchJson<Cart>(`carts/${cart.id}/`, {
+          init: {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              ...optionalAuthorizationHeader(accessToken),
+            },
+            body: JSON.stringify(payload satisfies CartPatchPayload),
+          },
+        })
 
-      if (!response.ok) {
-        const detail = await response.text().catch(() => "")
-        throw new Error(
-          detail
-            ? `Failed to update cart: ${detail}`
-            : "Failed to update cart. Please try again.",
-        )
+        const normalizedCart: Cart = {
+          ...updatedCart,
+          items: Array.isArray(updatedCart.items) ? updatedCart.items : [],
+        }
+
+        return normalizedCart
+      } catch (mutationError) {
+        throw toFriendlyError(mutationError, {
+          fallback: cartUpdateFallbackMessage,
+          codeMessages: {
+            VALIDATION_ERROR: cartValidationMessage,
+          },
+        })
       }
-
-      const updatedCart = (await response.json()) as Cart
-
-      const normalizedCart: Cart = {
-        ...updatedCart,
-        items: Array.isArray(updatedCart.items) ? updatedCart.items : [],
-      }
-
-      return normalizedCart
     },
     onSuccess: (updatedCart) => {
       queryClient.setQueryData(cartQueryKey(userId), updatedCart)

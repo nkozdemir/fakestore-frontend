@@ -1,12 +1,31 @@
 import { useMemo } from "react"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { fetchJson } from "@/lib/api.ts"
+import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type { Product, ProductRatingsList, RatingSummary } from "@/types/catalog.ts"
 import type { AuthUser } from "@/types/auth.ts"
 
 export const PRODUCT_RATING_VALUES = [1, 2, 3, 4, 5] as const
+
+const RATING_GENERIC_MESSAGES = [
+  "Authentication required",
+  "You do not have permission to perform this action",
+] as const
+
+const SAVE_RATING_FALLBACK_MESSAGE =
+  "We couldn't save your rating. Please try again."
+const SAVE_RATING_CODE_MESSAGES: Partial<Record<string, string>> = {
+  FORBIDDEN: "You do not have permission to rate this product.",
+  UNAUTHORIZED: "You need to sign in again to rate this product.",
+}
+
+const REMOVE_RATING_FALLBACK_MESSAGE =
+  "We couldn't remove your rating. Please try again."
+const REMOVE_RATING_CODE_MESSAGES: Partial<Record<string, string>> = {
+  ...SAVE_RATING_CODE_MESSAGES,
+  NOT_FOUND: "We couldn't find that rating to remove.",
+}
 
 type UseProductRatingsParams = {
   productId: string
@@ -134,17 +153,11 @@ export function useProductRatings({
           },
         })
       } catch (mutationError) {
-        if (mutationError instanceof Error) {
-          const message = mutationError.message.includes("403")
-            ? "You do not have permission to rate this product."
-            : mutationError.message.includes("401")
-              ? "You need to sign in again to rate this product."
-              : "We couldn't save your rating. Please try again."
-
-          throw new Error(message)
-        }
-
-        throw mutationError
+        throw toFriendlyError(mutationError, {
+          fallback: SAVE_RATING_FALLBACK_MESSAGE,
+          codeMessages: SAVE_RATING_CODE_MESSAGES,
+          genericMessages: [...RATING_GENERIC_MESSAGES],
+        })
       }
     },
     onSuccess: (updatedSummary, value) => {
@@ -210,17 +223,11 @@ export function useProductRatings({
           },
         })
       } catch (mutationError) {
-        if (mutationError instanceof Error) {
-          const message = mutationError.message.includes("404")
-            ? "We couldn't find that rating to remove."
-            : mutationError.message.includes("401")
-              ? "You need to sign in again to update your rating."
-              : "We couldn't remove your rating. Please try again."
-
-          throw new Error(message)
-        }
-
-        throw mutationError
+        throw toFriendlyError(mutationError, {
+          fallback: REMOVE_RATING_FALLBACK_MESSAGE,
+          codeMessages: REMOVE_RATING_CODE_MESSAGES,
+          genericMessages: [...RATING_GENERIC_MESSAGES],
+        })
       }
     },
     onSuccess: (updatedSummary) => {

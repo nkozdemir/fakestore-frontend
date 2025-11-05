@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import useAuth from "@/hooks/useAuth.ts"
-import { buildApiUrl } from "@/lib/api.ts"
+import { buildApiUrl, formatApiErrorMessage, parseApiError } from "@/lib/api.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type { UserAddress } from "@/types/auth.ts"
 import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard.tsx"
@@ -102,38 +102,49 @@ export default function ProfilePage() {
         throw new Error("You must be signed in to perform this action.")
       }
 
-      const response = await fetch(buildApiUrl(path), {
-        headers: {
-          "Content-Type": "application/json",
-          ...authorizationHeader(accessToken),
-          ...init.headers,
-        },
-        ...init,
-      })
+      const defaultErrorMessage =
+        "We couldn't complete that request right now. Please try again."
 
-      let parsedBody: unknown = null
+      let response: Response
+
       try {
-        parsedBody = await response.json()
-      } catch {
-        parsedBody = null
-      }
-
-      if (!response.ok) {
-        const detail =
-          parsedBody &&
-          typeof parsedBody === "object" &&
-          "detail" in parsedBody &&
-          typeof (parsedBody as { detail: unknown }).detail === "string"
-            ? (parsedBody as { detail: string }).detail
-            : null
-
+        response = await fetch(buildApiUrl(path), {
+          headers: {
+            "Content-Type": "application/json",
+            ...authorizationHeader(accessToken),
+            ...init.headers,
+          },
+          ...init,
+        })
+      } catch (networkError) {
         throw new Error(
-          detail ??
-            "We couldn't complete that request right now. Please try again.",
+          networkError instanceof Error && networkError.message.trim().length > 0
+            ? networkError.message
+            : defaultErrorMessage,
         )
       }
 
-      return parsedBody
+      if (!response.ok) {
+        const apiError = await parseApiError(response)
+        throw new Error(
+          formatApiErrorMessage(apiError, defaultErrorMessage, [
+            "Validation failed",
+            "Request failed",
+          ]),
+        )
+      }
+
+      const rawText = await response.text().catch(() => "")
+
+      if (!rawText) {
+        return null
+      }
+
+      try {
+        return JSON.parse(rawText)
+      } catch {
+        return null
+      }
     },
     [accessToken],
   )
