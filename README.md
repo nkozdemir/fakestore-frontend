@@ -33,6 +33,17 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
    ```
    The app defaults to `http://localhost:5173`.
 
+## Docker
+- Build the production image (inject your API base URL so Vite can inline it):
+  ```bash
+  docker build --build-arg VITE_API_BASE_URL=http://localhost:8000/api/ -t fakestore-frontend .
+  ```
+- Run the container (served by nginx on port 80):
+  ```bash
+  docker run -p 8080:80 fakestore-frontend
+  ```
+  Replace `8080` with any host port you prefer. Rebuild the image whenever the API URL changes because the value is compiled into the static bundle.
+
 ## Available scripts
 - `npm run dev` — start the development server with hot module replacement.
 - `npm run lint` — run ESLint across the project.
