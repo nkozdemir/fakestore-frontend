@@ -2,7 +2,8 @@ import { useMemo, useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { Link, NavLink, useNavigate } from "react-router"
 import { ModeToggle } from "@/components/mode-toggle.tsx"
-import { Button, buttonVariants } from "@/components/ui/button.tsx"
+import { Button } from "@/components/ui/button.tsx"
+import { buttonVariants } from "@/components/ui/button-variants.ts"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ import useAuth from "@/hooks/useAuth.ts"
 
 const navItems = [
   { label: "Products", to: "/", end: true },
-  { label: "Cart", to: "/carts" },
+  { label: "Cart", to: "/carts", end: false },
 ] as const
 
 export default function SiteHeader() {

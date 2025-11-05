@@ -14,11 +14,18 @@ export function useProductCatalog({
   page,
   selectedCategory,
 }: UseProductCatalogParams) {
-  const productsQuery = useQuery<ProductResponse, Error>({
-    queryKey: [
-      "products",
-      { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory },
-    ],
+  const productQueryKey = [
+    "products",
+    { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory },
+  ] as const
+
+  const productsQuery = useQuery<
+    ProductResponse,
+    Error,
+    ProductResponse,
+    typeof productQueryKey
+  >({
+    queryKey: productQueryKey,
     queryFn: () =>
       fetchJson<ProductResponse>("products/", {
         params: {
@@ -27,7 +34,8 @@ export function useProductCatalog({
           category: selectedCategory ?? undefined,
         },
       }),
-    keepPreviousData: true,
+    placeholderData: (previousData): ProductResponse | undefined =>
+      previousData ?? undefined,
   })
 
   const categoriesQuery = useQuery<Category[], Error>({

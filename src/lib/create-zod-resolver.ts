@@ -1,12 +1,19 @@
-import type { Resolver, FieldErrors } from "react-hook-form"
+import type {
+  FieldError,
+  FieldErrors,
+  FieldValues,
+  Resolver,
+} from "react-hook-form"
 import type { z } from "zod"
 
-export function createZodResolver<TSchema extends z.ZodTypeAny>(
-  schema: TSchema,
-): Resolver<z.infer<TSchema>> {
-  return async (values) => {
-    const result = schema.safeParse(values)
+export function createZodResolver<TFieldValues extends FieldValues>(
+  schema: z.Schema<TFieldValues>,
+): Resolver<TFieldValues> {
+  return async (values, context, options) => {
+    void context
+    void options
 
+    const result = await schema.safeParseAsync(values)
     if (result.success) {
       return {
         values: result.data,
@@ -14,27 +21,30 @@ export function createZodResolver<TSchema extends z.ZodTypeAny>(
       }
     }
 
-    const fieldErrors = result.error.flatten()
-    const errors: FieldErrors<z.infer<TSchema>> = {}
+    const {
+      fieldErrors: flattenedFieldErrors,
+      formErrors,
+    } = result.error.flatten()
+    const errors: FieldErrors<TFieldValues> = {}
 
-    Object.entries(fieldErrors.fieldErrors).forEach(([key, messages]) => {
-      if (messages?.length) {
-        errors[key as keyof z.infer<TSchema>] = {
+    Object.entries(flattenedFieldErrors).forEach(([rawKey, messages]) => {
+      if (messages && messages.length > 0) {
+        ;(errors as Record<string, FieldError>)[rawKey] = {
           type: "manual",
           message: messages[0],
         }
       }
     })
 
-    if (fieldErrors.formErrors.length) {
+    if (formErrors.length > 0) {
       errors.root = {
         type: "manual",
-        message: fieldErrors.formErrors[0],
-      }
+        message: formErrors[0],
+      } as FieldErrors<TFieldValues>["root"]
     }
 
     return {
-      values: {},
+      values: {} as Record<string, never>,
       errors,
     }
   }

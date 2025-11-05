@@ -16,8 +16,16 @@ function normalizeUrl(value: string): string {
   return value.endsWith("/") ? value : `${value}/`
 }
 
+const rawEnv = REQUIRED_ENV_KEYS.reduce<Record<RequiredEnvKey, string>>(
+  (acc, key) => {
+    acc[key] = readEnv(key)
+    return acc
+  },
+  {} as Record<RequiredEnvKey, string>,
+)
+
 export const env = {
-  apiBaseUrl: normalizeUrl(readEnv("VITE_API_BASE_URL")),
+  apiBaseUrl: normalizeUrl(rawEnv.VITE_API_BASE_URL),
 } as const
 
 export type AppEnv = typeof env
