@@ -134,11 +134,11 @@ export default function CartsPage() {
                   <Card key={item.product.id}>
                     <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-start sm:gap-6">
                       <div className="flex w-full gap-4">
-                        <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border bg-muted/20">
+                        <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted/20 p-2">
                           <img
                             alt={item.product.title}
                             src={item.product.image}
-                            className="h-full w-full object-cover"
+                            className="max-h-full max-w-full object-contain object-center"
                             loading="lazy"
                           />
                         </div>

@@ -33,11 +33,11 @@ export default function ProductOverviewCard({
   return (
     <Card className="overflow-hidden">
       <div className="grid gap-0 md:grid-cols-[1.2fr_1fr]">
-        <div className="bg-muted/20">
+        <div className="flex items-center justify-center bg-muted/20 p-4">
           <img
             alt={product.title}
             src={product.image}
-            className="h-full w-full object-cover"
+            className="max-h-full max-w-full object-contain object-center"
             loading="lazy"
           />
         </div>
