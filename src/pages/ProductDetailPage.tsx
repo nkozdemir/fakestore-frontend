@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react"
 import { Link, useNavigate, useParams } from "react-router"
 import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button.tsx"
@@ -32,6 +33,7 @@ export default function ProductDetailPage() {
     user,
   } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
+  const [quantity, setQuantity] = useState(1)
 
   const productQueryKey = productQueryKeyFor(normalizedProductId)
 
@@ -85,9 +87,15 @@ export default function ProductDetailPage() {
       return
     }
 
-    void addItem(currentProduct.id, 1)
+    const normalizedQuantity = Number.isFinite(quantity)
+      ? Math.max(1, Math.trunc(quantity))
+      : 1
+
+    void addItem(currentProduct.id, normalizedQuantity)
       .then(() => {
-        toast.success(`Added "${currentProduct.title}" to your cart.`)
+        toast.success(
+          `Added ${normalizedQuantity} of "${currentProduct.title}" to your cart.`,
+        )
       })
       .catch((addError) => {
         console.error(addError)
@@ -170,6 +178,10 @@ export default function ProductDetailPage() {
     />
   )
 
+  useEffect(() => {
+    setQuantity(1)
+  }, [normalizedProductId])
+
   return (
     <main className="bg-background">
       <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-6 px-6">
@@ -220,6 +232,9 @@ export default function ProductDetailPage() {
               onAddToCart={() => handleAddToCart(product)}
               isAddToCartDisabled={isAuthLoading || isCartUpdating}
               isAddToCartProcessing={isCartUpdating}
+              quantity={quantity}
+              onQuantityChange={setQuantity}
+              isQuantityDisabled={isCartUpdating}
               ratingPanel={ratingPanel}
             />
           </>

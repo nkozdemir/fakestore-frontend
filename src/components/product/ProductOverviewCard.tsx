@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import type { Product } from "@/types/catalog.ts"
+import QuantityStepper from "@/components/cart/QuantityStepper.tsx"
 
 type ProductOverviewCardProps = {
   product: Product
@@ -17,6 +18,9 @@ type ProductOverviewCardProps = {
   onAddToCart: () => void
   isAddToCartDisabled: boolean
   isAddToCartProcessing: boolean
+  quantity: number
+  onQuantityChange: (nextQuantity: number) => void
+  isQuantityDisabled?: boolean
   ratingPanel: ReactNode
 }
 
@@ -28,6 +32,9 @@ export default function ProductOverviewCard({
   onAddToCart,
   isAddToCartDisabled,
   isAddToCartProcessing,
+  quantity,
+  onQuantityChange,
+  isQuantityDisabled = false,
   ratingPanel,
 }: ProductOverviewCardProps) {
   return (
@@ -77,14 +84,21 @@ export default function ProductOverviewCard({
                   : "No ratings yet"}
               </p>
             </div>
-            <Button
-              className="w-full sm:w-auto"
-              size="lg"
-              disabled={isAddToCartDisabled}
-              onClick={onAddToCart}
-            >
-              {isAddToCartProcessing ? "Updating cart..." : "Add to cart"}
-            </Button>
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+              <Button
+                className="w-full sm:w-auto"
+                size="lg"
+                disabled={isAddToCartDisabled}
+                onClick={onAddToCart}
+              >
+                {isAddToCartProcessing ? "Updating cart..." : "Add to cart"}
+              </Button>
+              <QuantityStepper
+                value={quantity}
+                onChange={onQuantityChange}
+                disabled={isQuantityDisabled}
+              />
+            </div>
             {ratingPanel}
           </CardContent>
         </div>
