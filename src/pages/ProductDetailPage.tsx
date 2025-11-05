@@ -34,6 +34,9 @@ export default function ProductDetailPage() {
   } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
   const [quantity, setQuantity] = useState(1)
+  useEffect(() => {
+    setQuantity(1)
+  }, [normalizedProductId])
 
   const productQueryKey = productQueryKeyFor(normalizedProductId)
 
@@ -177,10 +180,6 @@ export default function ProductDetailPage() {
       onRemove={handleRemoveRating}
     />
   )
-
-  useEffect(() => {
-    setQuantity(1)
-  }, [normalizedProductId])
 
   return (
     <main className="bg-background">

@@ -1,4 +1,4 @@
-FROM node:20-alpine AS build
+FROM node:24.11-alpine3.22 AS build
 
 WORKDIR /app
 
@@ -15,7 +15,8 @@ COPY . .
 RUN npm run build
 
 # -- Production image -------------------------------------------------------
-FROM nginx:1.27-alpine AS runtime
+FROM nginx:1.27-alpine3.22 AS runtime
+RUN apk upgrade --no-cache
 
 # Copy the static build output to nginx
 COPY --from=build /app/dist /usr/share/nginx/html
