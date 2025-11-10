@@ -1,0 +1,11 @@
+{
+  "id": 2,
+  "username": "ava",
+  "email": "ava@example.com",
+  "first_name": "Ava",
+  "last_name": "Summers",
+  "last_login": "2024-11-05T10:00:00Z",
+  "date_joined": "2024-11-05T09:45:00Z",
+  "is_staff": false,
+  "is_superuser": false
+}

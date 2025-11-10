@@ -91,7 +91,12 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
+          <form
+            className="space-y-5"
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            data-testid="login-form"
+          >
             <UsernameField
               registration={usernameRegistration}
               autoComplete="username"
@@ -139,7 +144,13 @@ export default function LoginPage() {
                 </AlertDescription>
               </Alert>
             )}
-            <Button className="w-full" type="submit" size="lg" disabled={isSubmitting}>
+            <Button
+              className="w-full"
+              type="submit"
+              size="lg"
+              disabled={isSubmitting}
+              data-testid="login-submit"
+            >
               {t("auth.login.button", { defaultValue: "Sign in" })}
             </Button>
           </form>

@@ -8,6 +8,12 @@ import {
 import type { Category } from "@/types/catalog.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 
+const toTestId = (value: string): string =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "option"
+
 export type ProductCatalogHeaderProps = {
   categories: Category[]
   selectedCategoryValue: string
@@ -40,7 +46,10 @@ export default function ProductCatalogHeader({
         onValueChange={onCategoryChange}
         disabled={isLoadingCategories}
       >
-        <SelectTrigger className="w-full sm:w-64">
+        <SelectTrigger
+          className="w-full sm:w-64"
+          data-testid="category-filter"
+        >
           <SelectValue
             placeholder={
               isLoadingCategories
@@ -53,14 +62,18 @@ export default function ProductCatalogHeader({
             }
           />
         </SelectTrigger>
-        <SelectContent>
-          <SelectItem value="all">
+        <SelectContent data-testid="category-options">
+          <SelectItem value="all" data-testid="category-option-all">
             {t("products.header.allCategories", {
               defaultValue: "All categories",
             })}
           </SelectItem>
           {categories.map((category) => (
-            <SelectItem key={category.id} value={category.name}>
+            <SelectItem
+              key={category.id}
+              value={category.name}
+              data-testid={`category-option-${toTestId(category.name)}`}
+            >
               {category.name}
             </SelectItem>
           ))}

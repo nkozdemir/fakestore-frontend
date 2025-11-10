@@ -1,0 +1,31 @@
+{
+  "count": 2,
+  "next": null,
+  "previous": null,
+  "results": [
+    {
+      "id": 6,
+      "title": "WD 2TB Elements Portable External Hard Drive",
+      "price": "64",
+      "description": "USB 3.0 and USB 2.0 compatibility with improved performance.",
+      "image": "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
+      "rate": "0.0",
+      "count": 0,
+      "categories": [
+        { "id": 3, "name": "electronics" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "SanDisk SSD PLUS 1TB Internal SSD",
+      "price": "109",
+      "description": "Easy upgrade for faster boot-up, shutdown, application load and response.",
+      "image": "https://fakestoreapi.com/img/61U7T1koQqL._AC_SX679_.jpg",
+      "rate": "0.0",
+      "count": 0,
+      "categories": [
+        { "id": 3, "name": "electronics" }
+      ]
+    }
+  ]
+}

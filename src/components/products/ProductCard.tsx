@@ -55,7 +55,10 @@ export default function ProductCard({
 
   return (
     <Link to={`/products/${product.id}`} className="group block h-full">
-      <Card className="flex h-full flex-col transition duration-200 hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg">
+      <Card
+        data-testid="product-card"
+        className="flex h-full flex-col transition duration-200 hover:-translate-y-1 hover:border-primary/60 hover:shadow-lg"
+      >
         <CardHeader className="gap-1">
           <CardTitle className="text-xl font-semibold">
             <span title={product.title}>{shortenedTitle}</span>

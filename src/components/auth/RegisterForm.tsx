@@ -122,7 +122,12 @@ export default function RegisterForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-6" onSubmit={submitHandler} noValidate>
+        <form
+          className="space-y-6"
+          onSubmit={submitHandler}
+          noValidate
+          data-testid="register-form"
+        >
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="firstName">
@@ -249,7 +254,13 @@ export default function RegisterForm({
             </Alert>
           )}
 
-         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isSubmitting}
+            data-testid="register-submit"
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

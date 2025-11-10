@@ -50,6 +50,10 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
 - `npm run build` — type-check and produce a production build.
 - `npm run preview` — serve the built assets locally.
 - `npm test` — run Vitest unit suites (hooks, utilities) with MSW-powered API mocks.
+- `npm run cy:open` — launch the interactive Cypress runner against the dev server.
+- `npm run cy:run` — execute Cypress in headless mode.
+- `npm run test:e2e` — spin up `npm run dev`, wait for `http://localhost:5173`, and run the headless Cypress suite (ideal for CI).
+- `npm run test:e2e:ui` — same as above but opens the Cypress runner for debugging.
 
 ## Testing
 Vitest is configured with a jsdom environment and Testing Library helpers. We mock the Django API via MSW so the auth and cart hooks exercise realistic network flows without needing to boot the backend. Run the suites in watch mode with:
@@ -59,6 +63,16 @@ npm test
 Or execute once (useful for CI) with:
 ```bash
 npm test -- --run
+```
+
+End-to-end coverage relies on Cypress. The tests stub backend responses (products, categories) so they focus on verifying UI flows without requiring the Django API. Commands:
+```bash
+npm run test:e2e      # headless + dev server via start-server-and-test
+npm run test:e2e:ui   # interactive runner
+```
+Override the target URLs when needed with:
+```bash
+CYPRESS_BASE_URL=http://localhost:4173 CYPRESS_API_BASE_URL=http://localhost:8000/api/ npm run test:e2e
 ```
 
 ## Environment variables

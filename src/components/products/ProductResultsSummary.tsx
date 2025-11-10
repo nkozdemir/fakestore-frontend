@@ -26,7 +26,10 @@ export default function ProductResultsSummary({
   const formattedTotal = totalCount.toLocaleString(locale)
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground">
+    <div
+      className="flex flex-wrap items-center justify-between gap-2 text-sm text-muted-foreground"
+      data-testid="product-summary"
+    >
       <span>
         {t("products.summary.showing", {
           defaultValue: "Showing {{first}}–{{last}} of {{total}} {{label}}",

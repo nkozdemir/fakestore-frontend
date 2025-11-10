@@ -1,0 +1,21 @@
+{
+  "id": 2,
+  "email": "ava@example.com",
+  "username": "ava",
+  "phone": "+1 555 987 1234",
+  "addresses": [
+    {
+      "id": 10,
+      "street": "Market Street",
+      "number": 42,
+      "city": "San Francisco",
+      "zipcode": "94103",
+      "latitude": "37.7749",
+      "longitude": "-122.4194"
+    }
+  ],
+  "name": {
+    "first_name": "Ava",
+    "last_name": "Summers"
+  }
+}
