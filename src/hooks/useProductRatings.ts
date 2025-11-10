@@ -5,6 +5,7 @@ import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type { Product, ProductRatingsList, RatingSummary } from "@/types/catalog.ts"
 import type { AuthUser } from "@/types/auth.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 export const PRODUCT_RATING_VALUES = [1, 2, 3, 4, 5] as const
 
@@ -12,20 +13,6 @@ const RATING_GENERIC_MESSAGES = [
   "Authentication required",
   "You do not have permission to perform this action",
 ] as const
-
-const SAVE_RATING_FALLBACK_MESSAGE =
-  "We couldn't save your rating. Please try again."
-const SAVE_RATING_CODE_MESSAGES: Partial<Record<string, string>> = {
-  FORBIDDEN: "You do not have permission to rate this product.",
-  UNAUTHORIZED: "You need to sign in again to rate this product.",
-}
-
-const REMOVE_RATING_FALLBACK_MESSAGE =
-  "We couldn't remove your rating. Please try again."
-const REMOVE_RATING_CODE_MESSAGES: Partial<Record<string, string>> = {
-  ...SAVE_RATING_CODE_MESSAGES,
-  NOT_FOUND: "We couldn't find that rating to remove.",
-}
 
 type UseProductRatingsParams = {
   productId: string
@@ -98,6 +85,27 @@ export function useProductRatings({
   accessToken,
 }: UseProductRatingsParams) {
   const queryClient = useQueryClient()
+  const { t } = useTranslation()
+  const saveRatingFallbackMessage = t("productDetail.ratings.saveError", {
+    defaultValue: "We couldn't save your rating. Please try again.",
+  })
+  const saveRatingCodeMessages: Partial<Record<string, string>> = {
+    FORBIDDEN: t("productDetail.ratings.permissionError", {
+      defaultValue: "You do not have permission to rate this product.",
+    }),
+    UNAUTHORIZED: t("productDetail.ratings.authError", {
+      defaultValue: "You need to sign in again to rate this product.",
+    }),
+  }
+  const removeRatingFallbackMessage = t("productDetail.ratings.removeError", {
+    defaultValue: "We couldn't remove your rating. Please try again.",
+  })
+  const removeRatingCodeMessages: Partial<Record<string, string>> = {
+    ...saveRatingCodeMessages,
+    NOT_FOUND: t("productDetail.ratings.notFound", {
+      defaultValue: "We couldn't find that rating to remove.",
+    }),
+  }
   const ratingSummaryQueryKey = [
     "product",
     productId,
@@ -134,11 +142,19 @@ export function useProductRatings({
   const setRatingMutation = useMutation<RatingSummary, Error, number>({
     mutationFn: async (value) => {
       if (!productId) {
-        throw new Error("Missing product identifier.")
+        throw new Error(
+          t("productDetail.missingId", {
+            defaultValue: "Product identifier is missing.",
+          }),
+        )
       }
 
       if (!accessToken || !isAuthenticated) {
-        throw new Error("You need to sign in to rate this product.")
+        throw new Error(
+          t("productDetail.toasts.signInToRate", {
+            defaultValue: "Sign in to rate this product.",
+          }),
+        )
       }
 
       try {
@@ -154,8 +170,8 @@ export function useProductRatings({
         })
       } catch (mutationError) {
         throw toFriendlyError(mutationError, {
-          fallback: SAVE_RATING_FALLBACK_MESSAGE,
-          codeMessages: SAVE_RATING_CODE_MESSAGES,
+          fallback: saveRatingFallbackMessage,
+          codeMessages: saveRatingCodeMessages,
           genericMessages: [...RATING_GENERIC_MESSAGES],
         })
       }
@@ -187,7 +203,13 @@ export function useProductRatings({
       )
 
       toast.success(
-        `Thanks for rating this product ${value} star${value === 1 ? "" : "s"}.`,
+        t("productDetail.ratings.thanks", {
+          defaultValue: "Thanks for rating this product {{value}} star{{suffix}}.",
+          values: {
+            value,
+            suffix: value === 1 ? "" : "s",
+          },
+        }),
       )
     },
     onError: (mutationError) => {
@@ -195,7 +217,7 @@ export function useProductRatings({
       const message =
         mutationError instanceof Error
           ? mutationError.message
-          : "We couldn't save your rating. Please try again."
+          : saveRatingFallbackMessage
       toast.error(message)
     },
   })
@@ -203,11 +225,19 @@ export function useProductRatings({
   const deleteRatingMutation = useMutation<RatingSummary, Error, number>({
     mutationFn: async (ratingId) => {
       if (!productId) {
-        throw new Error("Missing product identifier.")
+        throw new Error(
+          t("productDetail.missingId", {
+            defaultValue: "Product identifier is missing.",
+          }),
+        )
       }
 
       if (!accessToken || !isAuthenticated) {
-        throw new Error("You need to sign in to update your rating.")
+        throw new Error(
+          t("productDetail.toasts.signInToRate", {
+            defaultValue: "Sign in to rate this product.",
+          }),
+        )
       }
 
       try {
@@ -224,8 +254,8 @@ export function useProductRatings({
         })
       } catch (mutationError) {
         throw toFriendlyError(mutationError, {
-          fallback: REMOVE_RATING_FALLBACK_MESSAGE,
-          codeMessages: REMOVE_RATING_CODE_MESSAGES,
+          fallback: removeRatingFallbackMessage,
+          codeMessages: removeRatingCodeMessages,
           genericMessages: [...RATING_GENERIC_MESSAGES],
         })
       }
@@ -256,14 +286,18 @@ export function useProductRatings({
         },
       )
 
-      toast.success("Your rating was removed.")
+      toast.success(
+        t("productDetail.ratings.removeSuccess", {
+          defaultValue: "Your rating was removed.",
+        }),
+      )
     },
     onError: (mutationError) => {
       console.error(mutationError)
       const message =
         mutationError instanceof Error
           ? mutationError.message
-          : "We couldn't remove your rating. Please try again."
+          : removeRatingFallbackMessage
       toast.error(message)
     },
   })
@@ -374,7 +408,12 @@ export function useProductRatings({
       const { userRatingId } = derived
       if (!userRatingId) {
         void productRatingsQuery.refetch()
-        toast.error("We couldn't find your rating to remove. Please refresh and try again.")
+        toast.error(
+          t("productDetail.ratings.localNotFound", {
+            defaultValue:
+              "We couldn't find your rating to remove. Please refresh and try again.",
+          }),
+        )
         return
       }
       deleteRatingMutation.mutate(userRatingId)

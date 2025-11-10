@@ -26,6 +26,7 @@ import {
   type AddressFormValues,
   type PasswordFormValues,
 } from "@/lib/profile-schemas.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type AddressDialogState =
   | {
@@ -47,6 +48,7 @@ export default function ProfilePage() {
     refreshUser,
     logout,
   } = useAuth()
+  const { t } = useTranslation()
 
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false)
   const [addressDialogState, setAddressDialogState] =
@@ -99,11 +101,16 @@ export default function ProfilePage() {
   const authorizedRequest = useCallback(
     async (path: string, init: RequestInit) => {
       if (!accessToken) {
-        throw new Error("You must be signed in to perform this action.")
+        throw new Error(
+          t("profile.messages.profileMissing", {
+            defaultValue: "We couldn't find your profile. Please sign in again.",
+          }),
+        )
       }
 
-      const defaultErrorMessage =
-        "We couldn't complete that request right now. Please try again."
+      const defaultErrorMessage = t("profile.messages.requestFailed", {
+        defaultValue: "We couldn't complete that request right now. Please try again.",
+      })
 
       let response: Response
 
@@ -146,13 +153,17 @@ export default function ProfilePage() {
         return null
       }
     },
-    [accessToken],
+    [accessToken, t],
   )
 
   const handleProfileSubmit = useCallback(
     async (values: ProfileDetailsFormValues) => {
       if (!user) {
-        throw new Error("We couldn't find your profile. Please sign in again.")
+        throw new Error(
+          t("profile.messages.profileMissing", {
+            defaultValue: "We couldn't find your profile. Please sign in again.",
+          }),
+        )
       }
 
       const payload: Record<string, unknown> = {
@@ -174,15 +185,23 @@ export default function ProfilePage() {
 
       await refreshUser()
       setProfileDialogOpen(false)
-      toast.success("Profile updated successfully.")
+      toast.success(
+        t("profile.toasts.profileUpdated", {
+          defaultValue: "Profile updated successfully.",
+        }),
+      )
     },
-    [authorizedRequest, refreshUser, user],
+    [authorizedRequest, refreshUser, t, user],
   )
 
   const handleAddressSubmit = useCallback(
     async (values: AddressFormValues) => {
       if (!user) {
-        throw new Error("We couldn't find your profile. Please sign in again.")
+        throw new Error(
+          t("profile.messages.profileMissing", {
+            defaultValue: "We couldn't find your profile. Please sign in again.",
+          }),
+        )
       }
 
       const isEditMode = addressDialogState?.mode === "edit"
@@ -220,12 +239,16 @@ export default function ProfilePage() {
       await refreshUser()
       toast.success(
         isEditMode
-          ? "Address updated successfully."
-          : "Address added successfully.",
+          ? t("profile.toasts.addressUpdated", {
+              defaultValue: "Address updated successfully.",
+            })
+          : t("profile.toasts.addressAdded", {
+              defaultValue: "Address added successfully.",
+            }),
       )
       setAddressDialogState(null)
     },
-    [addressDialogState, authorizedRequest, refreshUser, user],
+    [addressDialogState, authorizedRequest, refreshUser, t, user],
   )
 
   const handleDeleteAddress = useCallback(async () => {
@@ -242,24 +265,35 @@ export default function ProfilePage() {
         method: "DELETE",
       })
       await refreshUser()
-      toast.success("Address removed successfully.")
+      toast.success(
+        t("profile.toasts.addressRemoved", {
+          defaultValue: "Address removed successfully.",
+        }),
+      )
       setAddressToDelete(null)
     } catch (error) {
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't remove that address right now. Please try again."
+          : t("profile.toasts.addressRemoveError", {
+              defaultValue:
+                "We couldn't remove that address right now. Please try again.",
+            })
       setDeleteAddressError(message)
       toast.error(message)
     } finally {
       setIsDeletingAddress(false)
     }
-  }, [addressToDelete, authorizedRequest, refreshUser])
+  }, [addressToDelete, authorizedRequest, refreshUser, t])
 
   const handlePasswordSubmit = useCallback(
     async (values: PasswordFormValues) => {
       if (!user) {
-        throw new Error("We couldn't find your profile. Please sign in again.")
+        throw new Error(
+          t("profile.messages.profileMissing", {
+            defaultValue: "We couldn't find your profile. Please sign in again.",
+          }),
+        )
       }
 
       await authorizedRequest(`/users/${user.id}/`, {
@@ -270,14 +304,22 @@ export default function ProfilePage() {
       })
 
       setPasswordDialogOpen(false)
-      toast.success("Password updated successfully.")
+      toast.success(
+        t("profile.toasts.passwordUpdated", {
+          defaultValue: "Password updated successfully.",
+        }),
+      )
     },
-    [authorizedRequest, user],
+    [authorizedRequest, t, user],
   )
 
   const handleDeleteAccount = useCallback(async () => {
     if (!user) {
-      setDeleteError("We couldn't find your profile. Please sign in again.")
+      setDeleteError(
+        t("profile.messages.profileMissing", {
+          defaultValue: "We couldn't find your profile. Please sign in again.",
+        }),
+      )
       return
     }
 
@@ -287,7 +329,11 @@ export default function ProfilePage() {
       await authorizedRequest(`/users/${user.id}/`, {
         method: "DELETE",
       })
-      toast.success("Your account has been deleted.")
+      toast.success(
+        t("profile.toasts.accountDeleted", {
+          defaultValue: "Your account has been deleted.",
+        }),
+      )
       setDeleteDialogOpen(false)
       await logout()
       navigate("/", { replace: true })
@@ -295,13 +341,16 @@ export default function ProfilePage() {
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't delete your account right now. Please try again."
+          : t("profile.toasts.accountDeleteError", {
+              defaultValue:
+                "We couldn't delete your account right now. Please try again.",
+            })
       setDeleteError(message)
       toast.error(message)
     } finally {
       setIsDeleting(false)
     }
-  }, [authorizedRequest, logout, navigate, user])
+  }, [authorizedRequest, logout, navigate, t, user])
 
   if (isLoading) {
     return (
@@ -319,14 +368,24 @@ export default function ProfilePage() {
         <div className="page-section flex items-center justify-center px-6">
           <Card className="w-full max-w-xl">
             <CardHeader>
-              <CardTitle>Profile unavailable</CardTitle>
+              <CardTitle>
+                {t("profile.unavailable.title", {
+                  defaultValue: "Profile unavailable",
+                })}
+              </CardTitle>
               <CardDescription>
-                We couldn't load your profile details. Please sign in again to
-                continue.
+                {t("profile.unavailable.description", {
+                  defaultValue:
+                    "We couldn't load your profile details. Please sign in again to continue.",
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <Button onClick={() => navigate("/login")}>Go to sign in</Button>
+              <Button onClick={() => navigate("/login")}>
+                {t("profile.unavailable.action", {
+                  defaultValue: "Go to sign in",
+                })}
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -341,10 +400,12 @@ export default function ProfilePage() {
       <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-8 px-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Profile
+            {t("profile.title", { defaultValue: "Profile" })}
           </h1>
           <p className="text-muted-foreground">
-            Manage your personal information and account preferences.
+            {t("profile.subtitle", {
+              defaultValue: "Manage your personal information and account preferences.",
+            })}
           </p>
         </header>
 

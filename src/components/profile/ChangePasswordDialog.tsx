@@ -19,6 +19,8 @@ import {
   type PasswordFormValues,
   passwordResolver,
 } from "@/lib/profile-schemas.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
+import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type ChangePasswordDialogProps = {
   open: boolean
@@ -45,6 +47,9 @@ export default function ChangePasswordDialog({
     },
     resolver: passwordResolver,
   })
+  const { t } = useTranslation()
+  const resolveError = (message?: string) =>
+    translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (!open) {
@@ -67,7 +72,10 @@ export default function ChangePasswordDialog({
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't update your password right now. Please try again."
+          : t("profile.messages.requestFailed", {
+              defaultValue:
+                "We couldn't complete that request right now. Please try again.",
+            })
       setError("root", {
         type: "server",
         message,
@@ -81,14 +89,22 @@ export default function ChangePasswordDialog({
       <DialogContent>
         <form className="space-y-6" onSubmit={submitHandler} noValidate>
           <DialogHeader>
-            <DialogTitle>Change password</DialogTitle>
+            <DialogTitle>
+              {t("profile.dialogs.password.title", { defaultValue: "Change password" })}
+            </DialogTitle>
             <DialogDescription>
-              Choose a strong password that meets all requirements.
+              {t("profile.dialogs.password.description", {
+                defaultValue: "Choose a strong password that meets all requirements.",
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="new-password">New password</Label>
+              <Label htmlFor="new-password">
+                {t("profile.dialogs.password.newPassword", {
+                  defaultValue: "New password",
+                })}
+              </Label>
               <PasswordInput
                 id="new-password"
                 {...register("password")}
@@ -98,12 +114,16 @@ export default function ChangePasswordDialog({
               />
               {errors.password?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.password.message}
+                  {resolveError(errors.password.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">Confirm password</Label>
+              <Label htmlFor="confirm-password">
+                {t("profile.dialogs.password.confirmPassword", {
+                  defaultValue: "Confirm password",
+                })}
+              </Label>
               <PasswordInput
                 id="confirm-password"
                 {...register("confirmPassword")}
@@ -113,7 +133,7 @@ export default function ChangePasswordDialog({
               />
               {errors.confirmPassword?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.confirmPassword.message}
+                  {resolveError(errors.confirmPassword.message)}
                 </p>
               )}
             </div>
@@ -122,8 +142,12 @@ export default function ChangePasswordDialog({
           {errors.root?.message && (
             <Alert variant="destructive">
               <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>Password update failed</AlertTitle>
-              <AlertDescription>{errors.root.message}</AlertDescription>
+              <AlertTitle>
+                {t("profile.dialogs.password.alertTitle", {
+                  defaultValue: "Password update failed",
+                })}
+              </AlertTitle>
+              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
             </Alert>
           )}
           <DialogFooter>
@@ -133,16 +157,20 @@ export default function ChangePasswordDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-                  Saving...
+                  {t("profile.dialogs.password.saving", {
+                    defaultValue: "Saving...",
+                  })}
                 </>
               ) : (
-                "Update password"
+                t("profile.dialogs.password.save", {
+                  defaultValue: "Update password",
+                })
               )}
             </Button>
           </DialogFooter>

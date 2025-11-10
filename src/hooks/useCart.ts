@@ -9,21 +9,29 @@ import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
 import type { Cart, CartPatchPayload } from "@/types/cart.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 const cartQueryKey = (userId?: number): QueryKey => ["cart", userId ?? "guest"]
 
-const cartUpdateFallbackMessage = "Failed to update cart. Please try again."
-const cartValidationMessage =
-  "We couldn’t apply those cart changes. Please review and try again."
-
 export default function useCart() {
   const { user, accessToken, isAuthenticated } = useAuth()
+  const { t } = useTranslation()
+  const cartUpdateFallbackMessage = t("cart.messages.updateFailed", {
+    defaultValue: "Failed to update cart. Please try again.",
+  })
+  const cartValidationMessage = t("cart.messages.validationFailed", {
+    defaultValue: "We couldn’t apply those cart changes. Please review and try again.",
+  })
   const queryClient = useQueryClient()
 
   const userId = user?.id
   const fetchCart = useCallback(async (): Promise<Cart> => {
     if (!userId || !accessToken) {
-      throw new Error("You need to be signed in to access the cart.")
+      throw new Error(
+        t("cart.messages.accessRequired", {
+          defaultValue: "You need to be signed in to access the cart.",
+        }),
+      )
     }
 
     const rawCart = await fetchJson<Cart | Cart[]>("carts/", {
@@ -40,7 +48,11 @@ export default function useCart() {
     const cart = Array.isArray(rawCart) ? rawCart[0] : rawCart
 
     if (!cart) {
-      throw new Error("Unable to locate your cart.")
+      throw new Error(
+        t("cart.messages.notFound", {
+          defaultValue: "Unable to locate your cart.",
+        }),
+      )
     }
 
     return {
@@ -71,11 +83,19 @@ export default function useCart() {
   const patchCartMutation = useMutation<Cart, Error, CartPatchPayload>({
     mutationFn: async (payload) => {
       if (!userId || !accessToken) {
-        throw new Error("You need to be signed in to update the cart.")
+        throw new Error(
+          t("cart.messages.updateRequired", {
+            defaultValue: "You need to be signed in to update the cart.",
+          }),
+        )
       }
 
       if (!payload || (!payload.add && !payload.update && !payload.remove)) {
-        throw new Error("No cart changes were provided.")
+        throw new Error(
+          t("cart.messages.missingChanges", {
+            defaultValue: "No cart changes were provided.",
+          }),
+        )
       }
 
       const cart = await ensureCartData()
@@ -156,7 +176,11 @@ export default function useCart() {
       )
 
       if (!isInCart) {
-        throw new Error("The selected item is not in your cart.")
+        throw new Error(
+          t("cart.messages.itemMissing", {
+            defaultValue: "The selected item is not in your cart.",
+          }),
+        )
       }
 
       return patchCartMutation.mutateAsync({
@@ -171,7 +195,11 @@ export default function useCart() {
       const normalizedQuantity = Math.trunc(quantity)
 
       if (Number.isNaN(normalizedQuantity)) {
-        throw new Error("Quantity must be a valid number.")
+        throw new Error(
+          t("cart.messages.quantityInvalid", {
+            defaultValue: "Quantity must be a valid number.",
+          }),
+        )
       }
 
       if (normalizedQuantity <= 0) {
@@ -186,7 +214,11 @@ export default function useCart() {
       )
 
       if (!isInCart) {
-        throw new Error("The selected item is not in your cart.")
+        throw new Error(
+          t("cart.messages.itemMissing", {
+            defaultValue: "The selected item is not in your cart.",
+          }),
+        )
       }
 
       return patchCartMutation.mutateAsync({

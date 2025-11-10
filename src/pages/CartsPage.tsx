@@ -12,14 +12,7 @@ import QuantityStepper from "@/components/cart/QuantityStepper.tsx"
 import { Trash2Icon } from "lucide-react"
 import useCart from "@/hooks/useCart.ts"
 import { toast } from "sonner"
-
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 2,
-  }).format(value)
-}
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 export default function CartsPage() {
   const {
@@ -33,6 +26,7 @@ export default function CartsPage() {
     isUpdating,
     refetch,
   } = useCart()
+  const { t, formatCurrency, locale } = useTranslation()
 
   const rawItems = cart?.items
   const cartItems = Array.isArray(rawItems) ? rawItems : []
@@ -52,24 +46,37 @@ export default function CartsPage() {
       <section className="page-section mx-auto flex w-full max-w-5xl flex-col gap-6 px-6">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-            Your Cart
+            {t("cart.title", { defaultValue: "Your Cart" })}
           </h1>
           <p className="text-muted-foreground">
-            Review the items you&apos;ve added before checking out.
+            {t("cart.subtitle", {
+              defaultValue: "Review the items you've added before checking out.",
+            })}
           </p>
         </header>
 
         {isLoading ? (
           <div className="flex flex-col items-center gap-3 py-12 text-sm text-muted-foreground">
             <Spinner className="size-6" />
-            <span>Loading your cart...</span>
+            <span>
+              {t("cart.loading", {
+                defaultValue: "Loading your cart...",
+              })}
+            </span>
           </div>
         ) : error ? (
           <Card>
             <CardHeader>
-              <CardTitle>We couldn&apos;t load your cart</CardTitle>
+              <CardTitle>
+                {t("cart.reloadErrorTitle", {
+                  defaultValue: "We couldn't load your cart",
+                })}
+              </CardTitle>
               <CardDescription>
-                {error.message || "Something went wrong while loading your cart."}
+                {error.message ||
+                  t("cart.reloadErrorFallback", {
+                    defaultValue: "Something went wrong while loading your cart.",
+                  })}
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">
@@ -80,7 +87,9 @@ export default function CartsPage() {
                     toast.error(
                       fetchError instanceof Error
                         ? fetchError.message
-                        : "Failed to reload your cart.",
+                        : t("cart.reloadErrorRetry", {
+                            defaultValue: "Failed to reload your cart.",
+                          }),
                     )
                   })
                 }}
@@ -89,10 +98,10 @@ export default function CartsPage() {
                 {isRefetching ? (
                   <span className="flex items-center gap-2">
                     <Spinner className="size-4" />
-                    Retrying…
+                    {t("cart.retrying", { defaultValue: "Retrying…" })}
                   </span>
                 ) : (
-                  "Try again"
+                  t("common.actions.retry", { defaultValue: "Try again" })
                 )}
               </Button>
             </CardContent>
@@ -100,13 +109,19 @@ export default function CartsPage() {
         ) : !hasItems ? (
           <Card>
             <CardHeader>
-              <CardTitle>Your cart is empty</CardTitle>
+              <CardTitle>
+                {t("cart.empty.title", { defaultValue: "Your cart is empty" })}
+              </CardTitle>
               <CardDescription>
-                Browse products and add items to see them appear here.
+                {t("cart.empty.description", {
+                  defaultValue: "Browse products and add items to see them appear here.",
+                })}
               </CardDescription>
             </CardHeader>
             <CardContent className="text-sm text-muted-foreground">
-              When you add items from the catalog they&apos;ll show up here.
+              {t("cart.empty.hint", {
+                defaultValue: "When you add items from the catalog they'll show up here.",
+              })}
             </CardContent>
           </Card>
         ) : (
@@ -115,13 +130,21 @@ export default function CartsPage() {
               {isRefetching ? (
                 <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
                   <Spinner className="size-3.5" />
-                  <span>Refreshing cart…</span>
+                  <span>
+                    {t("cart.banners.refreshing", {
+                      defaultValue: "Refreshing cart…",
+                    })}
+                  </span>
                 </div>
               ) : null}
               {isUpdating ? (
                 <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
                   <Spinner className="size-3.5" />
-                  <span>Applying your changes…</span>
+                  <span>
+                    {t("cart.banners.applying", {
+                      defaultValue: "Applying your changes…",
+                    })}
+                  </span>
                 </div>
               ) : null}
               {cartItems.map((item) => {
@@ -160,39 +183,58 @@ export default function CartsPage() {
                               onClick={() => {
                                 void removeItem(item.product.id)
                                   .then(() => {
-                                    toast.success("Removed item from cart.")
+                                    toast.success(
+                                      t("cart.item.removeSuccess", {
+                                        defaultValue: "Removed item from cart.",
+                                      }),
+                                    )
                                   })
                                   .catch((removeError) => {
                                     console.error(removeError)
                                     toast.error(
                                       removeError instanceof Error
                                         ? removeError.message
-                                        : "Failed to remove item from cart.",
+                                        : t("cart.item.removeError", {
+                                            defaultValue: "Failed to remove item from cart.",
+                                          }),
                                     )
                                   })
                               }}
-                              aria-label={`Remove ${item.product.title} from cart`}
+                              aria-label={t("cart.item.removeAria", {
+                                defaultValue: 'Remove "{{product}}" from cart',
+                                values: { product: item.product.title },
+                              })}
                             >
                               <Trash2Icon className="size-4" />
                             </Button>
                           </div>
                           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2 text-sm">
-                              <span className="text-muted-foreground">Quantity</span>
+                              <span className="text-muted-foreground">
+                                {t("cart.quantity.label", {
+                                  defaultValue: "Quantity",
+                                })}
+                              </span>
                               <QuantityStepper
                                 value={item.quantity}
                                 disabled={isUpdating || isRefetching}
                                 onChange={(nextQuantity) => {
                                   void updateItemQuantity(item.product.id, nextQuantity)
                                     .then(() => {
-                                      toast.success("Updated cart quantity.")
+                                      toast.success(
+                                        t("cart.item.updateSuccess", {
+                                          defaultValue: "Updated cart quantity.",
+                                        }),
+                                      )
                                     })
                                     .catch((updateError) => {
                                       console.error(updateError)
                                       toast.error(
                                         updateError instanceof Error
                                           ? updateError.message
-                                          : "Failed to update quantity.",
+                                          : t("cart.item.updateError", {
+                                              defaultValue: "Failed to update quantity.",
+                                            }),
                                       )
                                     })
                                 }}
@@ -212,25 +254,45 @@ export default function CartsPage() {
 
             <Card className="h-fit">
               <CardHeader>
-                <CardTitle>Order summary</CardTitle>
+                <CardTitle>
+                  {t("cart.summary.title", { defaultValue: "Order summary" })}
+                </CardTitle>
                 <CardDescription>
-                  You have {totalItems} {totalItems === 1 ? "item" : "items"} in your
-                  cart.
+                  {t("cart.summary.description", {
+                    defaultValue: "You have {{count}} {{items}} in your cart.",
+                    values: {
+                      count: totalItems.toLocaleString(locale),
+                      items:
+                        totalItems === 1
+                          ? t("cart.summary.itemSingular", { defaultValue: "item" })
+                          : t("cart.summary.itemPlural", { defaultValue: "items" }),
+                    },
+                  })}
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span>Subtotal</span>
+                  <span>
+                    {t("cart.summary.subtotal", { defaultValue: "Subtotal" })}
+                  </span>
                   <span className="font-medium">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>Shipping</span>
-                  <span>Calculated at checkout</span>
+                  <span>
+                    {t("cart.summary.shipping", { defaultValue: "Shipping" })}
+                  </span>
+                  <span>
+                    {t("cart.summary.shippingNote", {
+                      defaultValue: "Calculated at checkout",
+                    })}
+                  </span>
                 </div>
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
                 <div className="flex w-full items-center justify-between text-sm font-semibold">
-                  <span>Total</span>
+                  <span>
+                    {t("cart.summary.total", { defaultValue: "Total" })}
+                  </span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <Button
@@ -238,13 +300,20 @@ export default function CartsPage() {
                   className="w-full"
                   disabled={!hasItems}
                   onClick={() => {
-                    toast.info("Ordering isn’t available yet. Please check back soon!")
+                    toast.info(
+                      t("cart.summary.orderUnavailable", {
+                        defaultValue:
+                          "Ordering isn’t available yet. Please check back soon!",
+                      }),
+                    )
                   }}
                 >
-                  Place order
+                  {t("cart.summary.placeOrder", { defaultValue: "Place order" })}
                 </Button>
                 <p className="text-center text-xs text-muted-foreground">
-                  Order placement will be available once checkout is ready.
+                  {t("cart.summary.disabledHint", {
+                    defaultValue: "Order placement will be available once checkout is ready.",
+                  })}
                 </p>
               </CardFooter>
             </Card>

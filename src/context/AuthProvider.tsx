@@ -30,6 +30,7 @@ import type {
   RegisterPayload,
   UserProfileResponse,
 } from "@/types/auth.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type AuthProviderProps = {
   children: ReactNode
@@ -75,6 +76,7 @@ async function fetchAuthenticatedUser(accessToken: string): Promise<AuthUser> {
 }
 
 export default function AuthProvider({ children }: AuthProviderProps) {
+  const { t } = useTranslation()
   const [tokens, setTokens] = useState<AuthTokens | null>(null)
   const [user, setUser] = useState<AuthUser | null>(null)
   const [isLoading, setIsLoading] = useState(true)
@@ -244,12 +246,18 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const login = useCallback(
     async (credentials: LoginCredentials) => {
-      const invalidCredentialsMessage =
-        "We couldn’t match that username and password. Double-check your details and try again."
-      const throttledMessage =
-        "Too many sign-in attempts. Please wait a moment and try again."
-      const defaultMessage =
-        "We ran into a problem while signing you in. Please try again in a few moments."
+      const invalidCredentialsMessage = t("auth.messages.invalidCredentials", {
+        defaultValue:
+          "We couldn’t match that username and password. Double-check your details and try again.",
+      })
+      const throttledMessage = t("auth.messages.throttled", {
+        defaultValue:
+          "Too many sign-in attempts. Please wait a moment and try again.",
+      })
+      const defaultMessage = t("auth.messages.loginGeneric", {
+        defaultValue:
+          "We ran into a problem while signing you in. Please try again in a few moments.",
+      })
 
       let tokens: Partial<AuthTokens> | null = null
 
@@ -307,7 +315,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         typeof tokens.refresh !== "string"
       ) {
         throw new Error(
-          "We ran into an unexpected issue while signing you in. Please try again.",
+          t("auth.messages.loginUnexpected", {
+            defaultValue:
+              "We ran into an unexpected issue while signing you in. Please try again.",
+          }),
         )
       }
 
@@ -326,10 +337,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         setUser(null)
         throw error instanceof Error
           ? error
-          : new Error("Unable to load your account details after signing in.")
+          : new Error(
+              t("auth.messages.loadProfileFailed", {
+                defaultValue: "Unable to load your account details after signing in.",
+              }),
+            )
       }
     },
-    [applyTokens],
+    [applyTokens, t],
   )
 
   const register = useCallback(
@@ -351,8 +366,10 @@ export default function AuthProvider({ children }: AuthProviderProps) {
           }),
         })
       } catch (networkError) {
-        const fallbackMessage =
-          "We ran into a problem while creating your account. Please try again in a few moments."
+        const fallbackMessage = t("auth.messages.registerGeneric", {
+          defaultValue:
+            "We ran into a problem while creating your account. Please try again in a few moments.",
+        })
         throw new Error(
           networkError instanceof Error && networkError.message.trim().length > 0
             ? networkError.message
@@ -364,8 +381,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         const apiError = await parseApiError(response)
         const fallbackMessage =
           apiError.status === 400
-            ? "We couldn’t create your account with those details. Please review the form and try again."
-            : "We ran into a problem while creating your account. Please try again in a few moments."
+            ? t("auth.messages.registerValidation", {
+                defaultValue:
+                  "We couldn’t create your account with those details. Please review the form and try again.",
+              })
+            : t("auth.messages.registerGeneric", {
+                defaultValue:
+                  "We ran into a problem while creating your account. Please try again in a few moments.",
+              })
 
         throw new Error(
           formatApiErrorMessage(apiError, fallbackMessage, [
@@ -384,11 +407,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         throw error instanceof Error
           ? error
           : new Error(
-              "Your account was created, but we couldn’t sign you in automatically. Try logging in manually.",
+              t("auth.messages.registerAutoLogin", {
+                defaultValue:
+                  "Your account was created, but we couldn’t sign you in automatically. Try logging in manually.",
+              }),
             )
       }
     },
-    [login],
+    [login, t],
   )
 
   const logout = useCallback(async () => {

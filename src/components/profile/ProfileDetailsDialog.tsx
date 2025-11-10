@@ -19,6 +19,8 @@ import {
   type ProfileDetailsFormValues,
   profileResolver,
 } from "@/lib/profile-schemas.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
+import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type ProfileDetailsDialogProps = {
   open: boolean
@@ -43,6 +45,9 @@ export default function ProfileDetailsDialog({
     defaultValues: initialValues,
     resolver: profileResolver,
   })
+  const { t } = useTranslation()
+  const resolveError = (message?: string) =>
+    translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (open) {
@@ -57,7 +62,9 @@ export default function ProfileDetailsDialog({
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't update your profile right now. Please try again."
+          : t("profile.messages.requestFailed", {
+              defaultValue: "We couldn't complete that request right now. Please try again.",
+            })
       setError("root", {
         type: "server",
         message,
@@ -71,15 +78,21 @@ export default function ProfileDetailsDialog({
       <DialogContent>
         <form className="space-y-6" onSubmit={submitHandler} noValidate>
           <DialogHeader>
-            <DialogTitle>Edit profile</DialogTitle>
+            <DialogTitle>
+              {t("profile.dialogs.profile.title", { defaultValue: "Edit profile" })}
+            </DialogTitle>
             <DialogDescription>
-              Update your personal details. Some changes may require you to sign in
-              again.
+              {t("profile.dialogs.profile.description", {
+                defaultValue:
+                  "Update your personal details. Some changes may require you to sign in again.",
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First name</Label>
+              <Label htmlFor="firstName">
+                {t("auth.register.firstName", { defaultValue: "First name" })}
+              </Label>
               <Input
                 id="firstName"
                 type="text"
@@ -90,12 +103,14 @@ export default function ProfileDetailsDialog({
               />
               {errors.firstName?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.firstName.message}
+                  {resolveError(errors.firstName.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last name</Label>
+              <Label htmlFor="lastName">
+                {t("auth.register.lastName", { defaultValue: "Last name" })}
+              </Label>
               <Input
                 id="lastName"
                 type="text"
@@ -106,12 +121,14 @@ export default function ProfileDetailsDialog({
               />
               {errors.lastName?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.lastName.message}
+                  {resolveError(errors.lastName.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">
+                {t("auth.register.email", { defaultValue: "Email" })}
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -122,12 +139,14 @@ export default function ProfileDetailsDialog({
               />
               {errors.email?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.email.message}
+                  {resolveError(errors.email.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">Phone</Label>
+              <Label htmlFor="phone">
+                {t("profile.fields.phone", { defaultValue: "Phone" })}
+              </Label>
               <Input
                 id="phone"
                 type="tel"
@@ -137,7 +156,7 @@ export default function ProfileDetailsDialog({
               />
               {errors.phone?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.phone.message}
+                  {resolveError(errors.phone.message)}
                 </p>
               )}
             </div>
@@ -152,8 +171,12 @@ export default function ProfileDetailsDialog({
           {errors.root?.message && (
             <Alert variant="destructive">
               <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>Profile update failed</AlertTitle>
-              <AlertDescription>{errors.root.message}</AlertDescription>
+              <AlertTitle>
+                {t("profile.dialogs.profile.alertTitle", {
+                  defaultValue: "Profile update failed",
+                })}
+              </AlertTitle>
+              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
             </Alert>
           )}
           <DialogFooter>
@@ -163,16 +186,20 @@ export default function ProfileDetailsDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-                  Saving...
+                  {t("profile.dialogs.profile.saving", {
+                    defaultValue: "Saving...",
+                  })}
                 </>
               ) : (
-                "Save changes"
+                t("profile.dialogs.profile.save", {
+                  defaultValue: "Save changes",
+                })
               )}
             </Button>
           </DialogFooter>

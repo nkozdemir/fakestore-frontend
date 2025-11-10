@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button.tsx"
 import type { Product } from "@/types/catalog.ts"
 import QuantityStepper from "@/components/cart/QuantityStepper.tsx"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type ProductOverviewCardProps = {
   product: Product
@@ -37,6 +38,31 @@ export default function ProductOverviewCard({
   isQuantityDisabled = false,
   ratingPanel,
 }: ProductOverviewCardProps) {
+  const { t, formatCurrency, locale } = useTranslation()
+  const parsedPrice = Number.parseFloat(product.price)
+  const formattedPrice = Number.isNaN(parsedPrice)
+    ? product.price
+    : formatCurrency(parsedPrice)
+  const ratingLabel = hasRatings && formattedAverageRating
+    ? t("productDetail.overview.ratingSummary", {
+        defaultValue: "{{rating}} average · {{count}} {{label}}",
+        values: {
+          rating: formattedAverageRating,
+          count: ratingCount.toLocaleString(locale),
+          label:
+            ratingCount === 1
+              ? t("productDetail.overview.ratingLabelSingular", {
+                  defaultValue: "rating",
+                })
+              : t("productDetail.overview.ratingLabelPlural", {
+                  defaultValue: "ratings",
+                }),
+        },
+      })
+    : t("productDetail.overview.ratingUnavailable", {
+        defaultValue: "No ratings yet",
+      })
+
   return (
     <Card className="overflow-hidden">
       <div className="grid gap-0 md:grid-cols-[1.2fr_1fr]">
@@ -57,44 +83,48 @@ export default function ProductOverviewCard({
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-wrap items-center gap-2">
-              {product.categories.length > 0 ? (
-                product.categories.map((category) => (
-                  <span
-                    key={category.id}
-                    className="rounded-full border border-primary/30 px-3 py-1 text-xs font-medium text-primary"
-                  >
-                    {category.name}
-                  </span>
-                ))
-              ) : (
-                <span className="text-xs text-muted-foreground">
-                  No categories assigned
+            {product.categories.length > 0 ? (
+              product.categories.map((category) => (
+                <span
+                  key={category.id}
+                  className="rounded-full border border-primary/30 px-3 py-1 text-xs font-medium text-primary"
+                >
+                  {category.name}
                 </span>
-              )}
-            </div>
-            <div className="space-y-2">
-              <p className="text-2xl font-semibold text-primary">
-                ${product.price}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {hasRatings && formattedAverageRating
-                  ? `${formattedAverageRating} average · ${ratingCount} ${
-                      ratingCount === 1 ? "rating" : "ratings"
-                    }`
-                  : "No ratings yet"}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <Button
-                className="w-full sm:w-auto"
-                size="lg"
-                disabled={isAddToCartDisabled}
-                onClick={onAddToCart}
-              >
-                {isAddToCartProcessing ? "Updating cart..." : "Add to cart"}
-              </Button>
-              <QuantityStepper
-                value={quantity}
+              ))
+            ) : (
+              <span className="text-xs text-muted-foreground">
+                {t("productDetail.overview.noCategories", {
+                  defaultValue: "No categories assigned",
+                })}
+              </span>
+            )}
+          </div>
+          <div className="space-y-2">
+            <p className="text-2xl font-semibold text-primary">
+              {formattedPrice}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {ratingLabel}
+            </p>
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <Button
+              className="w-full sm:w-auto"
+              size="lg"
+              disabled={isAddToCartDisabled}
+              onClick={onAddToCart}
+            >
+              {isAddToCartProcessing
+                ? t("products.actions.updatingCart", {
+                    defaultValue: "Updating cart...",
+                  })
+                : t("products.actions.addToCart", {
+                    defaultValue: "Add to cart",
+                  })}
+            </Button>
+            <QuantityStepper
+              value={quantity}
                 onChange={onQuantityChange}
                 disabled={isQuantityDisabled}
               />

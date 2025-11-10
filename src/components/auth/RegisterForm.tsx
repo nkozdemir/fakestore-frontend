@@ -16,6 +16,8 @@ import {
   type RegisterFormValues,
   registerResolver,
 } from "@/lib/register-schema.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
+import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 export type RegisterFormProps = {
   onSubmit: (values: RegisterFormValues) => Promise<void>
@@ -27,6 +29,9 @@ export default function RegisterForm({
   onSubmit,
   redirectHint = "Already have an account?",
 }: RegisterFormProps) {
+  const { t } = useTranslation()
+  const resolveError = (message?: string) =>
+    translateValidationMessage(t, message) ?? message
   const {
     register,
     handleSubmit,
@@ -48,6 +53,11 @@ export default function RegisterForm({
 
   const usernameAvailability = useUsernameAvailability()
   const passwordValue = watch("password") ?? ""
+  const resolvedRedirectHint =
+    redirectHint ||
+    t("auth.register.redirectHint", {
+      defaultValue: "Already have an account?",
+    })
 
   const validateUsernameAvailability = useCallback(async () => {
     const username = getValues("username")
@@ -102,16 +112,22 @@ export default function RegisterForm({
   return (
     <Card className="w-full max-w-2xl">
       <CardHeader className="space-y-2 text-center">
-        <CardTitle className="text-2xl font-semibold">Create an account</CardTitle>
+        <CardTitle className="text-2xl font-semibold">
+          {t("auth.register.title", { defaultValue: "Create an account" })}
+        </CardTitle>
         <CardDescription>
-          Join Fakestore to manage your profile, cart, and more.
+          {t("auth.register.description", {
+            defaultValue: "Join Fakestore to manage your profile, cart, and more.",
+          })}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-6" onSubmit={submitHandler} noValidate>
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="firstName">First name</Label>
+              <Label htmlFor="firstName">
+                {t("auth.register.firstName", { defaultValue: "First name" })}
+              </Label>
               <Input
                 id="firstName"
                 type="text"
@@ -120,11 +136,15 @@ export default function RegisterForm({
                 {...register("firstName")}
               />
               {errors.firstName?.message && (
-                <p className="text-sm text-destructive">{errors.firstName.message}</p>
+                <p className="text-sm text-destructive">
+                  {resolveError(errors.firstName.message)}
+                </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastName">Last name</Label>
+              <Label htmlFor="lastName">
+                {t("auth.register.lastName", { defaultValue: "Last name" })}
+              </Label>
               <Input
                 id="lastName"
                 type="text"
@@ -133,11 +153,15 @@ export default function RegisterForm({
                 {...register("lastName")}
               />
               {errors.lastName?.message && (
-                <p className="text-sm text-destructive">{errors.lastName.message}</p>
+                <p className="text-sm text-destructive">
+                  {resolveError(errors.lastName.message)}
+                </p>
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">
+                {t("auth.register.email", { defaultValue: "Email" })}
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -146,20 +170,32 @@ export default function RegisterForm({
                 {...register("email")}
               />
               {errors.email?.message && (
-                <p className="text-sm text-destructive">{errors.email.message}</p>
+                <p className="text-sm text-destructive">
+                  {resolveError(errors.email.message)}
+                </p>
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
               <UsernameField
                 registration={usernameFieldRegistration}
                 status={usernameAvailability.status}
-                error={errors.username?.message}
-                placeholder="Choose a unique username"
+                error={resolveError(errors.username?.message) ?? undefined}
+                placeholder={t("auth.register.usernamePlaceholder", {
+                  defaultValue: "Choose a unique username",
+                })}
                 statusMessages={{
-                  checking: "Checking availability...",
-                  available: "Username available",
-                  unavailable: "Username is already taken",
-                  error: "Couldn't verify username",
+                  checking: t("auth.username.status.checking", {
+                    defaultValue: "Checking availability...",
+                  }),
+                  available: t("auth.username.status.available", {
+                    defaultValue: "Username available",
+                  }),
+                  unavailable: t("auth.username.status.unavailable", {
+                    defaultValue: "Username is already taken",
+                  }),
+                  error: t("auth.username.status.error", {
+                    defaultValue: "We couldn't verify that username right now.",
+                  }),
                   idle: "",
                 }}
                 statusMessageClassName="mt-1 text-xs"
@@ -169,7 +205,9 @@ export default function RegisterForm({
               />
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">
+                {t("auth.register.password", { defaultValue: "Password" })}
+              </Label>
               <PasswordInput
                 id="password"
                 autoComplete="new-password"
@@ -178,17 +216,21 @@ export default function RegisterForm({
               />
               <div className="space-y-1">
                 <p className="text-xs text-muted-foreground">
-                  {PASSWORD_REQUIREMENT_MESSAGE}
+                  {t("auth.register.passwordHint", {
+                    defaultValue: PASSWORD_REQUIREMENT_MESSAGE,
+                  })}
                 </p>
                 <PasswordRequirements
                   password={passwordValue}
                   className="text-xs"
                   metIconClassName="size-3"
-                  unmetIconClassName="size-3"
-                />
+          unmetIconClassName="size-3"
+        />
               </div>
               {errors.password?.message && (
-                <p className="text-sm text-destructive">{errors.password.message}</p>
+                <p className="text-sm text-destructive">
+                  {resolveError(errors.password.message)}
+                </p>
               )}
             </div>
           </div>
@@ -196,26 +238,34 @@ export default function RegisterForm({
           {errors.root?.message && (
             <Alert variant="destructive">
               <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>Sign-up failed</AlertTitle>
-              <AlertDescription>{errors.root.message}</AlertDescription>
+              <AlertTitle>
+                {t("auth.alerts.signUpFailed", { defaultValue: "Sign-up failed" })}
+              </AlertTitle>
+              <AlertDescription>
+                {t(errors.root.message, {
+                  defaultValue: errors.root.message,
+                })}
+              </AlertDescription>
             </Alert>
           )}
 
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+         <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-                Creating account...
+                {t("auth.register.buttonLoading", {
+                  defaultValue: "Creating account...",
+                })}
               </>
             ) : (
-              "Create account"
+              t("auth.register.button", { defaultValue: "Create account" })
             )}
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          {redirectHint}{" "}
+          {resolvedRedirectHint}{" "}
           <Link className="font-medium text-primary hover:underline" to="/login">
-            Sign in
+            {t("auth.register.signInLink", { defaultValue: "Sign in" })}
           </Link>
           .
         </p>

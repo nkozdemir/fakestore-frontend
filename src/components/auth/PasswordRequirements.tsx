@@ -1,6 +1,7 @@
 import { Check, Circle } from "lucide-react"
 import { evaluatePasswordChecks } from "@/lib/password-policy.ts"
 import { cn } from "@/lib/utils.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type PasswordRequirementsProps = {
   password: string
@@ -16,6 +17,7 @@ export default function PasswordRequirements({
   unmetIconClassName = "size-4",
 }: PasswordRequirementsProps) {
   const checks = evaluatePasswordChecks(password)
+  const { t } = useTranslation()
 
   return (
     <ul className={cn("grid gap-1 text-sm", className)}>
@@ -33,7 +35,9 @@ export default function PasswordRequirements({
             />
           )}
           <span className={met ? "text-emerald-600" : "text-muted-foreground"}>
-            {label}
+            {t(`auth.passwordChecks.${id}`, {
+              defaultValue: label,
+            })}
           </span>
         </li>
       ))}

@@ -2,6 +2,7 @@ import { Star } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { PRODUCT_RATING_VALUES } from "@/hooks/useProductRatings.ts"
 import type { ProductRatingsList } from "@/types/catalog.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type ProductRatingsCardProps = {
   averageRating: number | null
@@ -42,6 +43,31 @@ export default function ProductRatingsCard({
   onRate,
   onRemove,
 }: ProductRatingsCardProps) {
+  const { t, locale } = useTranslation()
+  const summaryLabel =
+    formattedAverageRating ??
+    t("productDetail.ratings.summaryEmpty", {
+      defaultValue: "No ratings yet",
+    })
+  const ratingCountLabel = hasRatings
+    ? t("productDetail.ratings.summaryCount", {
+        defaultValue: "{{count}} {{label}}",
+        values: {
+          count: ratingCount.toLocaleString(locale),
+          label:
+            ratingCount === 1
+              ? t("productDetail.overview.ratingLabelSingular", {
+                  defaultValue: "rating",
+                })
+              : t("productDetail.overview.ratingLabelPlural", {
+                  defaultValue: "ratings",
+                }),
+        },
+      })
+    : t("productDetail.ratings.summaryPrompt", {
+        defaultValue: "Be the first to rate",
+      })
+
   return (
     <div className="space-y-4 rounded-lg border border-border/60 bg-muted/10 px-4 py-4">
       <div className="flex flex-wrap items-center gap-3">
@@ -61,14 +87,8 @@ export default function ProductRatingsCard({
             )
           })}
         </div>
-        <span className="text-lg font-semibold">
-          {formattedAverageRating ?? "No ratings yet"}
-        </span>
-        <span className="text-xs text-muted-foreground">
-          {hasRatings
-            ? `${ratingCount} ${ratingCount === 1 ? "rating" : "ratings"}`
-            : "Be the first to rate"}
-        </span>
+        <span className="text-lg font-semibold">{summaryLabel}</span>
+        <span className="text-xs text-muted-foreground">{ratingCountLabel}</span>
         {isSummaryFetching && <Spinner className="size-4 text-muted-foreground" />}
       </div>
 
@@ -84,7 +104,9 @@ export default function ProductRatingsCard({
         />
       ) : (
         <div className="rounded-md bg-muted px-3 py-2 text-xs text-muted-foreground">
-          Sign in to rate this product.
+          {t("productDetail.ratings.signInPrompt", {
+            defaultValue: "Sign in to rate this product.",
+          })}
         </div>
       )}
 
@@ -115,9 +137,15 @@ function UserRatingControls({
   onRate,
   onRemove,
 }: UserRatingControlsProps) {
+  const { t } = useTranslation()
+
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium">Your rating</p>
+      <p className="text-sm font-medium">
+        {t("productDetail.ratings.yourRating", {
+          defaultValue: "Your rating",
+        })}
+      </p>
       <div className="flex flex-wrap items-center gap-2">
         {PRODUCT_RATING_VALUES.map((value) => (
           <button
@@ -126,7 +154,13 @@ function UserRatingControls({
             className="group"
             onClick={() => onRate(value)}
             disabled={isRatingMutating}
-            aria-label={`Rate ${value} star${value === 1 ? "" : "s"}`}
+            aria-label={t("productDetail.ratings.rateAria", {
+              defaultValue: "Rate {{value}} star{{suffix}}",
+              values: {
+                value,
+                suffix: value === 1 ? "" : "s",
+              },
+            })}
           >
             <Star
               className="size-6"
@@ -143,16 +177,33 @@ function UserRatingControls({
       </div>
       <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
         {isRemovingRating ? (
-          <span>Removing your rating...</span>
+          <span>
+            {t("productDetail.ratings.removing", {
+              defaultValue: "Removing your rating...",
+            })}
+          </span>
         ) : currentUserRating !== null ? (
           <span>
-            You rated this product {currentUserRating} star
-            {currentUserRating === 1 ? "" : "s"}.
+            {t("productDetail.ratings.youRatedValue", {
+              defaultValue: "You rated this product {{value}} star{{suffix}}.",
+              values: {
+                value: currentUserRating,
+                suffix: currentUserRating === 1 ? "" : "s",
+              },
+            })}
           </span>
         ) : canRemoveRating ? (
-          <span>You rated this product.</span>
+          <span>
+            {t("productDetail.ratings.youRated", {
+              defaultValue: "You rated this product.",
+            })}
+          </span>
         ) : (
-          <span>Select a star rating.</span>
+          <span>
+            {t("productDetail.ratings.selectPrompt", {
+              defaultValue: "Select a star rating.",
+            })}
+          </span>
         )}
         {canRemoveRating && (
           <button
@@ -161,7 +212,13 @@ function UserRatingControls({
             onClick={onRemove}
             disabled={isRatingMutating}
           >
-            {isRemovingRating ? "Removing..." : "Remove rating"}
+            {isRemovingRating
+              ? t("productDetail.ratings.removingShort", {
+                  defaultValue: "Removing...",
+                })
+              : t("productDetail.ratings.remove", {
+                  defaultValue: "Remove rating",
+                })}
           </button>
         )}
       </div>
@@ -179,40 +236,62 @@ type RatingsListProps = {
 }
 
 function RatingsList({ state, displayedRatings }: RatingsListProps) {
+  const { t, locale } = useTranslation()
+
   if (state.isPending) {
     return (
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
         <Spinner className="size-4" />
-        <span>Loading ratings...</span>
+        <span>
+          {t("productDetail.ratings.loading", {
+            defaultValue: "Loading ratings...",
+          })}
+        </span>
       </div>
     )
   }
 
   if (state.error) {
     return (
-      <p className="text-xs text-destructive">Unable to load ratings right now.</p>
+      <p className="text-xs text-destructive">
+        {t("productDetail.ratings.loadError", {
+          defaultValue: "Unable to load ratings right now.",
+        })}
+      </p>
     )
   }
 
   if (displayedRatings.length === 0) {
     return (
       <p className="text-xs text-muted-foreground">
-        No ratings yet. Be the first to leave a rating.
+        {t("productDetail.ratings.noRatings", {
+          defaultValue: "No ratings yet. Be the first to leave a rating.",
+        })}
       </p>
     )
   }
 
   return (
     <div className="space-y-2">
-      <p className="text-sm font-medium">What shoppers are saying</p>
+      <p className="text-sm font-medium">
+        {t("productDetail.ratings.title", {
+          defaultValue: "What shoppers are saying",
+        })}
+      </p>
       <ul className="space-y-2">
         {displayedRatings.map((entry) => {
-          const name =
-            [entry.firstName, entry.lastName]
-              .filter(
-                (part) => typeof part === "string" && part.trim().length > 0,
-              )
-              .join(" ") || "Anonymous shopper"
+          const composedName = [entry.firstName, entry.lastName]
+            .filter(
+              (part) => typeof part === "string" && part.trim().length > 0,
+            )
+            .join(" ")
+            .trim()
+          const resolvedName =
+            composedName.length > 0
+              ? composedName
+              : t("productDetail.ratings.anonymous", {
+                  defaultValue: "Anonymous shopper",
+                })
 
           return (
             <li
@@ -222,7 +301,9 @@ function RatingsList({ state, displayedRatings }: RatingsListProps) {
               className="flex flex-col gap-1 rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-medium">{name}</span>
+                <span className="font-medium">
+                  {resolvedName}
+                </span>
                 <div className="flex items-center gap-1 text-primary">
                   {PRODUCT_RATING_VALUES.map((value) => (
                     <Star

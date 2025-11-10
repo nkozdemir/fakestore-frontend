@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react"
 import { MinusIcon, PlusIcon } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type QuantityStepperProps = {
   value: number
@@ -21,6 +22,7 @@ export default function QuantityStepper({
   disabled = false,
   className,
 }: QuantityStepperProps) {
+  const { t } = useTranslation()
   const [draftValue, setDraftValue] = useState<string>(() => String(value))
 
   useEffect(() => {
@@ -123,7 +125,9 @@ export default function QuantityStepper({
         className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
         onClick={decrement}
         disabled={disabled || isAtMin}
-        aria-label="Decrease quantity"
+        aria-label={t("cart.quantity.decrease", {
+          defaultValue: "Decrease quantity",
+        })}
       >
         <MinusIcon className="size-4" />
       </button>
@@ -135,7 +139,7 @@ export default function QuantityStepper({
         onChange={handleInputChange}
         onBlur={handleInputBlur}
         disabled={disabled}
-        aria-label="Quantity"
+        aria-label={t("cart.quantity.label", { defaultValue: "Quantity" })}
         className="w-12 rounded-full border-none bg-transparent text-center text-sm font-semibold outline-none [appearance:textfield] focus:ring-0 focus-visible:outline-none"
       />
       <button
@@ -143,7 +147,9 @@ export default function QuantityStepper({
         className="flex size-8 items-center justify-center rounded-full text-muted-foreground transition hover:text-foreground disabled:cursor-not-allowed disabled:opacity-30"
         onClick={increment}
         disabled={disabled || isAtMax}
-        aria-label="Increase quantity"
+        aria-label={t("cart.quantity.increase", {
+          defaultValue: "Increase quantity",
+        })}
       >
         <PlusIcon className="size-4" />
       </button>

@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/card.tsx"
 import { truncateText } from "@/lib/string.ts"
 import type { Product } from "@/types/catalog.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 const TITLE_CHAR_LIMIT = 60
 const DESCRIPTION_CHAR_LIMIT = 160
@@ -27,11 +28,30 @@ export default function ProductCard({
   isAddToCartDisabled,
   isAddToCartProcessing,
 }: ProductCardProps) {
+  const { t, formatCurrency, locale } = useTranslation()
   const shortenedTitle = truncateText(product.title, TITLE_CHAR_LIMIT)
   const shortenedDescription = truncateText(
     product.description,
     DESCRIPTION_CHAR_LIMIT,
   )
+  const parsedPrice = Number.parseFloat(product.price)
+  const formattedPrice = Number.isNaN(parsedPrice)
+    ? product.price
+    : formatCurrency(parsedPrice)
+  const ratingLabel = product.rate
+    ? t("products.grid.ratedLabel", {
+        defaultValue: "Rated {{rating}}",
+        values: { rating: product.rate },
+      })
+    : t("products.grid.ratingUnavailable", {
+        defaultValue: "Rating unavailable",
+      })
+  const reviewsLabel = t("products.grid.reviewsLabel", {
+    defaultValue: "{{count}} reviews",
+    values: {
+      count: (product.count ?? 0).toLocaleString(locale),
+    },
+  })
 
   return (
     <Link to={`/products/${product.id}`} className="group block h-full">
@@ -41,8 +61,7 @@ export default function ProductCard({
             <span title={product.title}>{shortenedTitle}</span>
           </CardTitle>
           <CardDescription>
-            {product.rate ? `Rated ${product.rate}` : "Rating unavailable"}{" "}
-            • {product.count ?? 0} reviews
+            {ratingLabel} • {reviewsLabel}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-1 flex-col gap-4">
@@ -59,7 +78,7 @@ export default function ProductCard({
           </p>
         </CardContent>
         <CardFooter className="mt-auto flex items-center justify-between gap-2">
-          <span className="text-lg font-semibold">${product.price}</span>
+          <span className="text-lg font-semibold">{formattedPrice}</span>
           <Button
             size="sm"
             disabled={isAddToCartDisabled}
@@ -69,7 +88,13 @@ export default function ProductCard({
               onAddToCart(product)
             }}
           >
-            {isAddToCartProcessing ? "Updating cart..." : "Add to cart"}
+            {isAddToCartProcessing
+              ? t("products.actions.updatingCart", {
+                  defaultValue: "Updating cart...",
+                })
+              : t("products.actions.addToCart", {
+                  defaultValue: "Add to cart",
+                })}
           </Button>
         </CardFooter>
       </Card>

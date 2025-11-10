@@ -6,6 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx"
 import type { Category } from "@/types/catalog.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 export type ProductCatalogHeaderProps = {
   categories: Category[]
@@ -20,14 +21,18 @@ export default function ProductCatalogHeader({
   onCategoryChange,
   isLoadingCategories,
 }: ProductCatalogHeaderProps) {
+  const { t } = useTranslation()
+
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <div className="space-y-2">
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          Products
+          {t("products.header.title", { defaultValue: "Products" })}
         </h1>
         <p className="text-muted-foreground">
-          Discover curated picks from our Fakestore catalog.
+          {t("products.header.description", {
+            defaultValue: "Discover curated picks from our Fakestore catalog.",
+          })}
         </p>
       </div>
       <Select
@@ -38,12 +43,22 @@ export default function ProductCatalogHeader({
         <SelectTrigger className="w-full sm:w-64">
           <SelectValue
             placeholder={
-              isLoadingCategories ? "Loading categories..." : "All categories"
+              isLoadingCategories
+                ? t("products.header.loadingCategories", {
+                    defaultValue: "Loading categories...",
+                  })
+                : t("products.header.allCategories", {
+                    defaultValue: "All categories",
+                  })
             }
           />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="all">All categories</SelectItem>
+          <SelectItem value="all">
+            {t("products.header.allCategories", {
+              defaultValue: "All categories",
+            })}
+          </SelectItem>
           {categories.map((category) => (
             <SelectItem key={category.id} value={category.name}>
               {category.name}

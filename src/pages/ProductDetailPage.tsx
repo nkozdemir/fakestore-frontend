@@ -19,6 +19,7 @@ import ProductOverviewCard from "@/components/product/ProductOverviewCard.tsx"
 import ProductRatingsCard from "@/components/product/ProductRatingsCard.tsx"
 import { useProductRatings } from "@/hooks/useProductRatings.ts"
 import type { Product } from "@/types/catalog.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 const productQueryKeyFor = (productId: string) => ["product", productId] as const
 
@@ -34,6 +35,7 @@ export default function ProductDetailPage() {
   } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
   const [quantity, setQuantity] = useState(1)
+  const { t } = useTranslation()
   useEffect(() => {
     setQuantity(1)
   }, [normalizedProductId])
@@ -69,10 +71,16 @@ export default function ProductDetailPage() {
       <main className="bg-background">
         <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-6 px-6">
           <Button asChild variant="outline" className="w-fit">
-            <Link to="/">← Back to products</Link>
+            <Link to="/">
+              {t("productDetail.backToProducts", {
+                defaultValue: "← Back to products",
+              })}
+            </Link>
           </Button>
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-            Product identifier is missing.
+            {t("productDetail.missingId", {
+              defaultValue: "Product identifier is missing.",
+            })}
           </div>
         </section>
       </main>
@@ -81,12 +89,19 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = (currentProduct: Product) => {
     if (!isAuthenticated) {
-      toast.info("Sign in to add items to your cart.", {
-        action: {
-          label: "Sign in",
-          onClick: () => navigate("/login"),
+      toast.info(
+        t("products.toasts.signInRequired", {
+          defaultValue: "Sign in to add items to your cart.",
+        }),
+        {
+          action: {
+            label: t("products.toasts.signInAction", {
+              defaultValue: "Sign in",
+            }),
+            onClick: () => navigate("/login"),
+          },
         },
-      })
+      )
       return
     }
 
@@ -97,7 +112,13 @@ export default function ProductDetailPage() {
     void addItem(currentProduct.id, normalizedQuantity)
       .then(() => {
         toast.success(
-          `Added ${normalizedQuantity} of "${currentProduct.title}" to your cart.`,
+          t("products.toasts.addToCartWithQuantity", {
+            defaultValue: 'Added {{count}} of "{{product}}" to your cart.',
+            values: {
+              count: normalizedQuantity,
+              product: currentProduct.title,
+            },
+          }),
         )
       })
       .catch((addError) => {
@@ -105,7 +126,9 @@ export default function ProductDetailPage() {
         toast.error(
           addError instanceof Error
             ? addError.message
-            : "We couldn't add that product to your cart.",
+            : t("products.toasts.addToCartError", {
+                defaultValue: "We couldn't add that product to your cart.",
+              }),
         )
       })
   }
@@ -116,12 +139,19 @@ export default function ProductDetailPage() {
     }
 
     if (!isAuthenticated) {
-      toast.info("Sign in to rate this product.", {
-        action: {
-          label: "Sign in",
-          onClick: () => navigate("/login"),
+      toast.info(
+        t("productDetail.toasts.signInToRate", {
+          defaultValue: "Sign in to rate this product.",
+        }),
+        {
+          action: {
+            label: t("products.toasts.signInAction", {
+              defaultValue: "Sign in",
+            }),
+            onClick: () => navigate("/login"),
+          },
         },
-      })
+      )
       return
     }
 
@@ -138,12 +168,19 @@ export default function ProductDetailPage() {
     }
 
     if (!isAuthenticated) {
-      toast.info("Sign in to rate this product.", {
-        action: {
-          label: "Sign in",
-          onClick: () => navigate("/login"),
+      toast.info(
+        t("productDetail.toasts.signInToRate", {
+          defaultValue: "Sign in to rate this product.",
+        }),
+        {
+          action: {
+            label: t("products.toasts.signInAction", {
+              defaultValue: "Sign in",
+            }),
+            onClick: () => navigate("/login"),
+          },
         },
-      })
+      )
       return
     }
 
@@ -185,13 +222,21 @@ export default function ProductDetailPage() {
     <main className="bg-background">
       <section className="page-section mx-auto flex w-full max-w-4xl flex-col gap-6 px-6">
         <Button asChild variant="outline" className="w-fit">
-          <Link to="/">← Back to products</Link>
+          <Link to="/">
+            {t("productDetail.backToProducts", {
+              defaultValue: "← Back to products",
+            })}
+          </Link>
         </Button>
 
         {isPending ? (
           <div className="flex flex-col items-center gap-3 py-12 text-sm text-muted-foreground">
             <Spinner className="size-6" />
-            <span>Loading product details...</span>
+            <span>
+              {t("productDetail.loading", {
+                defaultValue: "Loading product details...",
+              })}
+            </span>
           </div>
         ) : error ? (
           <div className="rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
@@ -203,7 +248,9 @@ export default function ProductDetailPage() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/">Products</Link>
+                    <Link to="/">
+                      {t("navigation.products", { defaultValue: "Products" })}
+                    </Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {primaryCategory && primaryCategoryLink ? (
@@ -239,7 +286,9 @@ export default function ProductDetailPage() {
           </>
         ) : (
           <div className="py-12 text-center text-sm text-muted-foreground">
-            Product not found.
+            {t("productDetail.notFound", {
+              defaultValue: "Product not found.",
+            })}
           </div>
         )}
       </section>

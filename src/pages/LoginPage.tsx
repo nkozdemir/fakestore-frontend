@@ -17,6 +17,8 @@ import UsernameField from "@/components/auth/UsernameField.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { createZodResolver } from "@/lib/create-zod-resolver.ts"
 import { usernameRequiredSchema } from "@/lib/username-policy.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
+import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 const loginSchema = z.object({
   username: usernameRequiredSchema,
@@ -32,6 +34,9 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
+  const { t } = useTranslation()
+  const resolveError = (message?: string) =>
+    translateValidationMessage(t, message) ?? message
   const {
     register,
     handleSubmit,
@@ -76,54 +81,72 @@ export default function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <CardTitle className="text-2xl font-semibold">Welcome back</CardTitle>
+          <CardTitle className="text-2xl font-semibold">
+            {t("auth.login.title", { defaultValue: "Welcome back" })}
+          </CardTitle>
           <CardDescription>
-            Sign in with your store credentials to continue.
+            {t("auth.login.description", {
+              defaultValue: "Sign in with your store credentials to continue.",
+            })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
             <UsernameField
               registration={usernameRegistration}
-              placeholder="Enter your username"
               autoComplete="username"
               required
-              error={errors.username?.message}
+              error={resolveError(errors.username?.message)}
             />
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">
+                {t("auth.login.passwordLabel", { defaultValue: "Password" })}
+              </Label>
               <PasswordInput
                 id="password"
                 {...register("password")}
-                placeholder="Enter your password"
+                placeholder={t("auth.login.passwordPlaceholder", {
+                  defaultValue: "Enter your password",
+                })}
                 required
                 autoComplete="current-password"
                 aria-invalid={errors.password ? "true" : "false"}
               />
               {errors.password?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.password.message}
+                  {resolveError(errors.password.message)}
                 </p>
               )}
             </div>
             {errors.root?.message && (
               <Alert variant="destructive">
                 <CircleAlert className="size-5" aria-hidden />
-                <AlertTitle>Unable to sign in</AlertTitle>
+                <AlertTitle>
+                  {t("auth.login.alertTitle", { defaultValue: "Unable to sign in" })}
+                </AlertTitle>
                 <AlertDescription>
-                  <p>{errors.root.message}</p>
-                  <p>If you forgot your password, try resetting it or contact support for help.</p>
+                  <p>
+                    {t(errors.root.message, {
+                      defaultValue: errors.root.message,
+                    })}
+                  </p>
+                  <p>
+                    {t("auth.login.alertHint", {
+                      defaultValue:
+                        "If you forgot your password, try resetting it or contact support for help.",
+                    })}
+                  </p>
                 </AlertDescription>
               </Alert>
             )}
             <Button className="w-full" type="submit" size="lg" disabled={isSubmitting}>
-              Sign in
+              {t("auth.login.button", { defaultValue: "Sign in" })}
             </Button>
           </form>
           <p className="mt-6 text-center text-sm text-muted-foreground">
-            Need an account?{" "}
+            {t("auth.login.registerPrompt", { defaultValue: "Need an account?" })}{" "}
             <Link className="font-medium text-primary hover:underline" to="/register">
-              Create one
+              {t("auth.login.registerLink", { defaultValue: "Create one" })}
             </Link>
             .
           </p>

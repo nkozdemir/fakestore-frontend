@@ -18,6 +18,8 @@ import {
   type AddressFormValues,
   addressResolver,
 } from "@/lib/profile-schemas.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
+import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type AddressDialogProps = {
   open: boolean
@@ -44,6 +46,9 @@ export default function AddressDialog({
     defaultValues: initialValues,
     resolver: addressResolver,
   })
+  const { t } = useTranslation()
+  const resolveError = (message?: string) =>
+    translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (open) {
@@ -58,7 +63,10 @@ export default function AddressDialog({
       const message =
         error instanceof Error
           ? error.message
-          : "We couldn't save that address right now. Please try again."
+          : t("profile.messages.requestFailed", {
+              defaultValue:
+                "We couldn't complete that request right now. Please try again.",
+            })
       setError("root", {
         type: "server",
         message,
@@ -73,15 +81,21 @@ export default function AddressDialog({
         <form className="space-y-6" onSubmit={submitHandler} noValidate>
           <DialogHeader>
             <DialogTitle>
-              {mode === "edit" ? "Edit address" : "Add new address"}
+              {mode === "edit"
+                ? t("profile.dialogs.address.editTitle", { defaultValue: "Edit address" })
+                : t("profile.dialogs.address.addTitle", { defaultValue: "Add new address" })}
             </DialogTitle>
             <DialogDescription>
-              Provide the full address details. All fields are required.
+              {t("profile.dialogs.address.description", {
+                defaultValue: "Provide the full address details. All fields are required.",
+              })}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="street">Street</Label>
+              <Label htmlFor="street">
+                {t("profile.fields.street", { defaultValue: "Street" })}
+              </Label>
               <Input
                 id="street"
                 type="text"
@@ -91,12 +105,14 @@ export default function AddressDialog({
               />
               {errors.street?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.street.message}
+                  {resolveError(errors.street.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="number">Number</Label>
+              <Label htmlFor="number">
+                {t("profile.fields.number", { defaultValue: "Number" })}
+              </Label>
               <Input
                 id="number"
                 type="text"
@@ -107,12 +123,14 @@ export default function AddressDialog({
               />
               {errors.number?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.number.message}
+                  {resolveError(errors.number.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">City</Label>
+              <Label htmlFor="city">
+                {t("profile.fields.city", { defaultValue: "City" })}
+              </Label>
               <Input
                 id="city"
                 type="text"
@@ -122,12 +140,14 @@ export default function AddressDialog({
               />
               {errors.city?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.city.message}
+                  {resolveError(errors.city.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="zipcode">ZIP code</Label>
+              <Label htmlFor="zipcode">
+                {t("profile.fields.zipcode", { defaultValue: "ZIP code" })}
+              </Label>
               <Input
                 id="zipcode"
                 type="text"
@@ -137,12 +157,14 @@ export default function AddressDialog({
               />
               {errors.zipcode?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.zipcode.message}
+                  {resolveError(errors.zipcode.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="latitude">Latitude</Label>
+              <Label htmlFor="latitude">
+                {t("profile.fields.latitude", { defaultValue: "Latitude" })}
+              </Label>
               <Input
                 id="latitude"
                 type="text"
@@ -152,12 +174,14 @@ export default function AddressDialog({
               />
               {errors.latitude?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.latitude.message}
+                  {resolveError(errors.latitude.message)}
                 </p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="longitude">Longitude</Label>
+              <Label htmlFor="longitude">
+                {t("profile.fields.longitude", { defaultValue: "Longitude" })}
+              </Label>
               <Input
                 id="longitude"
                 type="text"
@@ -167,7 +191,7 @@ export default function AddressDialog({
               />
               {errors.longitude?.message && (
                 <p className="text-sm text-destructive">
-                  {errors.longitude.message}
+                  {resolveError(errors.longitude.message)}
                 </p>
               )}
             </div>
@@ -175,8 +199,12 @@ export default function AddressDialog({
           {errors.root?.message && (
             <Alert variant="destructive">
               <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>Address update failed</AlertTitle>
-              <AlertDescription>{errors.root.message}</AlertDescription>
+              <AlertTitle>
+                {t("profile.dialogs.address.alertTitle", {
+                  defaultValue: "Address update failed",
+                })}
+              </AlertTitle>
+              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
             </Alert>
           )}
           <DialogFooter>
@@ -186,16 +214,24 @@ export default function AddressDialog({
               onClick={() => onOpenChange(false)}
               disabled={isSubmitting}
             >
-              Cancel
+              {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-                  Saving...
+                  {t("profile.dialogs.address.saving", {
+                    defaultValue: "Saving...",
+                  })}
                 </>
               ) : (
-                mode === "edit" ? "Update address" : "Add address"
+                mode === "edit"
+                  ? t("profile.dialogs.address.saveEdit", {
+                      defaultValue: "Update address",
+                    })
+                  : t("profile.dialogs.address.saveAdd", {
+                      defaultValue: "Add address",
+                    })
               )}
             </Button>
           </DialogFooter>

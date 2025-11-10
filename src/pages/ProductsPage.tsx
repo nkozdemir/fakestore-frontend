@@ -10,6 +10,7 @@ import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
 import type { Category, Product } from "@/types/catalog.ts"
 import { toast } from "sonner"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -17,6 +18,7 @@ export default function ProductsPage() {
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
+  const { t } = useTranslation()
 
   const selectedCategoryParam = searchParams.get("category")
   const selectedCategory =
@@ -71,25 +73,39 @@ export default function ProductsPage() {
 
   const handleAddToCart = (product: Product) => {
     if (!isAuthenticated) {
-      toast.info("Sign in to add items to your cart.", {
-        action: {
-          label: "Sign in",
-          onClick: () => navigate("/login"),
+      toast.info(
+        t("products.toasts.signInRequired", {
+          defaultValue: "Sign in to add items to your cart.",
+        }),
+        {
+          action: {
+            label: t("products.toasts.signInAction", {
+              defaultValue: "Sign in",
+            }),
+            onClick: () => navigate("/login"),
+          },
         },
-      })
+      )
       return
     }
 
     void addItem(product.id, 1)
       .then(() => {
-        toast.success(`Added "${product.title}" to your cart.`)
+        toast.success(
+          t("products.toasts.addToCartSuccess", {
+            defaultValue: 'Added "{{product}}" to your cart.',
+            values: { product: product.title },
+          }),
+        )
       })
       .catch((error) => {
         console.error(error)
         toast.error(
           error instanceof Error
             ? error.message
-            : "We couldn't add that product to your cart.",
+            : t("products.toasts.addToCartError", {
+                defaultValue: "We couldn't add that product to your cart.",
+              }),
         )
       })
   }
@@ -116,7 +132,11 @@ export default function ProductsPage() {
         {catalog.isRefetching ? (
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Spinner className="size-4" />
-            <span>Updating products…</span>
+            <span>
+              {t("products.summary.updating", {
+                defaultValue: "Updating products…",
+              })}
+            </span>
           </div>
         ) : null}
 
@@ -127,8 +147,13 @@ export default function ProductsPage() {
           totalCount={catalog.formattedTotalCount}
           summaryLabel={
             selectedCategoryLabel
-              ? `${selectedCategoryLabel} products`
-              : "products"
+              ? t("products.summary.categoryLabel", {
+                  defaultValue: "{{category}} products",
+                  values: { category: selectedCategoryLabel },
+                })
+              : t("products.summary.genericLabel", {
+                  defaultValue: "products",
+                })
           }
         />
 
@@ -136,7 +161,9 @@ export default function ProductsPage() {
           products={catalog.products}
           isInitialLoading={catalog.isInitialLoading}
           errorMessage={catalog.errorMessage}
-          emptyMessage="No products found for the selected filters."
+          emptyMessage={t("products.grid.empty", {
+            defaultValue: "No products found for the selected filters.",
+          })}
           onAddToCart={handleAddToCart}
           isAddToCartDisabled={isAuthLoading || isCartUpdating}
           isAddToCartProcessing={isCartUpdating}

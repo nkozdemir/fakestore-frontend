@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import type { UserAddress } from "@/types/auth.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 type AddressSectionProps = {
   addresses: UserAddress[]
@@ -41,18 +42,24 @@ export default function AddressSection({
   onDeleteRequest,
   deleteDialog,
 }: AddressSectionProps) {
+  const { t } = useTranslation()
+
   return (
     <Card>
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle>Addresses</CardTitle>
+          <CardTitle>
+            {t("profile.addresses.title", { defaultValue: "Addresses" })}
+          </CardTitle>
           <CardDescription>
-            Manage the delivery addresses linked to your account.
+            {t("profile.addresses.description", {
+              defaultValue: "Manage the delivery addresses linked to your account.",
+            })}
           </CardDescription>
         </div>
         <Button variant="outline" size="sm" onClick={onAdd}>
           <Plus className="mr-2 size-4" aria-hidden />
-          Add address
+          {t("profile.addresses.addButton", { defaultValue: "Add address" })}
         </Button>
       </CardHeader>
       <CardContent>
@@ -69,7 +76,13 @@ export default function AddressSection({
                       {address.city}, {address.zipcode}
                     </p>
                     <p className="text-muted-foreground text-xs">
-                      Coordinates: {address.latitude}, {address.longitude}
+                      {t("profile.addresses.coordinatesValue", {
+                        defaultValue: "Coordinates: {{lat}}, {{long}}",
+                        values: {
+                          lat: address.latitude,
+                          long: address.longitude,
+                        },
+                      })}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 self-end sm:self-auto">
@@ -79,14 +92,20 @@ export default function AddressSection({
                       onClick={() => onEdit(address)}
                     >
                       <Pencil className="mr-2 size-4" aria-hidden />
-                      Edit
+                      {t("profile.addresses.edit", { defaultValue: "Edit" })}
                     </Button>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="text-destructive hover:text-destructive focus-visible:text-destructive"
                       onClick={() => onDeleteRequest(address)}
-                      aria-label={`Remove address at ${address.street} ${address.number}`}
+                      aria-label={t("profile.addresses.removeAria", {
+                        defaultValue: "Remove address at {{street}} {{number}}",
+                        values: {
+                          street: address.street,
+                          number: address.number,
+                        },
+                      })}
                     >
                       <Trash2 className="size-4" aria-hidden />
                     </Button>
@@ -97,7 +116,9 @@ export default function AddressSection({
           </ul>
         ) : (
           <p className="text-sm text-muted-foreground">
-            You haven't saved any addresses yet.
+            {t("profile.addresses.empty", {
+              defaultValue: "You haven't saved any addresses yet.",
+            })}
           </p>
         )}
         <AlertDialog
@@ -111,23 +132,36 @@ export default function AddressSection({
           {deleteDialog.address && (
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Remove this address?</AlertDialogTitle>
+                <AlertDialogTitle>
+                  {t("profile.addresses.deleteDialogTitle", {
+                    defaultValue: "Remove this address?",
+                  })}
+                </AlertDialogTitle>
                 <AlertDialogDescription>
-                  We'll remove {deleteDialog.address.street}{" "}
-                  {deleteDialog.address.number} from your saved addresses. You can
-                  add it again at any time.
+                  {t("profile.addresses.deleteDialogDescription", {
+                    defaultValue:
+                      "We'll remove {{street}} {{number}} from your saved addresses. You can add it again at any time.",
+                    values: {
+                      street: deleteDialog.address.street,
+                      number: deleteDialog.address.number,
+                    },
+                  })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               {deleteDialog.error && (
                 <Alert variant="destructive">
                   <CircleAlert className="size-5" aria-hidden />
-                  <AlertTitle>Address removal failed</AlertTitle>
+                  <AlertTitle>
+                    {t("profile.addresses.deleteErrorTitle", {
+                      defaultValue: "Address removal failed",
+                    })}
+                  </AlertTitle>
                   <AlertDescription>{deleteDialog.error}</AlertDescription>
                 </Alert>
               )}
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={deleteDialog.isDeleting}>
-                  Cancel
+                  {t("profile.addresses.cancel", { defaultValue: "Cancel" })}
                 </AlertDialogCancel>
                 <AlertDialogAction
                   onClick={(event) => {
@@ -142,7 +176,7 @@ export default function AddressSection({
                   ) : (
                     <Trash2 className="mr-2 size-4" aria-hidden />
                   )}
-                  Remove
+                  {t("profile.addresses.confirm", { defaultValue: "Remove" })}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

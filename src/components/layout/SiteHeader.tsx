@@ -2,6 +2,7 @@ import { useMemo, useState } from "react"
 import { MenuIcon } from "lucide-react"
 import { Link, NavLink, useNavigate } from "react-router"
 import { ModeToggle } from "@/components/mode-toggle.tsx"
+import LanguageToggle from "@/components/language/LanguageToggle.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { buttonVariants } from "@/components/ui/button-variants.ts"
 import {
@@ -14,15 +15,17 @@ import {
 } from "@/components/ui/dropdown-menu.tsx"
 import { cn } from "@/lib/utils.ts"
 import useAuth from "@/hooks/useAuth.ts"
+import { useTranslation } from "@/context/I18nProvider.tsx"
 
 const navItems = [
-  { label: "Products", to: "/", end: true },
-  { label: "Cart", to: "/carts", end: false },
+  { labelKey: "navigation.products", to: "/", end: true },
+  { labelKey: "navigation.cart", to: "/carts", end: false },
 ] as const
 
 export default function SiteHeader() {
   const navigate = useNavigate()
   const { isAuthenticated, user, logout, isLoading } = useAuth()
+  const { t } = useTranslation()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const displayName = useMemo(() => {
     const name = user?.firstName?.trim()
@@ -33,8 +36,8 @@ export default function SiteHeader() {
     if (username && username.length > 0) {
       return username
     }
-    return "Account"
-  }, [user?.firstName, user?.username])
+    return t("navigation.accountFallback", { defaultValue: "Account" })
+  }, [t, user?.firstName, user?.username])
 
   const handleLogout = async () => {
     setIsLoggingOut(true)
@@ -50,7 +53,7 @@ export default function SiteHeader() {
     <header className="sticky top-0 z-50 border-b bg-background">
       <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6">
         <Link to="/" className="text-lg font-semibold tracking-tight">
-          Fakestore
+          {t("common.appName", { defaultValue: "Fakestore" })}
         </Link>
         <div className="flex items-center gap-2 sm:gap-3">
           <nav className="hidden items-center gap-1 sm:flex">
@@ -69,7 +72,9 @@ export default function SiteHeader() {
                   )
                 }
               >
-                {item.label}
+                {t(item.labelKey, {
+                  defaultValue: item.labelKey,
+                })}
               </NavLink>
             ))}
           </nav>
@@ -92,7 +97,7 @@ export default function SiteHeader() {
                       navigate("/profile")
                     }}
                   >
-                    Profile
+                    {t("navigation.profile", { defaultValue: "Profile" })}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
@@ -101,7 +106,7 @@ export default function SiteHeader() {
                     }}
                     disabled={isLoggingOut}
                   >
-                    Log out
+                    {t("navigation.signOut", { defaultValue: "Log out" })}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -112,7 +117,7 @@ export default function SiteHeader() {
                 className="hidden sm:inline-flex"
                 onClick={() => navigate("/login")}
               >
-                Sign in
+                {t("navigation.signIn", { defaultValue: "Sign in" })}
               </Button>
             ))}
           <DropdownMenu>
@@ -121,19 +126,25 @@ export default function SiteHeader() {
                 variant="ghost"
                 size="icon"
                 className="sm:hidden"
-                aria-label="Open navigation menu"
+                aria-label={t("navigation.openMenu", {
+                  defaultValue: "Open navigation menu",
+                })}
               >
                 <MenuIcon className="size-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>Navigate</DropdownMenuLabel>
+              <DropdownMenuLabel>
+                {t("navigation.menuLabel", { defaultValue: "Navigate" })}
+              </DropdownMenuLabel>
               {navItems.map((item) => (
                 <DropdownMenuItem
                   key={item.to}
                   onSelect={() => navigate(item.to)}
                 >
-                  {item.label}
+                  {t(item.labelKey, {
+                    defaultValue: item.labelKey,
+                  })}
                 </DropdownMenuItem>
               ))}
               {!isLoading && (
@@ -145,7 +156,7 @@ export default function SiteHeader() {
                       <DropdownMenuItem
                         onSelect={() => navigate("/profile")}
                       >
-                        Profile
+                        {t("navigation.profile", { defaultValue: "Profile" })}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onSelect={() => {
@@ -153,20 +164,25 @@ export default function SiteHeader() {
                         }}
                         disabled={isLoggingOut}
                       >
-                        Log out
+                        {t("navigation.signOut", {
+                          defaultValue: "Log out",
+                        })}
                       </DropdownMenuItem>
                     </>
                   ) : (
                     <DropdownMenuItem
                       onSelect={() => navigate("/login")}
                     >
-                      Sign in
+                      {t("navigation.signIn", {
+                        defaultValue: "Sign in",
+                      })}
                     </DropdownMenuItem>
                   )}
                 </>
               )}
             </DropdownMenuContent>
           </DropdownMenu>
+          <LanguageToggle />
           <ModeToggle />
         </div>
       </div>
