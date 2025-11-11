@@ -27,7 +27,7 @@ export function stubCatalogRoutes() {
   }).as("getCategories")
 
   cy.intercept("GET", productsMatcher, (req) => {
-    if (req.url.includes("category=electronics")) {
+    if (req.url.indexOf("category=electronics") !== -1) {
       req.reply({ fixture: "products/electronics-products.json" })
       return
     }
