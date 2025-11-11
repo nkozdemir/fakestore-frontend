@@ -50,10 +50,11 @@ const defaultAuthValue = (): AuthContextValue => ({
 function cloneCart(cart: Cart): Cart {
   return {
     ...cart,
-    items: cart.items?.map((item) => ({
-      product: { ...item.product },
-      quantity: item.quantity,
-    })) ?? [],
+    items:
+      cart.items?.map((item) => ({
+        product: { ...item.product },
+        quantity: item.quantity,
+      })) ?? [],
   }
 }
 
@@ -103,9 +104,10 @@ function setupCartHandlers(cart: Cart, patchSpy?: CartPatchPayload[]) {
   )
 }
 
-function createWrapper(
-  authOverrides: Partial<AuthContextValue> = {},
-): { wrapper: ({ children }: { children: ReactNode }) => JSX.Element; queryClient: QueryClient } {
+function createWrapper(authOverrides: Partial<AuthContextValue> = {}): {
+  wrapper: ({ children }: { children: ReactNode }) => JSX.Element
+  queryClient: QueryClient
+} {
   const authValue = {
     ...defaultAuthValue(),
     ...authOverrides,

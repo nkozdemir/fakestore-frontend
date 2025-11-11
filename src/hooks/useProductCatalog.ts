@@ -10,21 +10,13 @@ export type UseProductCatalogParams = {
   selectedCategory: string | null
 }
 
-export function useProductCatalog({
-  page,
-  selectedCategory,
-}: UseProductCatalogParams) {
+export function useProductCatalog({ page, selectedCategory }: UseProductCatalogParams) {
   const productQueryKey = [
     "products",
     { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory },
   ] as const
 
-  const productsQuery = useQuery<
-    ProductResponse,
-    Error,
-    ProductResponse,
-    typeof productQueryKey
-  >({
+  const productsQuery = useQuery<ProductResponse, Error, ProductResponse, typeof productQueryKey>({
     queryKey: productQueryKey,
     queryFn: () =>
       fetchJson<ProductResponse>("products/", {
@@ -34,8 +26,7 @@ export function useProductCatalog({
           category: selectedCategory ?? undefined,
         },
       }),
-    placeholderData: (previousData): ProductResponse | undefined =>
-      previousData ?? undefined,
+    placeholderData: (previousData): ProductResponse | undefined => previousData ?? undefined,
   })
 
   const categoriesQuery = useQuery<Category[], Error>({
@@ -61,13 +52,11 @@ export function useProductCatalog({
       : Math.max(1, page + (productsQuery.data?.next ? 1 : 0))
 
     const canGoPrevious = page > 1 || Boolean(productsQuery.data?.previous)
-    const canGoNext =
-      Boolean(productsQuery.data?.next) || (hasExplicitCount && page < totalPages)
+    const canGoNext = Boolean(productsQuery.data?.next) || (hasExplicitCount && page < totalPages)
 
     const isInitialLoading = productsQuery.isPending && !productsQuery.data
     const isRefetching = productsQuery.isFetching && !isInitialLoading
-    const errorMessage =
-      productsQuery.error?.message ?? categoriesQuery.error?.message ?? null
+    const errorMessage = productsQuery.error?.message ?? categoriesQuery.error?.message ?? null
 
     const firstItemIndex = (page - 1) * PRODUCTS_PAGE_SIZE + 1
     const lastItemIndex = firstItemIndex + products.length - 1

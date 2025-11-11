@@ -57,10 +57,7 @@ export default function LanguageToggle({ className }: LanguageToggleProps) {
               <span className="flex w-full items-center justify-between text-sm">
                 <span>{metadata.label}</span>
                 <CheckIcon
-                  className={cn(
-                    "size-4 opacity-0 transition",
-                    language === code && "opacity-100",
-                  )}
+                  className={cn("size-4 opacity-0 transition", language === code && "opacity-100")}
                 />
               </span>
             </DropdownMenuItem>

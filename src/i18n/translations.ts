@@ -91,8 +91,7 @@ export const translationResources = {
         passwordLabel: "Password",
         passwordPlaceholder: "Enter your password",
         alertTitle: "Unable to sign in",
-        alertHint:
-          "If you forgot your password, try resetting it or contact support for help.",
+        alertHint: "If you forgot your password, try resetting it or contact support for help.",
         button: "Sign in",
         registerPrompt: "Need an account?",
         registerLink: "Create one",
@@ -116,16 +115,12 @@ export const translationResources = {
         signUpFailed: "Sign-up failed",
       },
       messages: {
-        invalidCredentials:
-          "We couldn’t sign you in with those details. Please try again.",
-        throttled:
-          "Too many sign-in attempts. Please wait a moment and try again.",
+        invalidCredentials: "We couldn’t sign you in with those details. Please try again.",
+        throttled: "Too many sign-in attempts. Please wait a moment and try again.",
         loginGeneric:
           "We ran into a problem while signing you in. Please try again in a few moments.",
-        loginUnexpected:
-          "We ran into an unexpected issue while signing you in. Please try again.",
-        loadProfileFailed:
-          "Unable to load your account details after signing in.",
+        loginUnexpected: "We ran into an unexpected issue while signing you in. Please try again.",
+        loadProfileFailed: "Unable to load your account details after signing in.",
         registerValidation:
           "We couldn’t create your account with those details. Please review the form and try again.",
         registerGeneric:
@@ -233,27 +228,22 @@ export const translationResources = {
       subtitle: "Manage your personal information and account preferences.",
       unavailable: {
         title: "Profile unavailable",
-        description:
-          "We couldn't load your profile details. Please sign in again to continue.",
+        description: "We couldn't load your profile details. Please sign in again to continue.",
         action: "Go to sign in",
       },
       messages: {
-        requestFailed:
-          "We couldn't complete that request right now. Please try again.",
-        profileMissing:
-          "We couldn't find your profile. Please sign in again.",
+        requestFailed: "We couldn't complete that request right now. Please try again.",
+        profileMissing: "We couldn't find your profile. Please sign in again.",
       },
       toasts: {
         profileUpdated: "Profile updated successfully.",
         addressAdded: "Address added successfully.",
         addressUpdated: "Address updated successfully.",
         addressRemoved: "Address removed successfully.",
-        addressRemoveError:
-          "We couldn't remove that address right now. Please try again.",
+        addressRemoveError: "We couldn't remove that address right now. Please try again.",
         passwordUpdated: "Password updated successfully.",
         accountDeleted: "Your account has been deleted.",
-        accountDeleteError:
-          "We couldn't delete your account right now. Please try again.",
+        accountDeleteError: "We couldn't delete your account right now. Please try again.",
       },
       summary: {
         description: "Account details from your Fakestore profile.",
@@ -267,8 +257,7 @@ export const translationResources = {
       },
       addresses: {
         title: "Addresses",
-        description:
-          "Manage the delivery addresses linked to your account.",
+        description: "Manage the delivery addresses linked to your account.",
         addButton: "Add address",
         empty: "You haven't saved any addresses yet.",
         coordinatesLabel: "Coordinates",
@@ -279,21 +268,19 @@ export const translationResources = {
         deleteDialogDescription:
           "We'll remove {{street}} {{number}} from your saved addresses. You can add it again at any time.",
         deleteErrorTitle: "Address removal failed",
-        removeAria: 'Remove address at {{street}} {{number}}',
+        removeAria: "Remove address at {{street}} {{number}}",
         cancel: "Cancel",
         confirm: "Remove",
       },
       security: {
         title: "Security",
-        description:
-          "Update sensitive account information such as your password.",
+        description: "Update sensitive account information such as your password.",
         body: "Choose a strong password to keep your account secure.",
         button: "Change password",
       },
       delete: {
         title: "Delete account",
-        description:
-          "Permanently remove your Fakestore account and all associated data.",
+        description: "Permanently remove your Fakestore account and all associated data.",
         alertTitle: "Account deletion failed",
         dialogTitle: "Delete your account?",
         dialogDescription:
@@ -314,8 +301,7 @@ export const translationResources = {
         address: {
           addTitle: "Add new address",
           editTitle: "Edit address",
-          description:
-            "Provide the full address details. All fields are required.",
+          description: "Provide the full address details. All fields are required.",
           alertTitle: "Address update failed",
           saveAdd: "Add address",
           saveEdit: "Update address",
@@ -323,8 +309,7 @@ export const translationResources = {
         },
         password: {
           title: "Change password",
-          description:
-            "Choose a strong password that meets all requirements.",
+          description: "Choose a strong password that meets all requirements.",
           alertTitle: "Password update failed",
           newPassword: "New password",
           confirmPassword: "Confirm password",
@@ -464,8 +449,7 @@ export const translationResources = {
         passwordLabel: "Şifre",
         passwordPlaceholder: "Şifrenizi girin",
         alertTitle: "Giriş yapılamadı",
-        alertHint:
-          "Şifrenizi unuttuysanız sıfırlamayı deneyin veya destekle iletişime geçin.",
+        alertHint: "Şifrenizi unuttuysanız sıfırlamayı deneyin veya destekle iletişime geçin.",
         button: "Giriş yap",
         registerPrompt: "Hesabın mı yok?",
         registerLink: "Hemen oluştur",
@@ -489,20 +473,13 @@ export const translationResources = {
         signUpFailed: "Kayıt başarısız",
       },
       messages: {
-        invalidCredentials:
-          "Bu bilgilerle giriş yapamadık. Lütfen tekrar deneyin.",
-        throttled:
-          "Çok fazla giriş denemesi. Lütfen biraz bekleyip tekrar deneyin.",
-        loginGeneric:
-          "Giriş yaparken bir sorun oluştu. Lütfen kısa süre sonra tekrar deneyin.",
-        loginUnexpected:
-          "Giriş yaparken beklenmedik bir sorun oluştu. Lütfen tekrar deneyin.",
-        loadProfileFailed:
-          "Girişten sonra hesap bilgilerinizi yükleyemedik.",
-        registerValidation:
-          "Bu bilgilerle hesabınızı oluşturamadık. Lütfen formu kontrol edin.",
-        registerGeneric:
-          "Hesabınızı oluştururken bir sorun yaşadık. Lütfen tekrar deneyin.",
+        invalidCredentials: "Bu bilgilerle giriş yapamadık. Lütfen tekrar deneyin.",
+        throttled: "Çok fazla giriş denemesi. Lütfen biraz bekleyip tekrar deneyin.",
+        loginGeneric: "Giriş yaparken bir sorun oluştu. Lütfen kısa süre sonra tekrar deneyin.",
+        loginUnexpected: "Giriş yaparken beklenmedik bir sorun oluştu. Lütfen tekrar deneyin.",
+        loadProfileFailed: "Girişten sonra hesap bilgilerinizi yükleyemedik.",
+        registerValidation: "Bu bilgilerle hesabınızı oluşturamadık. Lütfen formu kontrol edin.",
+        registerGeneric: "Hesabınızı oluştururken bir sorun yaşadık. Lütfen tekrar deneyin.",
         registerAutoLogin:
           "Hesabınız oluşturuldu ancak otomatik giriş yapılamadı. Lütfen manuel giriş yapın.",
       },
@@ -582,7 +559,7 @@ export const translationResources = {
         signInPrompt: "Bu ürünü puanlamak için giriş yapın.",
         yourRating: "Puanınız",
         removing: "Puanınız kaldırılıyor...",
-        youRatedValue: 'Bu ürünü {{value}} yıldız olarak puanladınız.',
+        youRatedValue: "Bu ürünü {{value}} yıldız olarak puanladınız.",
         youRated: "Bu ürünü puanladınız.",
         selectPrompt: "Bir yıldız değeri seçin.",
         remove: "Puanı kaldır",
@@ -611,22 +588,18 @@ export const translationResources = {
         action: "Giriş sayfasına git",
       },
       messages: {
-        requestFailed:
-          "Bu isteği şu anda tamamlayamadık. Lütfen tekrar deneyin.",
-        profileMissing:
-          "Profilinizi bulamadık. Lütfen yeniden giriş yapın.",
+        requestFailed: "Bu isteği şu anda tamamlayamadık. Lütfen tekrar deneyin.",
+        profileMissing: "Profilinizi bulamadık. Lütfen yeniden giriş yapın.",
       },
       toasts: {
         profileUpdated: "Profil başarıyla güncellendi.",
         addressAdded: "Adres başarıyla eklendi.",
         addressUpdated: "Adres başarıyla güncellendi.",
         addressRemoved: "Adres başarıyla kaldırıldı.",
-        addressRemoveError:
-          "Bu adresi şu anda kaldıramadık. Lütfen tekrar deneyin.",
+        addressRemoveError: "Bu adresi şu anda kaldıramadık. Lütfen tekrar deneyin.",
         passwordUpdated: "Şifre başarıyla güncellendi.",
         accountDeleted: "Hesabınız silindi.",
-        accountDeleteError:
-          "Hesabınızı şu anda silemedik. Lütfen tekrar deneyin.",
+        accountDeleteError: "Hesabınızı şu anda silemedik. Lütfen tekrar deneyin.",
       },
       summary: {
         description: "Fakestore profilinizden hesap detayları.",
@@ -640,8 +613,7 @@ export const translationResources = {
       },
       addresses: {
         title: "Adresler",
-        description:
-          "Hesabınıza bağlı teslimat adreslerini yönetin.",
+        description: "Hesabınıza bağlı teslimat adreslerini yönetin.",
         addButton: "Adres ekle",
         empty: "Henüz kaydedilmiş adresiniz yok.",
         coordinatesLabel: "Koordinatlar",
@@ -658,15 +630,13 @@ export const translationResources = {
       },
       security: {
         title: "Güvenlik",
-        description:
-          "Şifreniz gibi hassas hesap bilgilerini güncelleyin.",
+        description: "Şifreniz gibi hassas hesap bilgilerini güncelleyin.",
         body: "Hesabınızı korumak için güçlü bir şifre seçin.",
         button: "Şifreyi değiştir",
       },
       delete: {
         title: "Hesabı sil",
-        description:
-          "Fakestore hesabınızı ve tüm verilerinizi kalıcı olarak silin.",
+        description: "Fakestore hesabınızı ve tüm verilerinizi kalıcı olarak silin.",
         alertTitle: "Hesap silme başarısız",
         dialogTitle: "Hesabınızı silmek istiyor musunuz?",
         dialogDescription:
@@ -695,8 +665,7 @@ export const translationResources = {
         },
         password: {
           title: "Şifreyi değiştir",
-          description:
-            "Tüm gereksinimleri karşılayan güçlü bir şifre seçin.",
+          description: "Tüm gereksinimleri karşılayan güçlü bir şifre seçin.",
           alertTitle: "Şifre güncellenemedi",
           newPassword: "Yeni şifre",
           confirmPassword: "Şifreyi doğrula",
@@ -739,8 +708,7 @@ export const translationResources = {
     notFound: {
       badge: "404 hatası",
       title: "Sayfa bulunamadı",
-      description:
-        "Aradığınız sayfayı bulamadık. Taşınmış veya silinmiş olabilir.",
+      description: "Aradığınız sayfayı bulamadık. Taşınmış veya silinmiş olabilir.",
       action: "Ana sayfaya dön",
     },
   },
@@ -768,6 +736,4 @@ export const languageMetadata: Record<
   },
 }
 
-export const supportedLanguages = Object.keys(
-  translationResources,
-) as Language[]
+export const supportedLanguages = Object.keys(translationResources) as Language[]

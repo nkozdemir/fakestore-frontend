@@ -1,10 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 
@@ -18,9 +12,7 @@ export default function SecurityCard({ onChangePassword }: SecurityCardProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
-          {t("profile.security.title", { defaultValue: "Security" })}
-        </CardTitle>
+        <CardTitle>{t("profile.security.title", { defaultValue: "Security" })}</CardTitle>
         <CardDescription>
           {t("profile.security.description", {
             defaultValue: "Update sensitive account information such as your password.",

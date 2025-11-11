@@ -25,11 +25,7 @@ type I18nContextValue = {
   locale: string
   setLanguage: (language: Language) => void
   t: (key: string, options?: TranslateOptions) => string
-  formatCurrency: (
-    value: number,
-    currency?: string,
-    options?: Intl.NumberFormatOptions,
-  ) => string
+  formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) => string
 }
 
 const STORAGE_KEY = "fakestore:language"
@@ -63,8 +59,7 @@ const detectBrowserLanguage = (): Language | null => {
     return null
   }
 
-  const navigatorLanguage =
-    window.navigator.language ?? window.navigator.languages?.[0]
+  const navigatorLanguage = window.navigator.language ?? window.navigator.languages?.[0]
 
   if (!navigatorLanguage) {
     return null
@@ -82,21 +77,14 @@ const detectBrowserLanguage = (): Language | null => {
 const detectInitialLanguage = (): Language =>
   getStoredLanguage() ?? detectBrowserLanguage() ?? fallbackLanguage
 
-const resolveTranslationString = (
-  language: Language,
-  key: string,
-): string | null => {
+const resolveTranslationString = (language: Language, key: string): string | null => {
   const resource = translationResources[language] as Record<string, unknown>
   const segments = key.split(".").filter(Boolean)
 
   let current: unknown = resource
 
   for (const segment of segments) {
-    if (
-      !current ||
-      typeof current !== "object" ||
-      !(segment in current)
-    ) {
+    if (!current || typeof current !== "object" || !(segment in current)) {
       return null
     }
 
@@ -162,11 +150,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   )
 
   const formatCurrency = useCallback(
-    (
-      value: number,
-      currency = "USD",
-      options?: Intl.NumberFormatOptions,
-    ) =>
+    (value: number, currency = "USD", options?: Intl.NumberFormatOptions) =>
       new Intl.NumberFormat(locale, {
         style: "currency",
         currency,
@@ -177,9 +161,7 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   )
 
   const setLanguage = useCallback((nextLanguage: Language) => {
-    setLanguageState((current) =>
-      current === nextLanguage ? current : nextLanguage,
-    )
+    setLanguageState((current) => (current === nextLanguage ? current : nextLanguage))
   }, [])
 
   const value = useMemo<I18nContextValue>(

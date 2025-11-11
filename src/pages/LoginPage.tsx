@@ -4,13 +4,7 @@ import { z } from "zod"
 import { CircleAlert } from "lucide-react"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import PasswordInput from "@/components/ui/password-input.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import UsernameField from "@/components/auth/UsernameField.tsx"
@@ -22,9 +16,7 @@ import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 const loginSchema = z.object({
   username: usernameRequiredSchema,
-  password: z
-    .string()
-    .nonempty("Password is required"),
+  password: z.string().nonempty("Password is required"),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
@@ -35,8 +27,7 @@ export default function LoginPage() {
   const location = useLocation()
   const { login } = useAuth()
   const { t } = useTranslation()
-  const resolveError = (message?: string) =>
-    translateValidationMessage(t, message) ?? message
+  const resolveError = (message?: string) => translateValidationMessage(t, message) ?? message
   const {
     register,
     handleSubmit,
@@ -52,16 +43,14 @@ export default function LoginPage() {
 
   const usernameRegistration = register("username")
 
-  const from =
-    (location.state as { from?: string } | null)?.from ?? "/"
+  const from = (location.state as { from?: string } | null)?.from ?? "/"
 
   const onSubmit = async (values: LoginFormValues) => {
     try {
       await login(values)
       navigate(from, { replace: true })
     } catch (error) {
-      const defaultMessage =
-        "We couldn’t sign you in with those details. Please try again."
+      const defaultMessage = "We couldn’t sign you in with those details. Please try again."
       const networkMessage =
         "We couldn’t reach the sign-in service. Check your connection and try again."
       const message =
@@ -118,9 +107,7 @@ export default function LoginPage() {
                 aria-invalid={errors.password ? "true" : "false"}
               />
               {errors.password?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.password.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.password.message)}</p>
               )}
             </div>
             {errors.root?.message && (

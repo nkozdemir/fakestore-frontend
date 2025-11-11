@@ -1,0 +1,29 @@
+# Dependencies
+node_modules
+
+# Build artifacts
+dist
+build
+coverage
+.vite
+
+# Cypress output
+cypress/screenshots
+cypress/videos
+cypress/downloads
+
+# Lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Editor and OS files
+.vscode
+.idea
+.DS_Store
+
+# Logs and temp files
+*.log
+*.cache
+*.tmp
+*.tsbuildinfo

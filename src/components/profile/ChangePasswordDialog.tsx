@@ -15,10 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
 import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
-import {
-  type PasswordFormValues,
-  passwordResolver,
-} from "@/lib/profile-schemas.ts"
+import { type PasswordFormValues, passwordResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
@@ -48,8 +45,7 @@ export default function ChangePasswordDialog({
     resolver: passwordResolver,
   })
   const { t } = useTranslation()
-  const resolveError = (message?: string) =>
-    translateValidationMessage(t, message) ?? message
+  const resolveError = (message?: string) => translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (!open) {
@@ -73,8 +69,7 @@ export default function ChangePasswordDialog({
         error instanceof Error
           ? error.message
           : t("profile.messages.requestFailed", {
-              defaultValue:
-                "We couldn't complete that request right now. Please try again.",
+              defaultValue: "We couldn't complete that request right now. Please try again.",
             })
       setError("root", {
         type: "server",
@@ -87,12 +82,7 @@ export default function ChangePasswordDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form
-          className="space-y-6"
-          onSubmit={submitHandler}
-          noValidate
-          data-testid="password-form"
-        >
+        <form className="space-y-6" onSubmit={submitHandler} noValidate data-testid="password-form">
           <DialogHeader>
             <DialogTitle>
               {t("profile.dialogs.password.title", { defaultValue: "Change password" })}
@@ -118,9 +108,7 @@ export default function ChangePasswordDialog({
                 aria-invalid={errors.password ? "true" : "false"}
               />
               {errors.password?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.password.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.password.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -164,11 +152,7 @@ export default function ChangePasswordDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              data-testid="password-save"
-            >
+            <Button type="submit" disabled={isSubmitting} data-testid="password-save">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

@@ -1,11 +1,5 @@
 import { Pencil, Plus, Trash2, CircleAlert, Loader2 } from "lucide-react"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import {
   AlertDialog,
@@ -48,21 +42,14 @@ export default function AddressSection({
     <Card>
       <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <CardTitle>
-            {t("profile.addresses.title", { defaultValue: "Addresses" })}
-          </CardTitle>
+          <CardTitle>{t("profile.addresses.title", { defaultValue: "Addresses" })}</CardTitle>
           <CardDescription>
             {t("profile.addresses.description", {
               defaultValue: "Manage the delivery addresses linked to your account.",
             })}
           </CardDescription>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onAdd}
-          data-testid="add-address-button"
-        >
+        <Button variant="outline" size="sm" onClick={onAdd} data-testid="add-address-button">
           <Plus className="mr-2 size-4" aria-hidden />
           {t("profile.addresses.addButton", { defaultValue: "Add address" })}
         </Button>

@@ -32,25 +32,10 @@ function buildPaginationItems(currentPage: number, totalPages: number): PageItem
   }
 
   if (currentPage >= totalPages - 2) {
-    return [
-      1,
-      "ellipsis",
-      totalPages - 3,
-      totalPages - 2,
-      totalPages - 1,
-      totalPages,
-    ]
+    return [1, "ellipsis", totalPages - 3, totalPages - 2, totalPages - 1, totalPages]
   }
 
-  return [
-    1,
-    "ellipsis",
-    currentPage - 1,
-    currentPage,
-    currentPage + 1,
-    "ellipsis",
-    totalPages,
-  ]
+  return [1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis", totalPages]
 }
 
 export default function PaginationControls({
@@ -68,10 +53,7 @@ export default function PaginationControls({
     canGoNext ?? (normalizedTotalPages > 1 && currentPage < normalizedTotalPages)
 
   const pageItems = useMemo<PageItem[]>(() => {
-    const safeCurrent = Math.min(
-      Math.max(1, currentPage),
-      Math.max(1, normalizedTotalPages),
-    )
+    const safeCurrent = Math.min(Math.max(1, currentPage), Math.max(1, normalizedTotalPages))
     return buildPaginationItems(safeCurrent, normalizedTotalPages)
   }, [currentPage, normalizedTotalPages])
 
@@ -88,9 +70,7 @@ export default function PaginationControls({
               }
               onPageChange(Math.max(1, currentPage - 1))
             }}
-            className={cn(
-              !resolvedCanGoPrevious && "pointer-events-none opacity-50",
-            )}
+            className={cn(!resolvedCanGoPrevious && "pointer-events-none opacity-50")}
             aria-disabled={!resolvedCanGoPrevious}
           />
         </PaginationItem>

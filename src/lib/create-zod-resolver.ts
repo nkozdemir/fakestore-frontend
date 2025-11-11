@@ -1,9 +1,4 @@
-import type {
-  FieldError,
-  FieldErrors,
-  FieldValues,
-  Resolver,
-} from "react-hook-form"
+import type { FieldError, FieldErrors, FieldValues, Resolver } from "react-hook-form"
 import type { z } from "zod"
 
 export function createZodResolver<TFieldValues extends FieldValues>(
@@ -21,10 +16,7 @@ export function createZodResolver<TFieldValues extends FieldValues>(
       }
     }
 
-    const {
-      fieldErrors: flattenedFieldErrors,
-      formErrors,
-    } = result.error.flatten()
+    const { fieldErrors: flattenedFieldErrors, formErrors } = result.error.flatten()
     const errors: FieldErrors<TFieldValues> = {}
 
     Object.entries(flattenedFieldErrors).forEach(([rawKey, messages]) => {

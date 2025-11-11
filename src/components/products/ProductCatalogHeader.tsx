@@ -46,10 +46,7 @@ export default function ProductCatalogHeader({
         onValueChange={onCategoryChange}
         disabled={isLoadingCategories}
       >
-        <SelectTrigger
-          className="w-full sm:w-64"
-          data-testid="category-filter"
-        >
+        <SelectTrigger className="w-full sm:w-64" data-testid="category-filter">
           <SelectValue
             placeholder={
               isLoadingCategories

@@ -27,8 +27,7 @@ const PRODUCT_FIXTURES: Record<number, CartProduct> = {
     id: 1,
     title: "Mens Cotton Jacket",
     price: "55.99",
-    description:
-      "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions.",
+    description: "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions.",
     image: "https://fakestoreapi.com/img/71li-ujtlUL._AC_UX679_.jpg",
     rate: "4.0",
     count: 259,
@@ -143,8 +142,7 @@ const setupCartInterceptors = (scenario: CartScenario) => {
           }
         }
         if (targetEntry) {
-          targetEntry.quantity =
-            Number(entry.quantity) || targetEntry.quantity
+          targetEntry.quantity = Number(entry.quantity) || targetEntry.quantity
         }
       }
       req.alias = "cartUpdate"
@@ -238,10 +236,7 @@ describe("Cart operations", () => {
     cy.contains('[data-testid="cart-item-card"]', "Mens Cotton Jacket")
       .should("be.visible")
       .within(() => {
-        cy.get('[data-testid="cart-item-1-quantity-input"]').should(
-          "have.value",
-          "1",
-        )
+        cy.get('[data-testid="cart-item-1-quantity-input"]').should("have.value", "1")
       })
   })
 
@@ -265,10 +260,7 @@ describe("Cart operations", () => {
     cy.contains('[data-testid="cart-item-card"]', "WD 2TB Elements")
       .should("be.visible")
       .within(() => {
-        cy.get('[data-testid="cart-item-6-quantity-input"]').should(
-          "have.value",
-          "3",
-        )
+        cy.get('[data-testid="cart-item-6-quantity-input"]').should("have.value", "3")
       })
   })
 
@@ -287,15 +279,10 @@ describe("Cart operations", () => {
 
     cy.get('[data-testid="cart-item-1-quantity-increase"]').click()
     cy.wait("@cartUpdate")
-    cy.get('[data-testid="cart-item-1-quantity-input"]').should(
-      "have.value",
-      "3",
-    )
+    cy.get('[data-testid="cart-item-1-quantity-input"]').should("have.value", "3")
 
     cy.get('[data-testid="cart-item-remove"][data-product-id="6"]').click()
     cy.wait("@cartRemove")
-    cy.get('[data-testid="cart-item-card"][data-product-id="6"]').should(
-      "not.exist",
-    )
+    cy.get('[data-testid="cart-item-card"][data-product-id="6"]').should("not.exist")
   })
 })

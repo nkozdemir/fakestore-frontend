@@ -6,12 +6,7 @@ import { Spinner } from "@/components/ui/spinner.tsx"
 import { cn } from "@/lib/utils.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 
-export type UsernameStatus =
-  | "idle"
-  | "checking"
-  | "available"
-  | "unavailable"
-  | "error"
+export type UsernameStatus = "idle" | "checking" | "available" | "unavailable" | "error"
 
 const STATUS_COLORS: Record<UsernameStatus, string> = {
   idle: "text-muted-foreground",
@@ -74,18 +69,18 @@ export default function UsernameField({
     [t],
   )
   const resolvedLabel = label ?? t("auth.username.label", { defaultValue: "Username" })
-  const resolvedPlaceholder = placeholder ?? t("auth.username.placeholder", {
-    defaultValue: "Enter your username",
-  })
+  const resolvedPlaceholder =
+    placeholder ??
+    t("auth.username.placeholder", {
+      defaultValue: "Enter your username",
+    })
 
   const { className: inputClassNameProp, ...restInputProps } = inputProps
   const fieldId = providedId ?? registration.name ?? "username"
   const showSpinner = status === "checking"
-  const messageTemplate =
-    statusMessages?.[status] ?? defaultStatusMessages[status]
+  const messageTemplate = statusMessages?.[status] ?? defaultStatusMessages[status]
   const shouldShowStatus =
-    Boolean(status !== "idle" && messageTemplate) &&
-    (status === "checking" || !error)
+    Boolean(status !== "idle" && messageTemplate) && (status === "checking" || !error)
   const statusColor = STATUS_COLORS[status] ?? "text-muted-foreground"
 
   return (
@@ -99,11 +94,7 @@ export default function UsernameField({
           autoComplete={autoComplete}
           required={required}
           aria-invalid={error ? "true" : "false"}
-          className={cn(
-            showSpinner && "pr-10",
-            inputClassNameProp,
-            inputClassName,
-          )}
+          className={cn(showSpinner && "pr-10", inputClassNameProp, inputClassName)}
           {...restInputProps}
           {...registration}
         />
@@ -117,23 +108,9 @@ export default function UsernameField({
         ) : null}
       </div>
       {shouldShowStatus ? (
-        <p
-          className={cn(
-            "mt-1 text-xs",
-            statusColor,
-            statusMessageClassName,
-          )}
-        >
-          {messageTemplate}
-        </p>
+        <p className={cn("mt-1 text-xs", statusColor, statusMessageClassName)}>{messageTemplate}</p>
       ) : null}
-      {error ? (
-        <p
-          className={cn("text-sm text-destructive", errorClassName)}
-        >
-          {error}
-        </p>
-      ) : null}
+      {error ? <p className={cn("text-sm text-destructive", errorClassName)}>{error}</p> : null}
     </div>
   )
 }

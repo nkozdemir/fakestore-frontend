@@ -1,12 +1,6 @@
 import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button.tsx"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import type { AuthUser } from "@/types/auth.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 
@@ -15,10 +9,7 @@ type ProfileSummaryCardProps = {
   onEdit: () => void
 }
 
-export default function ProfileSummaryCard({
-  user,
-  onEdit,
-}: ProfileSummaryCardProps) {
+export default function ProfileSummaryCard({ user, onEdit }: ProfileSummaryCardProps) {
   const { t, locale } = useTranslation()
 
   return (
@@ -34,12 +25,7 @@ export default function ProfileSummaryCard({
             })}
           </CardDescription>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={onEdit}
-          data-testid="edit-profile-button"
-        >
+        <Button variant="outline" size="sm" onClick={onEdit} data-testid="edit-profile-button">
           <Pencil className="mr-2 size-4" aria-hidden />
           {t("profile.summary.editButton", { defaultValue: "Edit profile" })}
         </Button>

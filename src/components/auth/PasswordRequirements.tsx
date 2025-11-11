@@ -24,15 +24,9 @@ export default function PasswordRequirements({
       {checks.map(({ id, label, met }) => (
         <li key={id} className="flex items-center gap-2">
           {met ? (
-            <Check
-              className={cn(metIconClassName, "text-emerald-600")}
-              aria-hidden
-            />
+            <Check className={cn(metIconClassName, "text-emerald-600")} aria-hidden />
           ) : (
-            <Circle
-              className={cn(unmetIconClassName, "text-muted-foreground")}
-              aria-hidden
-            />
+            <Circle className={cn(unmetIconClassName, "text-muted-foreground")} aria-hidden />
           )}
           <span className={met ? "text-emerald-600" : "text-muted-foreground"}>
             {t(`auth.passwordChecks.${id}`, {

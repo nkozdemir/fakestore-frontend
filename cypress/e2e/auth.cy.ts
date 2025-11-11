@@ -72,12 +72,9 @@ describe("Authentication", () => {
       cy.get('[data-testid="register-submit"]').click()
     })
 
-    cy.wait("@registerRequest").its("request.body").should(
-      "deep.include",
-      {
-        username: newUsername,
-      },
-    )
+    cy.wait("@registerRequest").its("request.body").should("deep.include", {
+      username: newUsername,
+    })
     cy.wait("@loginRequest")
     cy.wait("@authMe")
     cy.wait("@userProfile")

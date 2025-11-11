@@ -5,10 +5,7 @@ type JwtPayload = {
 function decodeBase64Url(value: string): string {
   const normalized = value.replace(/-/g, "+").replace(/_/g, "/")
   const paddingNeeded = normalized.length % 4
-  const padded =
-    paddingNeeded === 0
-      ? normalized
-      : `${normalized}${"=".repeat(4 - paddingNeeded)}`
+  const padded = paddingNeeded === 0 ? normalized : `${normalized}${"=".repeat(4 - paddingNeeded)}`
 
   return atob(padded)
 }

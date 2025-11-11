@@ -40,9 +40,8 @@ function findUserRatingEntry(
   }
 
   const entryById =
-    ratingEntries.find(
-      (entry) => typeof entry.id === "number" && entry.id === userRatingRaw,
-    ) ?? null
+    ratingEntries.find((entry) => typeof entry.id === "number" && entry.id === userRatingRaw) ??
+    null
 
   if (entryById) {
     return entryById
@@ -69,8 +68,7 @@ function findUserRatingEntry(
   }
 
   const matchingEntries = ratingEntries.filter(
-    (entry) =>
-      entry.value === userRatingRaw && typeof entry.id === "number",
+    (entry) => entry.value === userRatingRaw && typeof entry.id === "number",
   )
 
   return matchingEntries.length === 1 ? matchingEntries[0] : null
@@ -183,24 +181,21 @@ export function useProductRatings({
 
       queryClient.setQueryData(ratingSummaryQueryKey, updatedSummary)
       void queryClient.invalidateQueries({ queryKey: ratingListQueryKey })
-      queryClient.setQueryData(
-        productQueryKey,
-        (existing: Product | undefined) => {
-          if (!existing) {
-            return existing
-          }
+      queryClient.setQueryData(productQueryKey, (existing: Product | undefined) => {
+        if (!existing) {
+          return existing
+        }
 
-          const nextRate = Number.isFinite(updatedSummary.rating.rate)
-            ? updatedSummary.rating.rate.toFixed(2)
-            : existing.rate
+        const nextRate = Number.isFinite(updatedSummary.rating.rate)
+          ? updatedSummary.rating.rate.toFixed(2)
+          : existing.rate
 
-          return {
-            ...existing,
-            rate: nextRate,
-            count: updatedSummary.rating.count,
-          }
-        },
-      )
+        return {
+          ...existing,
+          rate: nextRate,
+          count: updatedSummary.rating.count,
+        }
+      })
 
       toast.success(
         t("productDetail.ratings.thanks", {
@@ -215,9 +210,7 @@ export function useProductRatings({
     onError: (mutationError) => {
       console.error(mutationError)
       const message =
-        mutationError instanceof Error
-          ? mutationError.message
-          : saveRatingFallbackMessage
+        mutationError instanceof Error ? mutationError.message : saveRatingFallbackMessage
       toast.error(message)
     },
   })
@@ -267,24 +260,21 @@ export function useProductRatings({
 
       queryClient.setQueryData(ratingSummaryQueryKey, updatedSummary)
       void queryClient.invalidateQueries({ queryKey: ratingListQueryKey })
-      queryClient.setQueryData(
-        productQueryKey,
-        (existing: Product | undefined) => {
-          if (!existing) {
-            return existing
-          }
+      queryClient.setQueryData(productQueryKey, (existing: Product | undefined) => {
+        if (!existing) {
+          return existing
+        }
 
-          const nextRate = Number.isFinite(updatedSummary.rating.rate)
-            ? updatedSummary.rating.rate.toFixed(2)
-            : existing.rate
+        const nextRate = Number.isFinite(updatedSummary.rating.rate)
+          ? updatedSummary.rating.rate.toFixed(2)
+          : existing.rate
 
-          return {
-            ...existing,
-            rate: nextRate,
-            count: updatedSummary.rating.count,
-          }
-        },
-      )
+        return {
+          ...existing,
+          rate: nextRate,
+          count: updatedSummary.rating.count,
+        }
+      })
 
       toast.success(
         t("productDetail.ratings.removeSuccess", {
@@ -295,9 +285,7 @@ export function useProductRatings({
     onError: (mutationError) => {
       console.error(mutationError)
       const message =
-        mutationError instanceof Error
-          ? mutationError.message
-          : removeRatingFallbackMessage
+        mutationError instanceof Error ? mutationError.message : removeRatingFallbackMessage
       toast.error(message)
     },
   })
@@ -311,54 +299,39 @@ export function useProductRatings({
     const entry = findUserRatingEntry(ratingEntries, userRatingRaw, user)
 
     const userRatingId =
-      (entry?.id ?? null) ??
-      (typeof userRatingRaw === "number" && userRatingRaw > 5
-        ? userRatingRaw
-        : null)
+      entry?.id ??
+      null ??
+      (typeof userRatingRaw === "number" && userRatingRaw > 5 ? userRatingRaw : null)
 
     const currentUserRating =
       entry?.value ??
-      (typeof userRatingRaw === "number" &&
-      userRatingRaw >= 1 &&
-      userRatingRaw <= 5
+      (typeof userRatingRaw === "number" && userRatingRaw >= 1 && userRatingRaw <= 5
         ? userRatingRaw
         : null)
 
     const averageFromList =
       ratingsData && ratingsData.count > 0
-        ? ratingsData.ratings.reduce((sum, rating) => sum + rating.value, 0) /
-          ratingsData.count
+        ? ratingsData.ratings.reduce((sum, rating) => sum + rating.value, 0) / ratingsData.count
         : null
 
     const productRateNumber =
-      product && product.rate !== undefined
-        ? Number.parseFloat(product.rate)
-        : null
+      product && product.rate !== undefined ? Number.parseFloat(product.rate) : null
 
     const normalizedProductRate =
-      productRateNumber !== null && Number.isFinite(productRateNumber)
-        ? productRateNumber
-        : null
+      productRateNumber !== null && Number.isFinite(productRateNumber) ? productRateNumber : null
 
     const averageRating =
-      ratingSummaryData?.rating.rate ??
-      (averageFromList ?? normalizedProductRate ?? null)
+      ratingSummaryData?.rating.rate ?? averageFromList ?? normalizedProductRate ?? null
 
-    const ratingCount =
-      ratingSummaryData?.rating.count ??
-      ratingsData?.count ??
-      (product?.count ?? 0)
+    const ratingCount = ratingSummaryData?.rating.count ?? ratingsData?.count ?? product?.count ?? 0
 
     const formattedAverageRating =
-      averageRating !== null && Number.isFinite(averageRating)
-        ? averageRating.toFixed(1)
-        : null
+      averageRating !== null && Number.isFinite(averageRating) ? averageRating.toFixed(1) : null
 
     const hasRatings = ratingCount > 0
 
     const pendingUserRating =
-      setRatingMutation.isPending &&
-      setRatingMutation.variables !== undefined
+      setRatingMutation.isPending && setRatingMutation.variables !== undefined
         ? setRatingMutation.variables
         : null
 
@@ -410,8 +383,7 @@ export function useProductRatings({
         void productRatingsQuery.refetch()
         toast.error(
           t("productDetail.ratings.localNotFound", {
-            defaultValue:
-              "We couldn't find your rating to remove. Please refresh and try again.",
+            defaultValue: "We couldn't find your rating to remove. Please refresh and try again.",
           }),
         )
         return

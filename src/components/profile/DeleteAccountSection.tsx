@@ -39,8 +39,7 @@ export default function DeleteAccountSection({
         </h2>
         <p className="text-sm text-muted-foreground">
           {t("profile.delete.description", {
-            defaultValue:
-              "Permanently remove your Fakestore account and all associated data.",
+            defaultValue: "Permanently remove your Fakestore account and all associated data.",
           })}
         </p>
       </div>

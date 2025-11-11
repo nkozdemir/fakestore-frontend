@@ -21,9 +21,7 @@ export default function NotFoundPage() {
           })}
         </p>
         <Button asChild className="mt-8" size="lg">
-          <Link to="/">
-            {t("notFound.action", { defaultValue: "Return home" })}
-          </Link>
+          <Link to="/">{t("notFound.action", { defaultValue: "Return home" })}</Link>
         </Button>
       </div>
     </main>

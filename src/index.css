@@ -1,4 +1,4 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is(.dark *));
@@ -144,9 +144,7 @@
     .page-section {
       min-height: max(
         0px,
-        calc(
-          100dvh - var(--header-height) - 2 * var(--page-section-block-padding)
-        )
+        calc(100dvh - var(--header-height) - 2 * var(--page-section-block-padding))
       );
     }
   }

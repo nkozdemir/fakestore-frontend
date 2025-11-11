@@ -1,16 +1,10 @@
 import { defineConfig } from "cypress"
 import { loadEnv } from "vite"
 
-const resolvedEnv = loadEnv(
-  process.env.NODE_ENV ?? "development",
-  process.cwd(),
-  "",
-)
+const resolvedEnv = loadEnv(process.env.NODE_ENV ?? "development", process.cwd(), "")
 
 const baseUrl =
-  process.env.CYPRESS_BASE_URL ??
-  resolvedEnv.CYPRESS_BASE_URL ??
-  "http://localhost:5173"
+  process.env.CYPRESS_BASE_URL ?? resolvedEnv.CYPRESS_BASE_URL ?? "http://localhost:5173"
 
 const apiBaseUrl =
   process.env.CYPRESS_API_BASE_URL ??

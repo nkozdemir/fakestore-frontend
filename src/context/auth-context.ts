@@ -1,9 +1,5 @@
 import { createContext } from "react"
-import type {
-  AuthUser,
-  LoginCredentials,
-  RegisterPayload,
-} from "@/types/auth.ts"
+import type { AuthUser, LoginCredentials, RegisterPayload } from "@/types/auth.ts"
 
 export type AuthContextValue = {
   user: AuthUser | null

@@ -1,8 +1,7 @@
 export const PASSWORD_REQUIREMENT_MESSAGE =
   "Password must be at least 6 characters and include uppercase, lowercase, number, and special character."
 
-export const PASSWORD_REGEX =
-  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
+export const PASSWORD_REGEX = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{6,}$/
 
 type PasswordCheckDefinition = {
   id: string

@@ -109,9 +109,7 @@ export default function CartsPage() {
         ) : !hasItems ? (
           <Card>
             <CardHeader>
-              <CardTitle>
-                {t("cart.empty.title", { defaultValue: "Your cart is empty" })}
-              </CardTitle>
+              <CardTitle>{t("cart.empty.title", { defaultValue: "Your cart is empty" })}</CardTitle>
               <CardDescription>
                 {t("cart.empty.description", {
                   defaultValue: "Browse products and add items to see them appear here.",
@@ -149,9 +147,7 @@ export default function CartsPage() {
               ) : null}
               {cartItems.map((item) => {
                 const price = Number.parseFloat(item.product.price ?? "0")
-                const itemTotal = Number.isNaN(price)
-                  ? 0
-                  : price * item.quantity
+                const itemTotal = Number.isNaN(price) ? 0 : price * item.quantity
 
                 return (
                   <Card
@@ -172,9 +168,7 @@ export default function CartsPage() {
                         <div className="flex flex-1 flex-col gap-3">
                           <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
                             <div className="space-y-1">
-                              <h2 className="text-lg font-medium">
-                                {item.product.title}
-                              </h2>
+                              <h2 className="text-lg font-medium">{item.product.title}</h2>
                               <p className="text-sm text-muted-foreground">
                                 {formatCurrency(Number.isNaN(price) ? 0 : price)}
                               </p>
@@ -247,9 +241,7 @@ export default function CartsPage() {
                                 testId={`cart-item-${item.product.id}-quantity`}
                               />
                             </div>
-                            <div className="text-sm font-medium">
-                              {formatCurrency(itemTotal)}
-                            </div>
+                            <div className="text-sm font-medium">{formatCurrency(itemTotal)}</div>
                           </div>
                         </div>
                       </div>
@@ -261,9 +253,7 @@ export default function CartsPage() {
 
             <Card className="h-fit">
               <CardHeader>
-                <CardTitle>
-                  {t("cart.summary.title", { defaultValue: "Order summary" })}
-                </CardTitle>
+                <CardTitle>{t("cart.summary.title", { defaultValue: "Order summary" })}</CardTitle>
                 <CardDescription>
                   {t("cart.summary.description", {
                     defaultValue: "You have {{count}} {{items}} in your cart.",
@@ -279,15 +269,11 @@ export default function CartsPage() {
               </CardHeader>
               <CardContent className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span>
-                    {t("cart.summary.subtotal", { defaultValue: "Subtotal" })}
-                  </span>
+                  <span>{t("cart.summary.subtotal", { defaultValue: "Subtotal" })}</span>
                   <span className="font-medium">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-muted-foreground">
-                  <span>
-                    {t("cart.summary.shipping", { defaultValue: "Shipping" })}
-                  </span>
+                  <span>{t("cart.summary.shipping", { defaultValue: "Shipping" })}</span>
                   <span>
                     {t("cart.summary.shippingNote", {
                       defaultValue: "Calculated at checkout",
@@ -297,9 +283,7 @@ export default function CartsPage() {
               </CardContent>
               <CardFooter className="flex flex-col gap-3">
                 <div className="flex w-full items-center justify-between text-sm font-semibold">
-                  <span>
-                    {t("cart.summary.total", { defaultValue: "Total" })}
-                  </span>
+                  <span>{t("cart.summary.total", { defaultValue: "Total" })}</span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <Button
@@ -309,8 +293,7 @@ export default function CartsPage() {
                   onClick={() => {
                     toast.info(
                       t("cart.summary.orderUnavailable", {
-                        defaultValue:
-                          "Ordering isn’t available yet. Please check back soon!",
+                        defaultValue: "Ordering isn’t available yet. Please check back soon!",
                       }),
                     )
                   }}

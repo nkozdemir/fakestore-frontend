@@ -149,9 +149,7 @@ const setupProfileInterceptors = (scenario: ScenarioState) => {
   const apiBaseUrl = getApiBaseUrl()
   const userUrl = `${apiBaseUrl}users/${scenario.auth.id}/`
   const addressesUrl = `${apiBaseUrl}users/${scenario.auth.id}/addresses/`
-  const addressDetailPattern = new RegExp(
-    `^${escapeRegExp(apiBaseUrl)}users/addresses/(\\d+)/`,
-  )
+  const addressDetailPattern = new RegExp(`^${escapeRegExp(apiBaseUrl)}users/addresses/(\\d+)/`)
 
   cy.intercept("GET", `${apiBaseUrl}auth/me/`, (req) => {
     req.reply(scenario.auth)

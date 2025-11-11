@@ -18,9 +18,7 @@ describe("Product catalog", () => {
     cy.wait("@getProducts")
 
     cy.contains("h1", "Products").should("be.visible")
-    cy.contains("p", "Discover curated picks from our Fakestore catalog.").should(
-      "be.visible",
-    )
+    cy.contains("p", "Discover curated picks from our Fakestore catalog.").should("be.visible")
 
     cy.contains(selectors.summary, "Showing 1–8 of 20 products").should("be.visible")
 
@@ -37,13 +35,10 @@ describe("Product catalog", () => {
 
     cy.url().should("include", "category=electronics")
     cy.get(selectors.productCard).should("have.length", 2)
-    cy.contains(
-      selectors.productCard,
-      "WD 2TB Elements Portable External Hard Drive",
-    ).should("be.visible")
-    cy.contains(selectors.productCard, "SanDisk SSD PLUS 1TB Internal SSD").should(
+    cy.contains(selectors.productCard, "WD 2TB Elements Portable External Hard Drive").should(
       "be.visible",
     )
+    cy.contains(selectors.productCard, "SanDisk SSD PLUS 1TB Internal SSD").should("be.visible")
     cy.contains(selectors.summary, /electronics products/i).should("be.visible")
   })
 })

@@ -67,24 +67,12 @@ export class ApiError extends Error {
   readonly detailMessage: string | null
 
   constructor(options: CreateApiErrorOptions) {
-    const {
-      message,
-      code,
-      status,
-      details,
-      hint,
-      extra,
-      headers,
-      rawBody,
-      responseStatus,
-    } = options
+    const { message, code, status, details, hint, extra, headers, rawBody, responseStatus } =
+      options
 
     const normalizedBackendMessage =
-      typeof message === "string" && message.trim().length > 0
-        ? message.trim()
-        : ""
-    const normalizedHint =
-      typeof hint === "string" && hint.trim().length > 0 ? hint.trim() : null
+      typeof message === "string" && message.trim().length > 0 ? message.trim() : ""
+    const normalizedHint = typeof hint === "string" && hint.trim().length > 0 ? hint.trim() : null
     const normalizedDetail = extractDetailString(details ?? null)
 
     const resolvedMessage =
@@ -119,13 +107,8 @@ export function formatApiErrorMessage(
     .map((message) => message.trim().toLowerCase())
     .filter((message) => message.length > 0)
 
-  const candidates = [
-    error.message,
-    error.detailMessage ?? undefined,
-    error.backendMessage,
-  ].filter(
-    (value): value is string =>
-      typeof value === "string" && value.trim().length > 0,
+  const candidates = [error.message, error.detailMessage ?? undefined, error.backendMessage].filter(
+    (value): value is string => typeof value === "string" && value.trim().length > 0,
   )
 
   for (const candidate of candidates) {
@@ -153,35 +136,18 @@ function mergeGenericMessages(extra: string[] | undefined): string[] {
     return [...DEFAULT_GENERIC_ERROR_MESSAGES]
   }
 
-  const normalized = extra
-    .map((message) => message.trim())
-    .filter((message) => message.length > 0)
+  const normalized = extra.map((message) => message.trim()).filter((message) => message.length > 0)
 
-  return Array.from(
-    new Set<string>([...DEFAULT_GENERIC_ERROR_MESSAGES, ...normalized]),
-  )
+  return Array.from(new Set<string>([...DEFAULT_GENERIC_ERROR_MESSAGES, ...normalized]))
 }
 
-export function resolveFriendlyErrorMessage(
-  error: unknown,
-  options: FriendlyErrorOptions,
-): string {
-  const {
-    fallback,
-    codeMessages = {},
-    statusMessages = {},
-    genericMessages,
-  } = options
+export function resolveFriendlyErrorMessage(error: unknown, options: FriendlyErrorOptions): string {
+  const { fallback, codeMessages = {}, statusMessages = {}, genericMessages } = options
 
   if (error instanceof ApiError) {
-    const override =
-      codeMessages[error.code] ?? statusMessages[error.status] ?? fallback
+    const override = codeMessages[error.code] ?? statusMessages[error.status] ?? fallback
 
-    return formatApiErrorMessage(
-      error,
-      override,
-      mergeGenericMessages(genericMessages),
-    )
+    return formatApiErrorMessage(error, override, mergeGenericMessages(genericMessages))
   }
 
   if (error instanceof Error) {
@@ -194,10 +160,7 @@ export function resolveFriendlyErrorMessage(
   return fallback
 }
 
-export function toFriendlyError(
-  error: unknown,
-  options: FriendlyErrorOptions,
-): Error {
+export function toFriendlyError(error: unknown, options: FriendlyErrorOptions): Error {
   const message = resolveFriendlyErrorMessage(error, options)
 
   if (error instanceof Error) {
@@ -261,10 +224,7 @@ export async function parseApiError(response: Response): Promise<ApiError> {
   })
 }
 
-export function buildApiUrl(
-  path: string,
-  params?: Record<string, QueryValue>,
-): string {
+export function buildApiUrl(path: string, params?: Record<string, QueryValue>): string {
   const sanitizedPath = path.replace(/^\/+/, "")
   const url = new URL(sanitizedPath, API_BASE_URL)
 

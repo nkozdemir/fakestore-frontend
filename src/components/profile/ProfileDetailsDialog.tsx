@@ -15,10 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
 import UsernameField from "@/components/auth/UsernameField.tsx"
-import {
-  type ProfileDetailsFormValues,
-  profileResolver,
-} from "@/lib/profile-schemas.ts"
+import { type ProfileDetailsFormValues, profileResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
@@ -46,8 +43,7 @@ export default function ProfileDetailsDialog({
     resolver: profileResolver,
   })
   const { t } = useTranslation()
-  const resolveError = (message?: string) =>
-    translateValidationMessage(t, message) ?? message
+  const resolveError = (message?: string) => translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (open) {
@@ -76,12 +72,7 @@ export default function ProfileDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form
-          className="space-y-6"
-          onSubmit={submitHandler}
-          noValidate
-          data-testid="profile-form"
-        >
+        <form className="space-y-6" onSubmit={submitHandler} noValidate data-testid="profile-form">
           <DialogHeader>
             <DialogTitle>
               {t("profile.dialogs.profile.title", { defaultValue: "Edit profile" })}
@@ -107,9 +98,7 @@ export default function ProfileDetailsDialog({
                 aria-invalid={errors.firstName ? "true" : "false"}
               />
               {errors.firstName?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.firstName.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.firstName.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -125,15 +114,11 @@ export default function ProfileDetailsDialog({
                 aria-invalid={errors.lastName ? "true" : "false"}
               />
               {errors.lastName?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.lastName.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.lastName.message)}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">
-                {t("auth.register.email", { defaultValue: "Email" })}
-              </Label>
+              <Label htmlFor="email">{t("auth.register.email", { defaultValue: "Email" })}</Label>
               <Input
                 id="email"
                 type="email"
@@ -143,15 +128,11 @@ export default function ProfileDetailsDialog({
                 aria-invalid={errors.email ? "true" : "false"}
               />
               {errors.email?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.email.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.email.message)}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="phone">
-                {t("profile.fields.phone", { defaultValue: "Phone" })}
-              </Label>
+              <Label htmlFor="phone">{t("profile.fields.phone", { defaultValue: "Phone" })}</Label>
               <Input
                 id="phone"
                 type="tel"
@@ -160,9 +141,7 @@ export default function ProfileDetailsDialog({
                 aria-invalid={errors.phone ? "true" : "false"}
               />
               {errors.phone?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.phone.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.phone.message)}</p>
               )}
             </div>
             <UsernameField
@@ -193,11 +172,7 @@ export default function ProfileDetailsDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              data-testid="profile-save"
-            >
+            <Button type="submit" disabled={isSubmitting} data-testid="profile-save">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

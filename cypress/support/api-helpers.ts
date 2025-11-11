@@ -6,8 +6,7 @@ export const AUTH_STORAGE_KEY = "fakestore.authTokens"
 export const getApiBaseUrl = (): string =>
   (Cypress.env("apiBaseUrl") as string | undefined) ?? FALLBACK_API_BASE_URL
 
-export const escapeRegExp = (value: string): string =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+export const escapeRegExp = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
 type AuthStubOptions = {
   meFixture?: string
@@ -52,13 +51,9 @@ export function stubAuthSuccess(options: AuthStubOptions = {}) {
     fixture: options.meFixture ?? "auth/me.json",
   }).as("authMe")
 
-  cy.intercept(
-    "GET",
-    new RegExp(`^${escapeRegExp(apiBaseUrl)}users/\\d+/`),
-    {
-      fixture: options.profileFixture ?? "auth/profile.json",
-    },
-  ).as("userProfile")
+  cy.intercept("GET", new RegExp(`^${escapeRegExp(apiBaseUrl)}users/\\d+/`), {
+    fixture: options.profileFixture ?? "auth/profile.json",
+  }).as("userProfile")
 }
 
 export function stubUsernameAvailability(alias = "checkUsername") {

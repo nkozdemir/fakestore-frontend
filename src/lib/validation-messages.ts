@@ -6,10 +6,13 @@ import {
   USERNAME_REQUIRED_MESSAGE,
 } from "@/lib/username-policy.ts"
 
-type TranslationFn = (key: string, options?: {
-  defaultValue?: string
-  values?: Record<string, string | number>
-}) => string
+type TranslationFn = (
+  key: string,
+  options?: {
+    defaultValue?: string
+    values?: Record<string, string | number>
+  },
+) => string
 
 type ValidationEntry = {
   key: string
@@ -49,10 +52,7 @@ const validationMessageMap: Record<string, ValidationEntry> = {
   "Passwords must match.": { key: "validation.passwordsMustMatch" },
 }
 
-export function translateValidationMessage(
-  t: TranslationFn,
-  message?: string,
-): string | undefined {
+export function translateValidationMessage(t: TranslationFn, message?: string): string | undefined {
   if (!message) {
     return undefined
   }

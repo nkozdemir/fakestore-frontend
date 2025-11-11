@@ -2,13 +2,7 @@ import { useCallback, useMemo, useState } from "react"
 import { useNavigate } from "react-router"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button.tsx"
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card.tsx"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { buildApiUrl, formatApiErrorMessage, parseApiError } from "@/lib/api.ts"
@@ -41,29 +35,18 @@ type AddressDialogState =
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const {
-    user,
-    accessToken,
-    isLoading,
-    refreshUser,
-    logout,
-  } = useAuth()
+  const { user, accessToken, isLoading, refreshUser, logout } = useAuth()
   const { t } = useTranslation()
 
   const [isProfileDialogOpen, setProfileDialogOpen] = useState(false)
-  const [addressDialogState, setAddressDialogState] =
-    useState<AddressDialogState>(null)
+  const [addressDialogState, setAddressDialogState] = useState<AddressDialogState>(null)
   const [isPasswordDialogOpen, setPasswordDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const [deleteError, setDeleteError] = useState<string | null>(null)
-  const [addressToDelete, setAddressToDelete] = useState<UserAddress | null>(
-    null,
-  )
+  const [addressToDelete, setAddressToDelete] = useState<UserAddress | null>(null)
   const [isDeletingAddress, setIsDeletingAddress] = useState(false)
-  const [deleteAddressError, setDeleteAddressError] = useState<string | null>(
-    null,
-  )
+  const [deleteAddressError, setDeleteAddressError] = useState<string | null>(null)
 
   const profileInitialValues = useMemo<ProfileDetailsFormValues>(
     () => ({
@@ -217,18 +200,11 @@ export default function ProfilePage() {
         },
       }
 
-      if (
-        addressDialogState &&
-        addressDialogState.mode === "edit" &&
-        addressDialogState.address
-      ) {
-        await authorizedRequest(
-          `/users/addresses/${addressDialogState.address.id}/`,
-          {
-            method: "PATCH",
-            body: JSON.stringify(payload),
-          },
-        )
+      if (addressDialogState && addressDialogState.mode === "edit" && addressDialogState.address) {
+        await authorizedRequest(`/users/addresses/${addressDialogState.address.id}/`, {
+          method: "PATCH",
+          body: JSON.stringify(payload),
+        })
       } else {
         await authorizedRequest(`/users/${user.id}/addresses/`, {
           method: "POST",
@@ -276,8 +252,7 @@ export default function ProfilePage() {
         error instanceof Error
           ? error.message
           : t("profile.toasts.addressRemoveError", {
-              defaultValue:
-                "We couldn't remove that address right now. Please try again.",
+              defaultValue: "We couldn't remove that address right now. Please try again.",
             })
       setDeleteAddressError(message)
       toast.error(message)
@@ -342,8 +317,7 @@ export default function ProfilePage() {
         error instanceof Error
           ? error.message
           : t("profile.toasts.accountDeleteError", {
-              defaultValue:
-                "We couldn't delete your account right now. Please try again.",
+              defaultValue: "We couldn't delete your account right now. Please try again.",
             })
       setDeleteError(message)
       toast.error(message)
@@ -409,10 +383,7 @@ export default function ProfilePage() {
           </p>
         </header>
 
-        <ProfileSummaryCard
-          user={user}
-          onEdit={() => setProfileDialogOpen(true)}
-        />
+        <ProfileSummaryCard user={user} onEdit={() => setProfileDialogOpen(true)} />
 
         <AddressSection
           addresses={user.addresses}

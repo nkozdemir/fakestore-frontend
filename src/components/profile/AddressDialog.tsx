@@ -14,10 +14,7 @@ import { Input } from "@/components/ui/input.tsx"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
-import {
-  type AddressFormValues,
-  addressResolver,
-} from "@/lib/profile-schemas.ts"
+import { type AddressFormValues, addressResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
@@ -47,8 +44,7 @@ export default function AddressDialog({
     resolver: addressResolver,
   })
   const { t } = useTranslation()
-  const resolveError = (message?: string) =>
-    translateValidationMessage(t, message) ?? message
+  const resolveError = (message?: string) => translateValidationMessage(t, message) ?? message
 
   useEffect(() => {
     if (open) {
@@ -64,8 +60,7 @@ export default function AddressDialog({
         error instanceof Error
           ? error.message
           : t("profile.messages.requestFailed", {
-              defaultValue:
-                "We couldn't complete that request right now. Please try again.",
+              defaultValue: "We couldn't complete that request right now. Please try again.",
             })
       setError("root", {
         type: "server",
@@ -78,12 +73,7 @@ export default function AddressDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form
-          className="space-y-6"
-          onSubmit={submitHandler}
-          noValidate
-          data-testid="address-form"
-        >
+        <form className="space-y-6" onSubmit={submitHandler} noValidate data-testid="address-form">
           <DialogHeader>
             <DialogTitle>
               {mode === "edit"
@@ -109,9 +99,7 @@ export default function AddressDialog({
                 aria-invalid={errors.street ? "true" : "false"}
               />
               {errors.street?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.street.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.street.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -127,15 +115,11 @@ export default function AddressDialog({
                 aria-invalid={errors.number ? "true" : "false"}
               />
               {errors.number?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.number.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.number.message)}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="city">
-                {t("profile.fields.city", { defaultValue: "City" })}
-              </Label>
+              <Label htmlFor="city">{t("profile.fields.city", { defaultValue: "City" })}</Label>
               <Input
                 id="city"
                 type="text"
@@ -144,9 +128,7 @@ export default function AddressDialog({
                 aria-invalid={errors.city ? "true" : "false"}
               />
               {errors.city?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.city.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.city.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -161,9 +143,7 @@ export default function AddressDialog({
                 aria-invalid={errors.zipcode ? "true" : "false"}
               />
               {errors.zipcode?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.zipcode.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.zipcode.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -178,9 +158,7 @@ export default function AddressDialog({
                 aria-invalid={errors.latitude ? "true" : "false"}
               />
               {errors.latitude?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.latitude.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.latitude.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -195,9 +173,7 @@ export default function AddressDialog({
                 aria-invalid={errors.longitude ? "true" : "false"}
               />
               {errors.longitude?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.longitude.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.longitude.message)}</p>
               )}
             </div>
           </div>
@@ -221,11 +197,7 @@ export default function AddressDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              data-testid="address-save"
-            >
+            <Button type="submit" disabled={isSubmitting} data-testid="address-save">
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
@@ -233,14 +205,14 @@ export default function AddressDialog({
                     defaultValue: "Saving...",
                   })}
                 </>
+              ) : mode === "edit" ? (
+                t("profile.dialogs.address.saveEdit", {
+                  defaultValue: "Update address",
+                })
               ) : (
-                mode === "edit"
-                  ? t("profile.dialogs.address.saveEdit", {
-                      defaultValue: "Update address",
-                    })
-                  : t("profile.dialogs.address.saveAdd", {
-                      defaultValue: "Add address",
-                    })
+                t("profile.dialogs.address.saveAdd", {
+                  defaultValue: "Add address",
+                })
               )}
             </Button>
           </DialogFooter>

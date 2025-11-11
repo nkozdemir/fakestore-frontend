@@ -6,7 +6,5 @@
   "image": "https://fakestoreapi.com/img/61IBBVJvSDL._AC_SY879_.jpg",
   "rate": "3.0",
   "count": 2,
-  "categories": [
-    { "id": 3, "name": "electronics" }
-  ]
+  "categories": [{ "id": 3, "name": "electronics" }]
 }

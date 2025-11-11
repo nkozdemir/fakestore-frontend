@@ -22,17 +22,15 @@ export default function ProductsPage() {
 
   const selectedCategoryParam = searchParams.get("category")
   const selectedCategory =
-    selectedCategoryParam && selectedCategoryParam !== "all"
-      ? selectedCategoryParam
-      : null
+    selectedCategoryParam && selectedCategoryParam !== "all" ? selectedCategoryParam : null
 
   const catalog = useProductCatalog({ page, selectedCategory })
 
   const categories = catalog.categoriesQuery.data ?? []
   const categoryValue = selectedCategory ?? "all"
   const selectedCategoryLabel = selectedCategory
-    ? categories.find((category: Category) => category.name === selectedCategory)?.name ??
-      selectedCategory
+    ? (categories.find((category: Category) => category.name === selectedCategory)?.name ??
+      selectedCategory)
     : null
 
   const scrollToTop = useCallback(() => {
@@ -115,9 +113,7 @@ export default function ProductsPage() {
     (catalog.totalPages > 1 || catalog.canGoPrevious || catalog.canGoNext)
 
   const summaryVisible =
-    !catalog.isInitialLoading &&
-    !catalog.errorMessage &&
-    catalog.products.length > 0
+    !catalog.isInitialLoading && !catalog.errorMessage && catalog.products.length > 0
 
   return (
     <main className="bg-background">

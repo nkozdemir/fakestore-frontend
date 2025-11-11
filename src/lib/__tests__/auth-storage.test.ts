@@ -1,9 +1,5 @@
 import { describe, expect, it, beforeEach } from "vitest"
-import {
-  clearStoredTokens,
-  readStoredTokens,
-  storeTokens,
-} from "@/lib/auth-storage.ts"
+import { clearStoredTokens, readStoredTokens, storeTokens } from "@/lib/auth-storage.ts"
 import type { AuthTokens } from "@/types/auth.ts"
 
 const STORAGE_KEY = "fakestore.authTokens"
@@ -21,9 +17,7 @@ describe("auth-storage", () => {
 
     storeTokens(tokens)
 
-    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(
-      JSON.stringify(tokens),
-    )
+    expect(window.localStorage.getItem(STORAGE_KEY)).toBe(JSON.stringify(tokens))
     expect(readStoredTokens()).toEqual(tokens)
   })
 

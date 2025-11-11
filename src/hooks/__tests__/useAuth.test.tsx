@@ -164,19 +164,17 @@ describe("useAuth", () => {
 
     const setTimeoutSpy = vi
       .spyOn(globalThis, "setTimeout")
-      .mockImplementation(
-        (callback: TimerHandler, delay?: number, ...args: unknown[]) => {
-          const handle = realSetTimeout(callback as TimerHandler, delay ?? 0, ...args)
+      .mockImplementation((callback: TimerHandler, delay?: number, ...args: unknown[]) => {
+        const handle = realSetTimeout(callback as TimerHandler, delay ?? 0, ...args)
 
-          if (typeof delay === "number" && delay >= 30_000 && typeof callback === "function") {
-            scheduledCallback = callback as () => unknown
-            scheduledDelay = delay
-            scheduledHandle = handle
-          }
+        if (typeof delay === "number" && delay >= 30_000 && typeof callback === "function") {
+          scheduledCallback = callback as () => unknown
+          scheduledDelay = delay
+          scheduledHandle = handle
+        }
 
-          return handle
-        },
-      )
+        return handle
+      })
 
     try {
       const initialTokens: AuthTokens = {
@@ -184,10 +182,7 @@ describe("useAuth", () => {
         refresh: createJwtToken(24 * 60 * 60),
       }
 
-      window.localStorage.setItem(
-        "fakestore.authTokens",
-        JSON.stringify(initialTokens),
-      )
+      window.localStorage.setItem("fakestore.authTokens", JSON.stringify(initialTokens))
 
       const refreshCalls: Array<Record<string, unknown>> = []
 

@@ -42,11 +42,7 @@ export default function ProductGrid({
   }
 
   if (products.length === 0) {
-    return (
-      <div className="py-12 text-center text-sm text-muted-foreground">
-        {emptyMessage}
-      </div>
-    )
+    return <div className="py-12 text-center text-sm text-muted-foreground">{emptyMessage}</div>
   }
 
   return (

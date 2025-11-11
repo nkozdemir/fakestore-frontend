@@ -12,10 +12,7 @@ import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
 import UsernameField from "@/components/auth/UsernameField.tsx"
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability.ts"
 import { PASSWORD_REQUIREMENT_MESSAGE } from "@/lib/password-policy.ts"
-import {
-  type RegisterFormValues,
-  registerResolver,
-} from "@/lib/register-schema.ts"
+import { type RegisterFormValues, registerResolver } from "@/lib/register-schema.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
@@ -30,8 +27,7 @@ export default function RegisterForm({
   redirectHint = "Already have an account?",
 }: RegisterFormProps) {
   const { t } = useTranslation()
-  const resolveError = (message?: string) =>
-    translateValidationMessage(t, message) ?? message
+  const resolveError = (message?: string) => translateValidationMessage(t, message) ?? message
   const {
     register,
     handleSubmit,
@@ -85,12 +81,8 @@ export default function RegisterForm({
     try {
       await onSubmit(values)
     } catch (error) {
-      const defaultMessage =
-        "We couldn't create your account right now. Please try again."
-      const message =
-        error instanceof Error && error.message
-          ? error.message
-          : defaultMessage
+      const defaultMessage = "We couldn't create your account right now. Please try again."
+      const message = error instanceof Error && error.message ? error.message : defaultMessage
 
       setError("root", {
         type: "server",
@@ -122,12 +114,7 @@ export default function RegisterForm({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form
-          className="space-y-6"
-          onSubmit={submitHandler}
-          noValidate
-          data-testid="register-form"
-        >
+        <form className="space-y-6" onSubmit={submitHandler} noValidate data-testid="register-form">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="firstName">
@@ -141,9 +128,7 @@ export default function RegisterForm({
                 {...register("firstName")}
               />
               {errors.firstName?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.firstName.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.firstName.message)}</p>
               )}
             </div>
             <div className="space-y-2">
@@ -158,15 +143,11 @@ export default function RegisterForm({
                 {...register("lastName")}
               />
               {errors.lastName?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.lastName.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.lastName.message)}</p>
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
-              <Label htmlFor="email">
-                {t("auth.register.email", { defaultValue: "Email" })}
-              </Label>
+              <Label htmlFor="email">{t("auth.register.email", { defaultValue: "Email" })}</Label>
               <Input
                 id="email"
                 type="email"
@@ -175,9 +156,7 @@ export default function RegisterForm({
                 {...register("email")}
               />
               {errors.email?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.email.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.email.message)}</p>
               )}
             </div>
             <div className="space-y-2 md:col-span-2">
@@ -229,13 +208,11 @@ export default function RegisterForm({
                   password={passwordValue}
                   className="text-xs"
                   metIconClassName="size-3"
-          unmetIconClassName="size-3"
-        />
+                  unmetIconClassName="size-3"
+                />
               </div>
               {errors.password?.message && (
-                <p className="text-sm text-destructive">
-                  {resolveError(errors.password.message)}
-                </p>
+                <p className="text-sm text-destructive">{resolveError(errors.password.message)}</p>
               )}
             </div>
           </div>

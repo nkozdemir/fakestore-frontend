@@ -27,12 +27,7 @@ export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
   const normalizedProductId = productId ?? ""
   const navigate = useNavigate()
-  const {
-    isAuthenticated,
-    isLoading: isAuthLoading,
-    accessToken,
-    user,
-  } = useAuth()
+  const { isAuthenticated, isLoading: isAuthLoading, accessToken, user } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
   const [quantity, setQuantity] = useState(1)
   const { t } = useTranslation()
@@ -105,9 +100,7 @@ export default function ProductDetailPage() {
       return
     }
 
-    const normalizedQuantity = Number.isFinite(quantity)
-      ? Math.max(1, Math.trunc(quantity))
-      : 1
+    const normalizedQuantity = Number.isFinite(quantity) ? Math.max(1, Math.trunc(quantity)) : 1
 
     void addItem(currentProduct.id, normalizedQuantity)
       .then(() => {
@@ -198,8 +191,7 @@ export default function ProductDetailPage() {
       ratingCount={ratingsState.ratingCount}
       hasRatings={ratingsState.hasRatings}
       isSummaryFetching={
-        ratingsState.ratingSummaryQuery.isFetching ||
-        ratingsState.productRatingsQuery.isFetching
+        ratingsState.ratingSummaryQuery.isFetching || ratingsState.productRatingsQuery.isFetching
       }
       ratingsQueryState={{
         isPending: ratingsState.productRatingsQuery.isPending,
@@ -248,9 +240,7 @@ export default function ProductDetailPage() {
               <BreadcrumbList>
                 <BreadcrumbItem>
                   <BreadcrumbLink asChild>
-                    <Link to="/">
-                      {t("navigation.products", { defaultValue: "Products" })}
-                    </Link>
+                    <Link to="/">{t("navigation.products", { defaultValue: "Products" })}</Link>
                   </BreadcrumbLink>
                 </BreadcrumbItem>
                 {primaryCategory && primaryCategoryLink ? (

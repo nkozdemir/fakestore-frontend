@@ -5,11 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export function formatPrice(
-  value: number,
-  locale = "en-US",
-  currency = "USD",
-) {
+export function formatPrice(value: number, locale = "en-US", currency = "USD") {
   const normalized = Number.isFinite(value) ? value : 0
 
   return new Intl.NumberFormat(locale, {

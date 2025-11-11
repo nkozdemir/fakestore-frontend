@@ -120,8 +120,7 @@ const setupProductDetailNetwork = () => {
   }).as("postRating")
 
   cy.intercept("DELETE", ratingUrlRegex, (req) => {
-    const ratingId =
-      req.query?.ratingId ?? new URL(req.url).searchParams.get("ratingId")
+    const ratingId = req.query?.ratingId ?? new URL(req.url).searchParams.get("ratingId")
 
     expect(ratingId, "rating id provided when deleting").to.equal(
       String(scenario.userRatingEntry.id),

@@ -82,11 +82,7 @@ export default function SiteHeader() {
             (isAuthenticated ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="max-w-[10rem] truncate font-medium"
-                  >
+                  <Button variant="ghost" size="sm" className="max-w-[10rem] truncate font-medium">
                     {displayName}
                   </Button>
                 </DropdownMenuTrigger>
@@ -138,10 +134,7 @@ export default function SiteHeader() {
                 {t("navigation.menuLabel", { defaultValue: "Navigate" })}
               </DropdownMenuLabel>
               {navItems.map((item) => (
-                <DropdownMenuItem
-                  key={item.to}
-                  onSelect={() => navigate(item.to)}
-                >
+                <DropdownMenuItem key={item.to} onSelect={() => navigate(item.to)}>
                   {t(item.labelKey, {
                     defaultValue: item.labelKey,
                   })}
@@ -153,9 +146,7 @@ export default function SiteHeader() {
                     <>
                       <DropdownMenuSeparator />
                       <DropdownMenuLabel>{displayName}</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onSelect={() => navigate("/profile")}
-                      >
+                      <DropdownMenuItem onSelect={() => navigate("/profile")}>
                         {t("navigation.profile", { defaultValue: "Profile" })}
                       </DropdownMenuItem>
                       <DropdownMenuItem
@@ -170,9 +161,7 @@ export default function SiteHeader() {
                       </DropdownMenuItem>
                     </>
                   ) : (
-                    <DropdownMenuItem
-                      onSelect={() => navigate("/login")}
-                    >
+                    <DropdownMenuItem onSelect={() => navigate("/login")}>
                       {t("navigation.signIn", {
                         defaultValue: "Sign in",
                       })}

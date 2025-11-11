@@ -4,10 +4,7 @@ import { Input } from "@/components/ui/input.tsx"
 import { cn } from "@/lib/utils.ts"
 import { useTranslation } from "@/context/I18nProvider.tsx"
 
-type PasswordInputProps = Omit<
-  React.ComponentPropsWithoutRef<typeof Input>,
-  "type"
->
+type PasswordInputProps = Omit<React.ComponentPropsWithoutRef<typeof Input>, "type">
 
 const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {

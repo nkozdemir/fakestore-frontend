@@ -3,6 +3,7 @@
 A modern Vite + React storefront for the [FakeStore API](https://github.com/nkozdemir/fakestore-backend). It implements browsing, authentication-protected actions, and a polished shopping experience by combining reusable UI primitives with robust data fetching.
 
 ## Features
+
 - Product catalogue with category filtering, pagination, skeleton loading states, and lightweight caching via TanStack Query.
 - Detailed product view with rating summaries, authenticated rating actions, carousel-ready media, and add-to-cart helpers.
 - Session-aware sign in/out and registration powered by JWT tokens, token refresh, protected routes, and form validation with React Hook Form + Zod.
@@ -10,6 +11,7 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
 - Responsive layout, accessible navigation, and a light/dark/system theme toggle built on Radix UI primitives.
 
 ## Tech stack
+
 - React 19 + TypeScript
 - Vite 7 with Tailwind CSS 4 and PostCSS
 - React Router 7 for routing
@@ -18,6 +20,7 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
 - shadcn/ui components driven by Radix UI, lucide-react icons, and Sonner notifications
 
 ## Getting started
+
 1. Copy the environment template and update it with your API endpoint:
    ```bash
    cp .env.example .env
@@ -34,6 +37,7 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
    The app defaults to `http://localhost:5173`.
 
 ## Docker
+
 - Build the production image (inject your API base URL so Vite can inline it):
   ```bash
   docker build --build-arg VITE_API_BASE_URL=http://localhost:8000/api/ -t fakestore-frontend .
@@ -45,6 +49,7 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
   Replace `8080` with any host port you prefer. Rebuild the image whenever the API URL changes because the value is compiled into the static bundle.
 
 ## Available scripts
+
 - `npm run dev` — start the development server with hot module replacement.
 - `npm run lint` — run ESLint across the project.
 - `npm run build` — type-check and produce a production build.
@@ -56,29 +61,38 @@ A modern Vite + React storefront for the [FakeStore API](https://github.com/nkoz
 - `npm run test:e2e:ui` — same as above but opens the Cypress runner for debugging.
 
 ## Testing
+
 Vitest is configured with a jsdom environment and Testing Library helpers. We mock the Django API via MSW so the auth and cart hooks exercise realistic network flows without needing to boot the backend. Run the suites in watch mode with:
+
 ```bash
 npm test
 ```
+
 Or execute once (useful for CI) with:
+
 ```bash
 npm test -- --run
 ```
 
 End-to-end coverage relies on Cypress. The tests stub backend responses (products, categories) so they focus on verifying UI flows without requiring the Django API. Commands:
+
 ```bash
 npm run test:e2e      # headless + dev server via start-server-and-test
 npm run test:e2e:ui   # interactive runner
 ```
+
 Override the target URLs when needed with:
+
 ```bash
 CYPRESS_BASE_URL=http://localhost:4173 CYPRESS_API_BASE_URL=http://localhost:8000/api/ npm run test:e2e
 ```
 
 ## Environment variables
+
 - `VITE_API_BASE_URL` — base URL of the FakeStore backend (`/` suffix optional); used for all REST requests.
 
 ## Project structure
+
 - `src/pages/` — top-level route components such as products, product detail, cart, login, register, and profile.
 - `src/context/AuthProvider.tsx` — centralizes JWT storage, refresh logic, and the authenticated user state.
 - `src/hooks/` — reusable domain hooks (auth, cart) built on TanStack Query.

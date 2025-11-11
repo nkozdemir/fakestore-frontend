@@ -1,10 +1,5 @@
 import { useCallback, useMemo } from "react"
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  type QueryKey,
-} from "@tanstack/react-query"
+import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/react-query"
 import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
@@ -138,9 +133,7 @@ export default function useCart() {
       const cart = await ensureCartData()
 
       const currentItems = Array.isArray(cart.items) ? cart.items : []
-      const existingItem = currentItems.find(
-        (item) => item.product.id === productId,
-      )
+      const existingItem = currentItems.find((item) => item.product.id === productId)
 
       if (existingItem) {
         const nextQuantity = existingItem.quantity + normalizedQuantity
@@ -171,9 +164,7 @@ export default function useCart() {
       const cart = await ensureCartData()
       const currentItems = Array.isArray(cart.items) ? cart.items : []
 
-      const isInCart = currentItems.some(
-        (item) => item.product.id === productId,
-      )
+      const isInCart = currentItems.some((item) => item.product.id === productId)
 
       if (!isInCart) {
         throw new Error(
@@ -209,9 +200,7 @@ export default function useCart() {
       const cart = await ensureCartData()
       const currentItems = Array.isArray(cart.items) ? cart.items : []
 
-      const isInCart = currentItems.some(
-        (item) => item.product.id === productId,
-      )
+      const isInCart = currentItems.some((item) => item.product.id === productId)
 
       if (!isInCart) {
         throw new Error(
@@ -247,12 +236,7 @@ export default function useCart() {
   }, [ensureCartData, patchCartMutation])
 
   const totalItems = useMemo(() => {
-    return (
-      cartQuery.data?.items?.reduce(
-        (sum, item) => sum + Math.max(0, item.quantity),
-        0,
-      ) ?? 0
-    )
+    return cartQuery.data?.items?.reduce((sum, item) => sum + Math.max(0, item.quantity), 0) ?? 0
   }, [cartQuery.data?.items])
 
   return {

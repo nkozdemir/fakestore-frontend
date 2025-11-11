@@ -30,14 +30,9 @@ export default function ProductCard({
 }: ProductCardProps) {
   const { t, formatCurrency, locale } = useTranslation()
   const shortenedTitle = truncateText(product.title, TITLE_CHAR_LIMIT)
-  const shortenedDescription = truncateText(
-    product.description,
-    DESCRIPTION_CHAR_LIMIT,
-  )
+  const shortenedDescription = truncateText(product.description, DESCRIPTION_CHAR_LIMIT)
   const parsedPrice = Number.parseFloat(product.price)
-  const formattedPrice = Number.isNaN(parsedPrice)
-    ? product.price
-    : formatCurrency(parsedPrice)
+  const formattedPrice = Number.isNaN(parsedPrice) ? product.price : formatCurrency(parsedPrice)
   const ratingLabel = product.rate
     ? t("products.grid.ratedLabel", {
         defaultValue: "Rated {{rating}}",

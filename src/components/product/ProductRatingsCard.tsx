@@ -73,8 +73,7 @@ export default function ProductRatingsCard({
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-1 text-primary">
           {PRODUCT_RATING_VALUES.map((value) => {
-            const isFilled =
-              averageRating !== null && averageRating >= value - 0.25
+            const isFilled = averageRating !== null && averageRating >= value - 0.25
 
             return (
               <Star
@@ -110,10 +109,7 @@ export default function ProductRatingsCard({
         </div>
       )}
 
-      <RatingsList
-        state={ratingsQueryState}
-        displayedRatings={displayedRatings}
-      />
+      <RatingsList state={ratingsQueryState} displayedRatings={displayedRatings} />
     </div>
   )
 }
@@ -166,15 +162,11 @@ function UserRatingControls({
             <Star
               className="size-6"
               strokeWidth={1.5}
-              fill={
-                value <= highlightedUserRating ? "currentColor" : "transparent"
-              }
+              fill={value <= highlightedUserRating ? "currentColor" : "transparent"}
             />
           </button>
         ))}
-        {isRatingMutating && (
-          <Spinner className="size-4 text-muted-foreground" />
-        )}
+        {isRatingMutating && <Spinner className="size-4 text-muted-foreground" />}
       </div>
       <div
         className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground"
@@ -286,9 +278,7 @@ function RatingsList({ state, displayedRatings }: RatingsListProps) {
       <ul className="space-y-2">
         {displayedRatings.map((entry) => {
           const composedName = [entry.firstName, entry.lastName]
-            .filter(
-              (part) => typeof part === "string" && part.trim().length > 0,
-            )
+            .filter((part) => typeof part === "string" && part.trim().length > 0)
             .join(" ")
             .trim()
           const resolvedName =
@@ -300,15 +290,11 @@ function RatingsList({ state, displayedRatings }: RatingsListProps) {
 
           return (
             <li
-              key={`${entry.id ?? "rating"}-${
-                entry.updatedAt ?? entry.createdAt ?? entry.value
-              }`}
+              key={`${entry.id ?? "rating"}-${entry.updatedAt ?? entry.createdAt ?? entry.value}`}
               className="flex flex-col gap-1 rounded-md border border-border/60 bg-background/60 px-3 py-2 text-sm"
             >
               <div className="flex items-center justify-between gap-2">
-                <span className="font-medium">
-                  {resolvedName}
-                </span>
+                <span className="font-medium">{resolvedName}</span>
                 <div className="flex items-center gap-1 text-primary">
                   {PRODUCT_RATING_VALUES.map((value) => (
                     <Star
@@ -318,9 +304,7 @@ function RatingsList({ state, displayedRatings }: RatingsListProps) {
                       fill={value <= entry.value ? "currentColor" : "transparent"}
                     />
                   ))}
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    {entry.value}/5
-                  </span>
+                  <span className="ml-2 text-xs text-muted-foreground">{entry.value}/5</span>
                 </div>
               </div>
             </li>

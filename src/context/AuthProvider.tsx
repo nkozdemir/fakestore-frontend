@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react"
 import { useNavigate } from "react-router"
 import { AuthContext } from "@/context/auth-context.ts"
 import {
@@ -15,11 +8,7 @@ import {
   formatApiErrorMessage,
   parseApiError,
 } from "@/lib/api.ts"
-import {
-  clearStoredTokens,
-  readStoredTokens,
-  storeTokens,
-} from "@/lib/auth-storage.ts"
+import { clearStoredTokens, readStoredTokens, storeTokens } from "@/lib/auth-storage.ts"
 import { getJwtExpiry } from "@/lib/jwt.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type {
@@ -122,18 +111,15 @@ export default function AuthProvider({ children }: AuthProviderProps) {
     isRefreshingRef.current = true
 
     try {
-      const refreshResponse = await fetchJson<{ access?: unknown }>(
-        "/auth/refresh/",
-        {
-          init: {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ refresh: refreshToken }),
+      const refreshResponse = await fetchJson<{ access?: unknown }>("/auth/refresh/", {
+        init: {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
+          body: JSON.stringify({ refresh: refreshToken }),
         },
-      )
+      })
 
       if (typeof refreshResponse.access !== "string") {
         throw new Error("Refresh response missing access token")
@@ -217,10 +203,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
     if (timeUntilExpiry <= REFRESH_LEEWAY_MS) {
       const bufferAdjusted = timeUntilExpiry - MIN_EXPIRY_BUFFER_MS
-      const cappedDelay = Math.min(
-        bufferAdjusted,
-        timeUntilExpiry - MIN_REFRESH_INTERVAL_MS,
-      )
+      const cappedDelay = Math.min(bufferAdjusted, timeUntilExpiry - MIN_REFRESH_INTERVAL_MS)
       const delay = Math.max(cappedDelay, MIN_REFRESH_INTERVAL_MS)
 
       refreshTimeoutRef.current = setTimeout(() => {
@@ -251,8 +234,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
           "We couldn’t match that username and password. Double-check your details and try again.",
       })
       const throttledMessage = t("auth.messages.throttled", {
-        defaultValue:
-          "Too many sign-in attempts. Please wait a moment and try again.",
+        defaultValue: "Too many sign-in attempts. Please wait a moment and try again.",
       })
       const defaultMessage = t("auth.messages.loginGeneric", {
         defaultValue:
@@ -275,16 +257,12 @@ export default function AuthProvider({ children }: AuthProviderProps) {
         if (error instanceof ApiError) {
           if (error.code === "TOO_MANY_REQUESTS" || error.status === 429) {
             throw new Error(
-              formatApiErrorMessage(error, throttledMessage, [
-                "Request was throttled",
-              ]),
+              formatApiErrorMessage(error, throttledMessage, ["Request was throttled"]),
             )
           }
 
           if (
-            ["VALIDATION_ERROR", "UNAUTHORIZED", "FORBIDDEN"].includes(
-              error.code,
-            ) ||
+            ["VALIDATION_ERROR", "UNAUTHORIZED", "FORBIDDEN"].includes(error.code) ||
             [400, 401, 403].includes(error.status)
           ) {
             throw new Error(
@@ -296,28 +274,19 @@ export default function AuthProvider({ children }: AuthProviderProps) {
             )
           }
 
-          throw new Error(
-            formatApiErrorMessage(error, defaultMessage, ["Request failed"]),
-          )
+          throw new Error(formatApiErrorMessage(error, defaultMessage, ["Request failed"]))
         }
 
         const message =
-          error instanceof Error && error.message.trim().length > 0
-            ? error.message
-            : defaultMessage
+          error instanceof Error && error.message.trim().length > 0 ? error.message : defaultMessage
 
         throw new Error(message)
       }
 
-      if (
-        !tokens ||
-        typeof tokens.access !== "string" ||
-        typeof tokens.refresh !== "string"
-      ) {
+      if (!tokens || typeof tokens.access !== "string" || typeof tokens.refresh !== "string") {
         throw new Error(
           t("auth.messages.loginUnexpected", {
-            defaultValue:
-              "We ran into an unexpected issue while signing you in. Please try again.",
+            defaultValue: "We ran into an unexpected issue while signing you in. Please try again.",
           }),
         )
       }
@@ -391,10 +360,7 @@ export default function AuthProvider({ children }: AuthProviderProps) {
               })
 
         throw new Error(
-          formatApiErrorMessage(apiError, fallbackMessage, [
-            "Validation failed",
-            "Request failed",
-          ]),
+          formatApiErrorMessage(apiError, fallbackMessage, ["Validation failed", "Request failed"]),
         )
       }
 

@@ -33,8 +33,7 @@ export default function QuantityStepper({
 
   const { isAtMin, isAtMax } = useMemo(() => {
     const minimum = Number.isFinite(min) ? min : 1
-    const maximum =
-      max === null || max === undefined ? Number.POSITIVE_INFINITY : max
+    const maximum = max === null || max === undefined ? Number.POSITIVE_INFINITY : max
 
     return {
       isAtMin: value <= minimum,
@@ -44,8 +43,7 @@ export default function QuantityStepper({
 
   const clampQuantity = (next: number) => {
     const minimum = Number.isFinite(min) ? min : 1
-    const maximum =
-      max === null || max === undefined ? Number.POSITIVE_INFINITY : max
+    const maximum = max === null || max === undefined ? Number.POSITIVE_INFINITY : max
 
     return Math.min(Math.max(next, minimum), maximum)
   }
