@@ -76,7 +76,12 @@ export default function ProfileDetailsDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form className="space-y-6" onSubmit={submitHandler} noValidate>
+        <form
+          className="space-y-6"
+          onSubmit={submitHandler}
+          noValidate
+          data-testid="profile-form"
+        >
           <DialogHeader>
             <DialogTitle>
               {t("profile.dialogs.profile.title", { defaultValue: "Edit profile" })}
@@ -188,7 +193,11 @@ export default function ProfileDetailsDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              data-testid="profile-save"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

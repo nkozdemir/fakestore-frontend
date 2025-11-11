@@ -114,6 +114,8 @@ export default function ProductOverviewCard({
               size="lg"
               disabled={isAddToCartDisabled}
               onClick={onAddToCart}
+              data-testid="product-detail-add-button"
+              data-product-id={product.id}
             >
               {isAddToCartProcessing
                 ? t("products.actions.updatingCart", {
@@ -125,9 +127,10 @@ export default function ProductOverviewCard({
             </Button>
             <QuantityStepper
               value={quantity}
-                onChange={onQuantityChange}
-                disabled={isQuantityDisabled}
-              />
+              onChange={onQuantityChange}
+              disabled={isQuantityDisabled}
+              testId="product-detail-quantity"
+            />
             </div>
             {ratingPanel}
           </CardContent>

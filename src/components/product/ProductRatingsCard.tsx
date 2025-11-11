@@ -161,6 +161,7 @@ function UserRatingControls({
                 suffix: value === 1 ? "" : "s",
               },
             })}
+            data-testid={`rate-star-${value}`}
           >
             <Star
               className="size-6"
@@ -175,7 +176,10 @@ function UserRatingControls({
           <Spinner className="size-4 text-muted-foreground" />
         )}
       </div>
-      <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+      <div
+        className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground"
+        data-testid="user-rating-message"
+      >
         {isRemovingRating ? (
           <span>
             {t("productDetail.ratings.removing", {
@@ -211,6 +215,7 @@ function UserRatingControls({
             className="font-medium text-primary underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:text-muted-foreground"
             onClick={onRemove}
             disabled={isRatingMutating}
+            data-testid="remove-rating"
           >
             {isRemovingRating
               ? t("productDetail.ratings.removingShort", {

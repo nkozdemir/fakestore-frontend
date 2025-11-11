@@ -33,7 +33,7 @@ export default function SecurityCard({ onChangePassword }: SecurityCardProps) {
             defaultValue: "Choose a strong password to keep your account secure.",
           })}
         </p>
-        <Button onClick={onChangePassword}>
+        <Button onClick={onChangePassword} data-testid="change-password-button">
           {t("profile.security.button", { defaultValue: "Change password" })}
         </Button>
       </CardContent>

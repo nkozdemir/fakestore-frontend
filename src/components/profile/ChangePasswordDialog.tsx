@@ -87,7 +87,12 @@ export default function ChangePasswordDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form className="space-y-6" onSubmit={submitHandler} noValidate>
+        <form
+          className="space-y-6"
+          onSubmit={submitHandler}
+          noValidate
+          data-testid="password-form"
+        >
           <DialogHeader>
             <DialogTitle>
               {t("profile.dialogs.password.title", { defaultValue: "Change password" })}
@@ -159,7 +164,11 @@ export default function ChangePasswordDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              data-testid="password-save"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

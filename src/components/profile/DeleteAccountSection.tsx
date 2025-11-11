@@ -55,7 +55,7 @@ export default function DeleteAccountSection({
       )}
       <AlertDialog open={isDialogOpen} onOpenChange={onOpenChange}>
         <AlertDialogTrigger asChild>
-          <Button variant="destructive">
+          <Button variant="destructive" data-testid="delete-account-trigger">
             {t("profile.delete.button", { defaultValue: "Delete account" })}
           </Button>
         </AlertDialogTrigger>
@@ -81,6 +81,7 @@ export default function DeleteAccountSection({
               onClick={onConfirm}
               disabled={isDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              data-testid="confirm-delete-account"
             >
               {isDeleting ? (
                 <>

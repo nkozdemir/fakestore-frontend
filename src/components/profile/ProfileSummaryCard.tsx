@@ -34,7 +34,12 @@ export default function ProfileSummaryCard({
             })}
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={onEdit}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onEdit}
+          data-testid="edit-profile-button"
+        >
           <Pencil className="mr-2 size-4" aria-hidden />
           {t("profile.summary.editButton", { defaultValue: "Edit profile" })}
         </Button>

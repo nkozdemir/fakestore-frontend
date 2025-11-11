@@ -154,7 +154,11 @@ export default function CartsPage() {
                   : price * item.quantity
 
                 return (
-                  <Card key={item.product.id}>
+                  <Card
+                    key={item.product.id}
+                    data-testid="cart-item-card"
+                    data-product-id={item.product.id}
+                  >
                     <CardContent className="flex flex-col gap-4 pt-6 sm:flex-row sm:items-start sm:gap-6">
                       <div className="flex w-full gap-4">
                         <div className="flex h-24 w-24 flex-shrink-0 items-center justify-center overflow-hidden rounded-md border bg-muted/20 p-2">
@@ -204,6 +208,8 @@ export default function CartsPage() {
                                 defaultValue: 'Remove "{{product}}" from cart',
                                 values: { product: item.product.title },
                               })}
+                              data-testid="cart-item-remove"
+                              data-product-id={item.product.id}
                             >
                               <Trash2Icon className="size-4" />
                             </Button>
@@ -238,6 +244,7 @@ export default function CartsPage() {
                                       )
                                     })
                                 }}
+                                testId={`cart-item-${item.product.id}-quantity`}
                               />
                             </div>
                             <div className="text-sm font-medium">

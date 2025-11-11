@@ -10,6 +10,7 @@ type QuantityStepperProps = {
   max?: number | null
   disabled?: boolean
   className?: string
+  testId?: string
 }
 
 const INTEGER_PATTERN = /^\d*$/
@@ -21,6 +22,7 @@ export default function QuantityStepper({
   max = null,
   disabled = false,
   className,
+  testId,
 }: QuantityStepperProps) {
   const { t } = useTranslation()
   const [draftValue, setDraftValue] = useState<string>(() => String(value))
@@ -112,6 +114,8 @@ export default function QuantityStepper({
     commitQuantity(value - 1)
   }
 
+  const baseTestId = testId ?? "quantity-stepper"
+
   return (
     <div
       className={cn(
@@ -119,6 +123,7 @@ export default function QuantityStepper({
         disabled && "opacity-60",
         className,
       )}
+      data-testid={baseTestId}
     >
       <button
         type="button"
@@ -128,6 +133,7 @@ export default function QuantityStepper({
         aria-label={t("cart.quantity.decrease", {
           defaultValue: "Decrease quantity",
         })}
+        data-testid={`${baseTestId}-decrease`}
       >
         <MinusIcon className="size-4" />
       </button>
@@ -141,6 +147,7 @@ export default function QuantityStepper({
         disabled={disabled}
         aria-label={t("cart.quantity.label", { defaultValue: "Quantity" })}
         className="w-12 rounded-full border-none bg-transparent text-center text-sm font-semibold outline-none [appearance:textfield] focus:ring-0 focus-visible:outline-none"
+        data-testid={`${baseTestId}-input`}
       />
       <button
         type="button"
@@ -150,6 +157,7 @@ export default function QuantityStepper({
         aria-label={t("cart.quantity.increase", {
           defaultValue: "Increase quantity",
         })}
+        data-testid={`${baseTestId}-increase`}
       >
         <PlusIcon className="size-4" />
       </button>

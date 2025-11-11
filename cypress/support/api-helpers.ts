@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 const FALLBACK_API_BASE_URL = "http://localhost:8000/api/"
+export const AUTH_STORAGE_KEY = "fakestore.authTokens"
 
 export const getApiBaseUrl = (): string =>
   (Cypress.env("apiBaseUrl") as string | undefined) ?? FALLBACK_API_BASE_URL

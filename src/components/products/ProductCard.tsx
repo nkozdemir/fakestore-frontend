@@ -90,6 +90,8 @@ export default function ProductCard({
               event.stopPropagation()
               onAddToCart(product)
             }}
+            data-testid="product-card-add-button"
+            data-product-id={product.id}
           >
             {isAddToCartProcessing
               ? t("products.actions.updatingCart", {

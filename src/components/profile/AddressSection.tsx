@@ -57,7 +57,12 @@ export default function AddressSection({
             })}
           </CardDescription>
         </div>
-        <Button variant="outline" size="sm" onClick={onAdd}>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onAdd}
+          data-testid="add-address-button"
+        >
           <Plus className="mr-2 size-4" aria-hidden />
           {t("profile.addresses.addButton", { defaultValue: "Add address" })}
         </Button>
@@ -66,7 +71,12 @@ export default function AddressSection({
         {addresses.length > 0 ? (
           <ul className="grid gap-4">
             {addresses.map((address) => (
-              <li key={address.id} className="rounded-md border p-4 shadow-sm">
+              <li
+                key={address.id}
+                className="rounded-md border p-4 shadow-sm"
+                data-testid="address-item"
+                data-address-id={address.id}
+              >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="space-y-1">
                     <p className="font-medium text-foreground">
@@ -90,6 +100,8 @@ export default function AddressSection({
                       variant="outline"
                       size="sm"
                       onClick={() => onEdit(address)}
+                      data-testid="edit-address-button"
+                      data-address-id={address.id}
                     >
                       <Pencil className="mr-2 size-4" aria-hidden />
                       {t("profile.addresses.edit", { defaultValue: "Edit" })}
@@ -99,6 +111,8 @@ export default function AddressSection({
                       size="icon"
                       className="text-destructive hover:text-destructive focus-visible:text-destructive"
                       onClick={() => onDeleteRequest(address)}
+                      data-testid="delete-address-button"
+                      data-address-id={address.id}
                       aria-label={t("profile.addresses.removeAria", {
                         defaultValue: "Remove address at {{street}} {{number}}",
                         values: {
@@ -170,6 +184,7 @@ export default function AddressSection({
                   }}
                   disabled={deleteDialog.isDeleting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  data-testid="confirm-delete-address"
                 >
                   {deleteDialog.isDeleting ? (
                     <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />

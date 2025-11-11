@@ -78,7 +78,12 @@ export default function AddressDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <form className="space-y-6" onSubmit={submitHandler} noValidate>
+        <form
+          className="space-y-6"
+          onSubmit={submitHandler}
+          noValidate
+          data-testid="address-form"
+        >
           <DialogHeader>
             <DialogTitle>
               {mode === "edit"
@@ -216,7 +221,11 @@ export default function AddressDialog({
             >
               {t("common.actions.cancel", { defaultValue: "Cancel" })}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              data-testid="address-save"
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
