@@ -5,7 +5,7 @@ import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type { Product, ProductRatingsList, RatingSummary } from "@/types/catalog.ts"
 import type { AuthUser } from "@/types/auth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export const PRODUCT_RATING_VALUES = [1, 2, 3, 4, 5] as const
 
@@ -83,7 +83,7 @@ export function useProductRatings({
   accessToken,
 }: UseProductRatingsParams) {
   const queryClient = useQueryClient()
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   const saveRatingFallbackMessage = t("productDetail.ratings.saveError", {
     defaultValue: "We couldn't save your rating. Please try again.",
   })
@@ -109,8 +109,9 @@ export function useProductRatings({
     productId,
     "rating-summary",
     user?.id ?? "guest",
+    language,
   ] as const
-  const ratingListQueryKey = ["product", productId, "ratings"] as const
+  const ratingListQueryKey = ["product", productId, "ratings", language] as const
 
   const ratingSummaryQuery = useQuery<RatingSummary, Error>({
     queryKey: ratingSummaryQueryKey,
@@ -300,7 +301,6 @@ export function useProductRatings({
 
     const userRatingId =
       entry?.id ??
-      null ??
       (typeof userRatingRaw === "number" && userRatingRaw > 5 ? userRatingRaw : null)
 
     const currentUserRating =

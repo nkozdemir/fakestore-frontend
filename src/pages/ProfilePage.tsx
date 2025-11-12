@@ -5,7 +5,12 @@ import { Button } from "@/components/ui/button.tsx"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import useAuth from "@/hooks/useAuth.ts"
-import { buildApiUrl, formatApiErrorMessage, parseApiError } from "@/lib/api.ts"
+import {
+  buildApiUrl,
+  formatApiErrorMessage,
+  parseApiError,
+  resolvePreferredApiLanguage,
+} from "@/lib/api.ts"
 import { authorizationHeader } from "@/lib/auth-headers.ts"
 import type { UserAddress } from "@/types/auth.ts"
 import ProfileSummaryCard from "@/components/profile/ProfileSummaryCard.tsx"
@@ -20,7 +25,7 @@ import {
   type AddressFormValues,
   type PasswordFormValues,
 } from "@/lib/profile-schemas.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type AddressDialogState =
   | {
@@ -97,10 +102,13 @@ export default function ProfilePage() {
 
       let response: Response
 
+      const preferredLanguage = resolvePreferredApiLanguage()
+
       try {
         response = await fetch(buildApiUrl(path), {
           headers: {
             "Content-Type": "application/json",
+            "Accept-Language": preferredLanguage,
             ...authorizationHeader(accessToken),
             ...init.headers,
           },

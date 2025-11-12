@@ -12,7 +12,7 @@ import QuantityStepper from "@/components/cart/QuantityStepper.tsx"
 import { Trash2Icon } from "lucide-react"
 import useCart from "@/hooks/useCart.ts"
 import { toast } from "sonner"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export default function CartsPage() {
   const {

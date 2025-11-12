@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
 import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
 import { type PasswordFormValues, passwordResolver } from "@/lib/profile-schemas.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type ChangePasswordDialogProps = {

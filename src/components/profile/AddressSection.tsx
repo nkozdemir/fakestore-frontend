@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import type { UserAddress } from "@/types/auth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type AddressSectionProps = {
   addresses: UserAddress[]

@@ -11,7 +11,7 @@ import UsernameField from "@/components/auth/UsernameField.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { createZodResolver } from "@/lib/create-zod-resolver.ts"
 import { usernameRequiredSchema } from "@/lib/username-policy.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 const loginSchema = z.object({

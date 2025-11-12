@@ -1,81 +1,24 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useState,
-  type ReactNode,
-} from "react"
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react"
 import {
   fallbackLanguage,
   languageMetadata,
-  supportedLanguages,
   translationResources,
   type Language,
 } from "@/i18n/translations.ts"
+import { getActiveLanguage, setActiveLanguage } from "@/i18n/language-preferences.ts"
+import {
+  I18nContext,
+  type I18nContextValue,
+  type TranslateOptions,
+} from "@/context/I18nContext.ts"
 
-type TranslateOptions = {
-  values?: Record<string, string | number>
-  defaultValue?: string
+type TranslationLeaf = string
+
+interface TranslationBranch {
+  [key: string]: TranslationLeaf | TranslationBranch
 }
 
-type I18nContextValue = {
-  language: Language
-  locale: string
-  setLanguage: (language: Language) => void
-  t: (key: string, options?: TranslateOptions) => string
-  formatCurrency: (value: number, currency?: string, options?: Intl.NumberFormatOptions) => string
-}
-
-const STORAGE_KEY = "fakestore:language"
-
-type TranslationNode = string | Record<string, TranslationNode>
-
-const I18nContext = createContext<I18nContextValue | null>(null)
-
-const isSupportedLanguage = (value: string): value is Language =>
-  (supportedLanguages as string[]).includes(value)
-
-const getStoredLanguage = (): Language | null => {
-  if (typeof window === "undefined") {
-    return null
-  }
-
-  try {
-    const stored = window.localStorage.getItem(STORAGE_KEY)
-    if (stored && isSupportedLanguage(stored)) {
-      return stored
-    }
-  } catch {
-    /* no-op */
-  }
-
-  return null
-}
-
-const detectBrowserLanguage = (): Language | null => {
-  if (typeof window === "undefined") {
-    return null
-  }
-
-  const navigatorLanguage = window.navigator.language ?? window.navigator.languages?.[0]
-
-  if (!navigatorLanguage) {
-    return null
-  }
-
-  const normalized = navigatorLanguage.split("-")[0]?.toLowerCase()
-
-  if (normalized && isSupportedLanguage(normalized)) {
-    return normalized
-  }
-
-  return null
-}
-
-const detectInitialLanguage = (): Language =>
-  getStoredLanguage() ?? detectBrowserLanguage() ?? fallbackLanguage
+type TranslationNode = TranslationLeaf | TranslationBranch
 
 const resolveTranslationString = (language: Language, key: string): string | null => {
   const resource = translationResources[language] as Record<string, unknown>
@@ -112,20 +55,12 @@ const interpolateTemplate = (
 }
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [language, setLanguageState] = useState<Language>(detectInitialLanguage)
+  const [language, setLanguageState] = useState<Language>(getActiveLanguage)
 
   const locale = languageMetadata[language]?.locale ?? "en-US"
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return
-    }
-
-    try {
-      window.localStorage.setItem(STORAGE_KEY, language)
-    } catch {
-      /* no-op */
-    }
+    setActiveLanguage(language)
   }, [language])
 
   useEffect(() => {
@@ -161,7 +96,14 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   )
 
   const setLanguage = useCallback((nextLanguage: Language) => {
-    setLanguageState((current) => (current === nextLanguage ? current : nextLanguage))
+    setLanguageState((current) => {
+      if (current === nextLanguage) {
+        return current
+      }
+
+      setActiveLanguage(nextLanguage, { persist: false })
+      return nextLanguage
+    })
   }, [])
 
   const value = useMemo<I18nContextValue>(
@@ -176,14 +118,4 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   )
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>
-}
-
-export function useTranslation(): I18nContextValue {
-  const context = useContext(I18nContext)
-
-  if (!context) {
-    throw new Error("useTranslation must be used within an I18nProvider")
-  }
-
-  return context
 }

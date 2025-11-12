@@ -1,7 +1,7 @@
 import { Check, Circle } from "lucide-react"
 import { evaluatePasswordChecks } from "@/lib/password-policy.ts"
 import { cn } from "@/lib/utils.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type PasswordRequirementsProps = {
   password: string

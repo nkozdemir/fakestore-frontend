@@ -1,4 +1,5 @@
 import { env } from "@/config/env.ts"
+import { getActiveLanguage } from "@/i18n/language-preferences.ts"
 
 type QueryValue = string | number | boolean | null | undefined
 
@@ -224,9 +225,14 @@ export async function parseApiError(response: Response): Promise<ApiError> {
   })
 }
 
+export function resolvePreferredApiLanguage(): string {
+  return getActiveLanguage()
+}
+
 export function buildApiUrl(path: string, params?: Record<string, QueryValue>): string {
   const sanitizedPath = path.replace(/^\/+/, "")
   const url = new URL(sanitizedPath, API_BASE_URL)
+  const preferredLanguage = resolvePreferredApiLanguage()
 
   if (params) {
     Object.entries(params).forEach(([key, rawValue]) => {
@@ -236,6 +242,13 @@ export function buildApiUrl(path: string, params?: Record<string, QueryValue>): 
 
       url.searchParams.set(key, String(rawValue))
     })
+  }
+
+  const hasLanguageParam =
+    Boolean(url.searchParams.get("lang")) || Boolean(url.searchParams.get("language"))
+
+  if (!hasLanguageParam && preferredLanguage) {
+    url.searchParams.set("lang", preferredLanguage)
   }
 
   return url.toString()
@@ -249,9 +262,11 @@ export async function fetchJson<T>(
   } = {},
 ): Promise<T> {
   const { params, init } = options
+  const preferredLanguage = resolvePreferredApiLanguage()
   const response = await fetch(buildApiUrl(path, params), {
     headers: {
       Accept: "application/json",
+      ...(preferredLanguage ? { "Accept-Language": preferredLanguage } : {}),
       ...init?.headers,
     },
     ...init,

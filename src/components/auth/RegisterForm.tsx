@@ -13,7 +13,7 @@ import UsernameField from "@/components/auth/UsernameField.tsx"
 import { useUsernameAvailability } from "@/hooks/useUsernameAvailability.ts"
 import { PASSWORD_REQUIREMENT_MESSAGE } from "@/lib/password-policy.ts"
 import { type RegisterFormValues, registerResolver } from "@/lib/register-schema.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 export type RegisterFormProps = {

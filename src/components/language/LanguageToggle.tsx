@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu.tsx"
 import { languageMetadata, supportedLanguages, type Language } from "@/i18n/translations.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { cn } from "@/lib/utils.ts"
 
 export type LanguageToggleProps = {

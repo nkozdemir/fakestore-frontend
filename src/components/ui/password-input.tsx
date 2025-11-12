@@ -2,7 +2,7 @@ import { forwardRef, useState } from "react"
 import { Eye, EyeOff } from "lucide-react"
 import { Input } from "@/components/ui/input.tsx"
 import { cn } from "@/lib/utils.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type PasswordInputProps = Omit<React.ComponentPropsWithoutRef<typeof Input>, "type">
 

@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/card.tsx"
 import { truncateText } from "@/lib/string.ts"
 import type { Product } from "@/types/catalog.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 const TITLE_CHAR_LIMIT = 60
 const DESCRIPTION_CHAR_LIMIT = 160

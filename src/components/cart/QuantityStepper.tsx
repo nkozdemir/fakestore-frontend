@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from "react"
 import { MinusIcon, PlusIcon } from "lucide-react"
 import { cn } from "@/lib/utils.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type QuantityStepperProps = {
   value: number

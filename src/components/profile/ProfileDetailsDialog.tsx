@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
 import UsernameField from "@/components/auth/UsernameField.tsx"
 import { type ProfileDetailsFormValues, profileResolver } from "@/lib/profile-schemas.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type ProfileDetailsDialogProps = {

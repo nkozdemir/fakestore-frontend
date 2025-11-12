@@ -2,6 +2,7 @@ import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { fetchJson } from "@/lib/api.ts"
 import type { Category, ProductResponse } from "@/types/catalog.ts"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export const PRODUCTS_PAGE_SIZE = 8
 
@@ -11,9 +12,10 @@ export type UseProductCatalogParams = {
 }
 
 export function useProductCatalog({ page, selectedCategory }: UseProductCatalogParams) {
+  const { language } = useTranslation()
   const productQueryKey = [
     "products",
-    { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory },
+    { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory, language },
   ] as const
 
   const productsQuery = useQuery<ProductResponse, Error, ProductResponse, typeof productQueryKey>({
@@ -30,7 +32,7 @@ export function useProductCatalog({ page, selectedCategory }: UseProductCatalogP
   })
 
   const categoriesQuery = useQuery<Category[], Error>({
-    queryKey: ["categories"],
+    queryKey: ["categories", language] as const,
     queryFn: () => fetchJson<Category[]>("categories/"),
   })
 

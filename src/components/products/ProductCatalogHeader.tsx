@@ -6,7 +6,7 @@ import {
   SelectValue,
 } from "@/components/ui/select.tsx"
 import type { Category } from "@/types/catalog.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 const toTestId = (value: string): string =>
   value

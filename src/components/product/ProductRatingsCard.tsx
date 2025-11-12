@@ -2,7 +2,7 @@ import { Star } from "lucide-react"
 import { Spinner } from "@/components/ui/spinner.tsx"
 import { PRODUCT_RATING_VALUES } from "@/hooks/useProductRatings.ts"
 import type { ProductRatingsList } from "@/types/catalog.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type ProductRatingsCardProps = {
   averageRating: number | null
@@ -233,7 +233,7 @@ type RatingsListProps = {
 }
 
 function RatingsList({ state, displayedRatings }: RatingsListProps) {
-  const { t, locale } = useTranslation()
+  const { t } = useTranslation()
 
   if (state.isPending) {
     return (

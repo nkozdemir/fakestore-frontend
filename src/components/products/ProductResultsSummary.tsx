@@ -1,4 +1,4 @@
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export type ProductResultsSummaryProps = {
   isVisible: boolean

@@ -4,13 +4,17 @@ import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
 import type { Cart, CartPatchPayload } from "@/types/cart.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
-const cartQueryKey = (userId?: number): QueryKey => ["cart", userId ?? "guest"]
+const cartQueryKey = (userId: number | undefined, language: string): QueryKey => [
+  "cart",
+  userId ?? "guest",
+  language,
+]
 
 export default function useCart() {
   const { user, accessToken, isAuthenticated } = useAuth()
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   const cartUpdateFallbackMessage = t("cart.messages.updateFailed", {
     defaultValue: "Failed to update cart. Please try again.",
   })
@@ -57,7 +61,7 @@ export default function useCart() {
   }, [accessToken, userId])
 
   const cartQuery = useQuery<Cart, Error>({
-    queryKey: cartQueryKey(userId),
+    queryKey: cartQueryKey(userId, language),
     queryFn: fetchCart,
     enabled: Boolean(isAuthenticated && userId && accessToken),
     staleTime: 0,
@@ -71,9 +75,9 @@ export default function useCart() {
     }
 
     const fetchedCart = await fetchCart()
-    queryClient.setQueryData(cartQueryKey(userId), fetchedCart)
+    queryClient.setQueryData(cartQueryKey(userId, language), fetchedCart)
     return fetchedCart
-  }, [cartQuery.data, fetchCart, queryClient, userId])
+  }, [cartQuery.data, fetchCart, language, queryClient, userId])
 
   const patchCartMutation = useMutation<Cart, Error, CartPatchPayload>({
     mutationFn: async (payload) => {
@@ -123,7 +127,7 @@ export default function useCart() {
       }
     },
     onSuccess: (updatedCart) => {
-      queryClient.setQueryData(cartQueryKey(userId), updatedCart)
+      queryClient.setQueryData(cartQueryKey(userId, language), updatedCart)
     },
   })
 

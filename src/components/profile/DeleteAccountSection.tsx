@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog.tsx"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { CircleAlert, Loader2 } from "lucide-react"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type DeleteAccountSectionProps = {
   isDialogOpen: boolean

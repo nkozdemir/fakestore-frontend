@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import { Navigate, useLocation } from "react-router"
 import useAuth from "@/hooks/useAuth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type ProtectedRouteProps = {
   children: ReactNode

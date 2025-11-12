@@ -1,6 +1,6 @@
 import { Link } from "react-router"
 import { Button } from "@/components/ui/button.tsx"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export default function NotFoundPage() {
   const { t } = useTranslation()

@@ -2,7 +2,7 @@ import { useLocation, useNavigate } from "react-router"
 import RegisterForm from "@/components/auth/RegisterForm.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import type { RegisterFormValues } from "@/lib/register-schema.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export default function RegisterPage() {
   const navigate = useNavigate()

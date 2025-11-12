@@ -19,9 +19,10 @@ import ProductOverviewCard from "@/components/product/ProductOverviewCard.tsx"
 import ProductRatingsCard from "@/components/product/ProductRatingsCard.tsx"
 import { useProductRatings } from "@/hooks/useProductRatings.ts"
 import type { Product } from "@/types/catalog.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
-const productQueryKeyFor = (productId: string) => ["product", productId] as const
+const productQueryKeyFor = (productId: string, language: string) =>
+  ["product", productId, language] as const
 
 export default function ProductDetailPage() {
   const { productId } = useParams<{ productId: string }>()
@@ -30,12 +31,12 @@ export default function ProductDetailPage() {
   const { isAuthenticated, isLoading: isAuthLoading, accessToken, user } = useAuth()
   const { addItem, isUpdating: isCartUpdating } = useCart()
   const [quantity, setQuantity] = useState(1)
-  const { t } = useTranslation()
+  const { t, language } = useTranslation()
   useEffect(() => {
     setQuantity(1)
   }, [normalizedProductId])
 
-  const productQueryKey = productQueryKeyFor(normalizedProductId)
+  const productQueryKey = productQueryKeyFor(normalizedProductId, language)
 
   const {
     data: product,

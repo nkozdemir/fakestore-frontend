@@ -2,7 +2,7 @@ import { Pencil } from "lucide-react"
 import { Button } from "@/components/ui/button.tsx"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card.tsx"
 import type { AuthUser } from "@/types/auth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type ProfileSummaryCardProps = {
   user: AuthUser

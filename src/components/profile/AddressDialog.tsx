@@ -15,7 +15,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
 import { Loader2, CircleAlert } from "lucide-react"
 import { type AddressFormValues, addressResolver } from "@/lib/profile-schemas.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
 
 type AddressDialogProps = {

@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button.tsx"
 import type { Product } from "@/types/catalog.ts"
 import QuantityStepper from "@/components/cart/QuantityStepper.tsx"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type ProductOverviewCardProps = {
   product: Product

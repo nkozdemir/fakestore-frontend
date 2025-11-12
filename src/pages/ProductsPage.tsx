@@ -10,7 +10,7 @@ import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
 import type { Category, Product } from "@/types/catalog.ts"
 import { toast } from "sonner"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()

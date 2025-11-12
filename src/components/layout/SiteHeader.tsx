@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu.tsx"
 import { cn } from "@/lib/utils.ts"
 import useAuth from "@/hooks/useAuth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 const navItems = [
   { labelKey: "navigation.products", to: "/", end: true },

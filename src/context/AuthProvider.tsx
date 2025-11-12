@@ -7,6 +7,7 @@ import {
   fetchJson,
   formatApiErrorMessage,
   parseApiError,
+  resolvePreferredApiLanguage,
 } from "@/lib/api.ts"
 import { clearStoredTokens, readStoredTokens, storeTokens } from "@/lib/auth-storage.ts"
 import { getJwtExpiry } from "@/lib/jwt.ts"
@@ -19,7 +20,7 @@ import type {
   RegisterPayload,
   UserProfileResponse,
 } from "@/types/auth.ts"
-import { useTranslation } from "@/context/I18nProvider.tsx"
+import { useTranslation } from "@/hooks/useTranslation.ts"
 
 type AuthProviderProps = {
   children: ReactNode
@@ -319,12 +320,14 @@ export default function AuthProvider({ children }: AuthProviderProps) {
   const register = useCallback(
     async (payload: RegisterPayload) => {
       let response: Response
+      const preferredLanguage = resolvePreferredApiLanguage()
 
       try {
         response = await fetch(buildApiUrl("/auth/register/"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept-Language": preferredLanguage,
           },
           body: JSON.stringify({
             username: payload.username,
@@ -385,11 +388,13 @@ export default function AuthProvider({ children }: AuthProviderProps) {
 
   const logout = useCallback(async () => {
     if (refreshToken) {
+      const preferredLanguage = resolvePreferredApiLanguage()
       try {
         await fetch(buildApiUrl("/auth/logout/"), {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "Accept-Language": preferredLanguage,
           },
           body: JSON.stringify({ refresh: refreshToken }),
         })
