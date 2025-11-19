@@ -9,7 +9,7 @@ export type ProductGridProps = {
   emptyMessage: string
   onAddToCart: (product: Product) => void
   isAddToCartDisabled: boolean
-  isAddToCartProcessing: boolean
+  activeAddToCartProductId: number | null
   pageSize: number
 }
 
@@ -20,7 +20,7 @@ export default function ProductGrid({
   emptyMessage,
   onAddToCart,
   isAddToCartDisabled,
-  isAddToCartProcessing,
+  activeAddToCartProductId,
   pageSize,
 }: ProductGridProps) {
   if (isInitialLoading) {
@@ -53,7 +53,7 @@ export default function ProductGrid({
           product={product}
           onAddToCart={onAddToCart}
           isAddToCartDisabled={isAddToCartDisabled}
-          isAddToCartProcessing={isAddToCartProcessing}
+          isAddToCartProcessing={activeAddToCartProductId === product.id}
         />
       ))}
     </div>

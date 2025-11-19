@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button.tsx"
 import {
   Card,
@@ -27,6 +28,7 @@ export default function CartsPage() {
     refetch,
   } = useCart()
   const { t, formatCurrency, locale } = useTranslation()
+  const applyingToastIdRef = useRef<string | number | null>(null)
 
   const rawItems = cart?.items
   const cartItems = Array.isArray(rawItems) ? rawItems : []
@@ -40,6 +42,38 @@ export default function CartsPage() {
   }, 0)
 
   const hasItems = cartItems.length > 0
+
+  useEffect(() => {
+    if (isUpdating) {
+      if (applyingToastIdRef.current) {
+        return
+      }
+
+      applyingToastIdRef.current = toast.loading(
+        t("cart.banners.applying", {
+          defaultValue: "Applying your changes…",
+        }),
+        {
+          duration: Infinity,
+        },
+      )
+      return
+    }
+
+    if (applyingToastIdRef.current) {
+      toast.dismiss(applyingToastIdRef.current)
+      applyingToastIdRef.current = null
+    }
+  }, [isUpdating, t])
+
+  useEffect(() => {
+    return () => {
+      if (applyingToastIdRef.current) {
+        toast.dismiss(applyingToastIdRef.current)
+        applyingToastIdRef.current = null
+      }
+    }
+  }, [])
 
   return (
     <main className="bg-background">
@@ -131,16 +165,6 @@ export default function CartsPage() {
                   <span>
                     {t("cart.banners.refreshing", {
                       defaultValue: "Refreshing cart…",
-                    })}
-                  </span>
-                </div>
-              ) : null}
-              {isUpdating ? (
-                <div className="flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground">
-                  <Spinner className="size-3.5" />
-                  <span>
-                    {t("cart.banners.applying", {
-                      defaultValue: "Applying your changes…",
                     })}
                   </span>
                 </div>

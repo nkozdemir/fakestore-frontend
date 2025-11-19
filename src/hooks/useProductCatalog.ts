@@ -1,8 +1,9 @@
 import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { fetchJson } from "@/lib/api.ts"
-import type { Category, ProductResponse } from "@/types/catalog.ts"
+import type { Category, CategoryFilterOption, ProductResponse } from "@/types/catalog.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
+import { fallbackLanguage } from "@/i18n/translations.ts"
 
 export const PRODUCTS_PAGE_SIZE = 8
 
@@ -13,6 +14,7 @@ export type UseProductCatalogParams = {
 
 export function useProductCatalog({ page, selectedCategory }: UseProductCatalogParams) {
   const { language } = useTranslation()
+  const shouldUseCanonicalCategories = language !== fallbackLanguage
   const productQueryKey = [
     "products",
     { limit: PRODUCTS_PAGE_SIZE, page, category: selectedCategory, language },
@@ -36,6 +38,49 @@ export function useProductCatalog({ page, selectedCategory }: UseProductCatalogP
     queryFn: () => fetchJson<Category[]>("categories/"),
   })
 
+  const canonicalCategoriesQuery = useQuery<Category[], Error>({
+    queryKey: ["categories", "canonical", fallbackLanguage] as const,
+    queryFn: () =>
+      fetchJson<Category[]>("categories/", {
+        params: { lang: fallbackLanguage },
+        init: { headers: { "Accept-Language": fallbackLanguage } },
+      }),
+    enabled: shouldUseCanonicalCategories,
+  })
+
+  const categories = useMemo<CategoryFilterOption[]>(() => {
+    const localizedCategories = categoriesQuery.data ?? []
+
+    if (localizedCategories.length === 0) {
+      return []
+    }
+
+    if (shouldUseCanonicalCategories) {
+      const canonicalCategories = canonicalCategoriesQuery.data ?? []
+      if (canonicalCategories.length === 0) {
+        return []
+      }
+
+      const canonicalById = new Map<number, string>(
+        canonicalCategories.map((category) => [category.id, category.name]),
+      )
+
+      return localizedCategories.map((category) => ({
+        ...category,
+        slug: canonicalById.get(category.id) ?? category.name,
+      }))
+    }
+
+    return localizedCategories.map((category) => ({
+      ...category,
+      slug: category.name,
+    }))
+  }, [categoriesQuery.data, canonicalCategoriesQuery.data, shouldUseCanonicalCategories])
+
+  const isLoadingCategories =
+    categoriesQuery.isPending ||
+    (shouldUseCanonicalCategories && canonicalCategoriesQuery.isPending)
+
   const computed = useMemo(() => {
     const products = productsQuery.data?.results ?? []
     const rawCount = productsQuery.data?.count
@@ -58,7 +103,11 @@ export function useProductCatalog({ page, selectedCategory }: UseProductCatalogP
 
     const isInitialLoading = productsQuery.isPending && !productsQuery.data
     const isRefetching = productsQuery.isFetching && !isInitialLoading
-    const errorMessage = productsQuery.error?.message ?? categoriesQuery.error?.message ?? null
+    const errorMessage =
+      productsQuery.error?.message ??
+      categoriesQuery.error?.message ??
+      canonicalCategoriesQuery.error?.message ??
+      null
 
     const firstItemIndex = (page - 1) * PRODUCTS_PAGE_SIZE + 1
     const lastItemIndex = firstItemIndex + products.length - 1
@@ -85,6 +134,7 @@ export function useProductCatalog({ page, selectedCategory }: UseProductCatalogP
     }
   }, [
     categoriesQuery.error?.message,
+    canonicalCategoriesQuery.error?.message,
     page,
     productsQuery.data,
     productsQuery.error,
@@ -95,6 +145,9 @@ export function useProductCatalog({ page, selectedCategory }: UseProductCatalogP
   return {
     productsQuery,
     categoriesQuery,
+    canonicalCategoriesQuery,
+    categories,
+    isLoadingCategories,
     ...computed,
   }
 }

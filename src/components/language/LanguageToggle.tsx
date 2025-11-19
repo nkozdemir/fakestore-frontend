@@ -1,4 +1,4 @@
-import { LanguagesIcon, CheckIcon } from "lucide-react"
+import { GlobeIcon, CheckIcon } from "lucide-react"
 import { Button } from "@/components/ui/button.tsx"
 import {
   DropdownMenu,
@@ -30,7 +30,7 @@ export default function LanguageToggle({ className }: LanguageToggleProps) {
           })}
           className={className}
         >
-          <LanguagesIcon className="size-5" />
+          <GlobeIcon className="size-5" />
           <span className="sr-only">
             {t("language.switcherLabel", {
               defaultValue: "Language",

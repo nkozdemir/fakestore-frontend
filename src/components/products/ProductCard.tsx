@@ -79,7 +79,7 @@ export default function ProductCard({
           <span className="text-lg font-semibold">{formattedPrice}</span>
           <Button
             size="sm"
-            disabled={isAddToCartDisabled}
+            disabled={isAddToCartDisabled || isAddToCartProcessing}
             onClick={(event) => {
               event.preventDefault()
               event.stopPropagation()

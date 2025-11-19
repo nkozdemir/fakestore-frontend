@@ -5,7 +5,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select.tsx"
-import type { Category } from "@/types/catalog.ts"
+import type { CategoryFilterOption } from "@/types/catalog.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 
 const toTestId = (value: string): string =>
@@ -15,7 +15,7 @@ const toTestId = (value: string): string =>
     .replace(/^-+|-+$/g, "") || "option"
 
 export type ProductCatalogHeaderProps = {
-  categories: Category[]
+  categories: CategoryFilterOption[]
   selectedCategoryValue: string
   onCategoryChange: (value: string) => void
   isLoadingCategories: boolean
@@ -28,6 +28,7 @@ export default function ProductCatalogHeader({
   isLoadingCategories,
 }: ProductCatalogHeaderProps) {
   const { t } = useTranslation()
+  const disableSelect = isLoadingCategories || categories.length === 0
 
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -44,7 +45,7 @@ export default function ProductCatalogHeader({
       <Select
         value={selectedCategoryValue}
         onValueChange={onCategoryChange}
-        disabled={isLoadingCategories}
+        disabled={disableSelect}
       >
         <SelectTrigger className="w-full sm:w-64" data-testid="category-filter">
           <SelectValue
@@ -68,7 +69,7 @@ export default function ProductCatalogHeader({
           {categories.map((category) => (
             <SelectItem
               key={category.id}
-              value={category.name}
+              value={category.slug}
               data-testid={`category-option-${toTestId(category.name)}`}
             >
               {category.name}

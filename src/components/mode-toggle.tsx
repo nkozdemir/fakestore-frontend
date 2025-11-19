@@ -1,4 +1,4 @@
-import { Moon, Sun } from "lucide-react"
+import { CheckIcon, Moon, Sun } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -7,10 +7,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/components/theme-context"
+import { useTheme, type Theme } from "@/components/theme-context"
+import { cn } from "@/lib/utils"
 
 export function ModeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
+  const themeOptions: { value: Theme; label: string }[] = [
+    { value: "light", label: "Light" },
+    { value: "dark", label: "Dark" },
+    { value: "system", label: "System" },
+  ]
 
   return (
     <DropdownMenu>
@@ -22,9 +28,19 @@ export function ModeToggle() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>Light</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>Dark</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")}>System</DropdownMenuItem>
+        {themeOptions.map(({ value, label }) => (
+          <DropdownMenuItem
+            key={value}
+            onClick={() => setTheme(value)}
+            aria-checked={theme === value}
+            className="cursor-pointer"
+          >
+            <span className="flex w-full items-center justify-between text-sm">
+              <span>{label}</span>
+              <CheckIcon className={cn("size-4 opacity-0 transition", theme === value && "opacity-100")} />
+            </span>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   )

@@ -8,16 +8,17 @@ import { Spinner } from "@/components/ui/spinner.tsx"
 import { useProductCatalog, PRODUCTS_PAGE_SIZE } from "@/hooks/useProductCatalog.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
-import type { Category, Product } from "@/types/catalog.ts"
+import type { Product } from "@/types/catalog.ts"
 import { toast } from "sonner"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
   const [page, setPage] = useState(1)
+  const [pendingAddProductId, setPendingAddProductId] = useState<number | null>(null)
   const navigate = useNavigate()
   const { isAuthenticated, isLoading: isAuthLoading } = useAuth()
-  const { addItem, isUpdating: isCartUpdating } = useCart()
+  const { addItem } = useCart()
   const { t } = useTranslation()
 
   const selectedCategoryParam = searchParams.get("category")
@@ -26,12 +27,30 @@ export default function ProductsPage() {
 
   const catalog = useProductCatalog({ page, selectedCategory })
 
-  const categories = catalog.categoriesQuery.data ?? []
+  const categories = catalog.categories
   const categoryValue = selectedCategory ?? "all"
   const selectedCategoryLabel = selectedCategory
-    ? (categories.find((category: Category) => category.name === selectedCategory)?.name ??
+    ? (categories.find((category) => category.slug === selectedCategory)?.name ??
       selectedCategory)
     : null
+
+  useEffect(() => {
+    if (!selectedCategory) {
+      return
+    }
+
+    const matchingCategory = categories.find(
+      (category) => category.name === selectedCategory && category.slug !== selectedCategory,
+    )
+
+    if (!matchingCategory) {
+      return
+    }
+
+    const nextParams = new URLSearchParams(searchParams)
+    nextParams.set("category", matchingCategory.slug)
+    setSearchParams(nextParams, { replace: true })
+  }, [categories, searchParams, selectedCategory, setSearchParams])
 
   const scrollToTop = useCallback(() => {
     if (typeof window !== "undefined") {
@@ -46,6 +65,7 @@ export default function ProductsPage() {
   }, [page, catalog.totalPages])
 
   const hasScrolledInitialRef = useRef(false)
+  const addToCartPendingRef = useRef(false)
 
   useEffect(() => {
     if (!hasScrolledInitialRef.current) {
@@ -70,6 +90,10 @@ export default function ProductsPage() {
   }
 
   const handleAddToCart = (product: Product) => {
+    if (addToCartPendingRef.current) {
+      return
+    }
+
     if (!isAuthenticated) {
       toast.info(
         t("products.toasts.signInRequired", {
@@ -86,6 +110,9 @@ export default function ProductsPage() {
       )
       return
     }
+
+    addToCartPendingRef.current = true
+    setPendingAddProductId(product.id)
 
     void addItem(product.id, 1)
       .then(() => {
@@ -106,6 +133,10 @@ export default function ProductsPage() {
               }),
         )
       })
+      .finally(() => {
+        addToCartPendingRef.current = false
+        setPendingAddProductId((current) => (current === product.id ? null : current))
+      })
   }
 
   const showPagination =
@@ -122,7 +153,7 @@ export default function ProductsPage() {
           categories={categories}
           selectedCategoryValue={categoryValue}
           onCategoryChange={handleCategoryChange}
-          isLoadingCategories={catalog.categoriesQuery.isPending}
+          isLoadingCategories={catalog.isLoadingCategories}
         />
 
         {catalog.isRefetching ? (
@@ -161,8 +192,8 @@ export default function ProductsPage() {
             defaultValue: "No products found for the selected filters.",
           })}
           onAddToCart={handleAddToCart}
-          isAddToCartDisabled={isAuthLoading || isCartUpdating}
-          isAddToCartProcessing={isCartUpdating}
+          isAddToCartDisabled={isAuthLoading}
+          activeAddToCartProductId={pendingAddProductId}
           pageSize={PRODUCTS_PAGE_SIZE}
         />
 

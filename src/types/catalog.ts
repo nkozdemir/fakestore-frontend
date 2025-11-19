@@ -3,6 +3,10 @@ export type Category = {
   name: string
 }
 
+export type CategoryFilterOption = Category & {
+  slug: string
+}
+
 export type Product = {
   id: number
   title: string

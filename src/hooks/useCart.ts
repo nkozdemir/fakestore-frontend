@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient, type QueryKey } from "@tanstack/
 import { fetchJson, toFriendlyError } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import { optionalAuthorizationHeader } from "@/lib/auth-headers.ts"
-import type { Cart, CartPatchPayload } from "@/types/cart.ts"
+import type { Cart, CartItem, CartPatchPayload } from "@/types/cart.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 
 const cartQueryKey = (userId: number | undefined, language: string): QueryKey => [
@@ -11,6 +11,48 @@ const cartQueryKey = (userId: number | undefined, language: string): QueryKey =>
   userId ?? "guest",
   language,
 ]
+
+const normalizeCartItems = (items: Cart["items"]): CartItem[] =>
+  Array.isArray(items) ? items : []
+
+const mergeCartItemsWithExistingOrder = (
+  nextItems: CartItem[],
+  previousItems: CartItem[],
+): CartItem[] => {
+  if (previousItems.length === 0) {
+    return nextItems
+  }
+
+  const nextById = new Map<number, CartItem>()
+  for (const item of nextItems) {
+    nextById.set(item.product.id, item)
+  }
+
+  const ordered: CartItem[] = []
+
+  for (const previousItem of previousItems) {
+    const updated = nextById.get(previousItem.product.id)
+    if (!updated) {
+      continue
+    }
+    ordered.push(updated)
+    nextById.delete(previousItem.product.id)
+  }
+
+  if (nextById.size === 0) {
+    return ordered
+  }
+
+  for (const item of nextItems) {
+    if (!nextById.has(item.product.id)) {
+      continue
+    }
+    ordered.push(item)
+    nextById.delete(item.product.id)
+  }
+
+  return ordered
+}
 
 export default function useCart() {
   const { user, accessToken, isAuthenticated } = useAuth()
@@ -56,7 +98,7 @@ export default function useCart() {
 
     return {
       ...cart,
-      items: Array.isArray(cart.items) ? cart.items : [],
+      items: normalizeCartItems(cart.items),
     }
   }, [accessToken, userId])
 
@@ -113,10 +155,16 @@ export default function useCart() {
 
         const normalizedCart: Cart = {
           ...updatedCart,
-          items: Array.isArray(updatedCart.items) ? updatedCart.items : [],
+          items: normalizeCartItems(updatedCart.items),
         }
 
-        return normalizedCart
+        const previousItems = normalizeCartItems(cart.items)
+        const mergedItems = mergeCartItemsWithExistingOrder(normalizedCart.items, previousItems)
+
+        return {
+          ...normalizedCart,
+          items: mergedItems,
+        }
       } catch (mutationError) {
         throw toFriendlyError(mutationError, {
           fallback: cartUpdateFallbackMessage,
