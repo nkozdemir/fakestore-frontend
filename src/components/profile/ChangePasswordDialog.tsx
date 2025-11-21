@@ -1,6 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -11,13 +10,21 @@ import {
 } from "@/components/ui/dialog.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import PasswordInput from "@/components/ui/password-input.tsx"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { Loader2, CircleAlert } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import PasswordRequirements from "@/components/auth/PasswordRequirements.tsx"
 import { type PasswordFormValues, passwordResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx"
 
 type ChangePasswordDialogProps = {
   open: boolean
@@ -30,13 +37,13 @@ export default function ChangePasswordDialog({
   onOpenChange,
   onSubmit,
 }: ChangePasswordDialogProps) {
+  const [errorDialogMessage, setErrorDialogMessage] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     watch,
     reset,
-    setError,
   } = useForm<PasswordFormValues>({
     defaultValues: {
       password: "",
@@ -71,11 +78,7 @@ export default function ChangePasswordDialog({
           : t("profile.messages.requestFailed", {
               defaultValue: "We couldn't complete that request right now. Please try again.",
             })
-      setError("root", {
-        type: "server",
-        message,
-      })
-      toast.error(message)
+      setErrorDialogMessage(message)
     }
   })
 
@@ -132,17 +135,6 @@ export default function ChangePasswordDialog({
             </div>
             <PasswordRequirements password={passwordValue} />
           </div>
-          {errors.root?.message && (
-            <Alert variant="destructive">
-              <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>
-                {t("profile.dialogs.password.alertTitle", {
-                  defaultValue: "Password update failed",
-                })}
-              </AlertTitle>
-              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
-            </Alert>
-          )}
           <DialogFooter>
             <Button
               type="button"
@@ -169,6 +161,35 @@ export default function ChangePasswordDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      <AlertDialog
+        open={Boolean(errorDialogMessage)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setErrorDialogMessage(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("profile.dialogs.password.alertTitle", {
+                defaultValue: "Password update failed",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {resolveError(errorDialogMessage ?? undefined) ??
+                t("profile.messages.requestFailed", {
+                  defaultValue: "We couldn't complete that request right now. Please try again.",
+                })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              {t("common.actions.close", { defaultValue: "Close" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

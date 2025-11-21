@@ -266,7 +266,7 @@ export const translationResources = {
         remove: "Remove",
         deleteDialogTitle: "Remove this address?",
         deleteDialogDescription:
-          "We'll remove {{street}} {{number}} from your saved addresses. You can add it again at any time.",
+          'We\'ll remove "{{addressLabel}}" from your saved addresses. You can add it again at any time.',
         deleteErrorTitle: "Address removal failed",
         removeAria: "Remove address at {{street}} {{number}}",
         cancel: "Cancel",
@@ -622,7 +622,7 @@ export const translationResources = {
         remove: "Kaldır",
         deleteDialogTitle: "Bu adres kaldırılsın mı?",
         deleteDialogDescription:
-          "{{street}} {{number}} adresini kayıtlı adreslerinizden kaldıracağız. Dilediğiniz zaman yeniden ekleyebilirsiniz.",
+          '"{{addressLabel}}" adresini kayıtlı adreslerinizden kaldıracağız. Dilediğiniz zaman yeniden ekleyebilirsiniz.',
         deleteErrorTitle: "Adres kaldırılamadı",
         removeAria: "{{street}} {{number}} adresini kaldır",
         cancel: "Vazgeç",

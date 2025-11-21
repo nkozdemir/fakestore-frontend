@@ -4,6 +4,7 @@ import { MemoryRouter } from "react-router"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { ReactNode } from "react"
 import AuthProvider from "@/context/AuthProvider.tsx"
+import { I18nProvider } from "@/context/I18nProvider.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import type { AuthTokens } from "@/types/auth.ts"
 import { server } from "@/test/msw-server.ts"
@@ -12,7 +13,9 @@ const API_BASE_URL = "http://localhost:8000/api/"
 
 const wrapper = ({ children }: { children: ReactNode }) => (
   <MemoryRouter initialEntries={["/"]}>
-    <AuthProvider>{children}</AuthProvider>
+    <I18nProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </I18nProvider>
   </MemoryRouter>
 )
 

@@ -185,11 +185,6 @@ const setupProfileInterceptors = (scenario: ScenarioState) => {
       scenario.profile.email = body.email
     }
 
-    if (typeof body.username === "string") {
-      scenario.auth.username = body.username
-      scenario.profile.username = body.username
-    }
-
     if (typeof body.phone === "string") {
       scenario.profile.phone = body.phone
     }
@@ -299,18 +294,21 @@ describe("Profile management", () => {
       cy.get("#lastName").clear().type("Carter")
       cy.get("#email").clear().type("johnathan@example.com")
       cy.get("#phone").clear().type("+1 555 777 8888")
-      cy.get("#username").clear().type("johnny")
+      cy.get("#username").should("not.exist")
       cy.get('[data-testid="profile-save"]').click()
     })
 
-    cy.wait("@updateProfile")
+    cy.wait("@updateProfile").its("request.body").should((body) => {
+      const payload = typeof body === "string" ? JSON.parse(body) : body
+      expect(payload).not.to.have.property("username")
+    })
     cy.wait("@authMe")
     cy.wait("@userProfile")
 
     cy.contains("Johnathan Carter").should("be.visible")
     cy.contains("johnathan@example.com").should("be.visible")
     cy.contains("+1 555 777 8888").should("be.visible")
-    cy.contains("Username: johnny").should("be.visible")
+    cy.contains("Username: john").should("be.visible")
   })
 
   it("changes the account password", () => {

@@ -1,6 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -11,13 +10,20 @@ import {
 } from "@/components/ui/dialog.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { Loader2, CircleAlert } from "lucide-react"
-import UsernameField from "@/components/auth/UsernameField.tsx"
+import { Loader2 } from "lucide-react"
 import { type ProfileDetailsFormValues, profileResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx"
 
 type ProfileDetailsDialogProps = {
   open: boolean
@@ -32,12 +38,12 @@ export default function ProfileDetailsDialog({
   initialValues,
   onSubmit,
 }: ProfileDetailsDialogProps) {
+  const [errorDialogMessage, setErrorDialogMessage] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setError,
   } = useForm<ProfileDetailsFormValues>({
     defaultValues: initialValues,
     resolver: profileResolver,
@@ -61,11 +67,7 @@ export default function ProfileDetailsDialog({
           : t("profile.messages.requestFailed", {
               defaultValue: "We couldn't complete that request right now. Please try again.",
             })
-      setError("root", {
-        type: "server",
-        message,
-      })
-      toast.error(message)
+      setErrorDialogMessage(message)
     }
   })
 
@@ -144,25 +146,7 @@ export default function ProfileDetailsDialog({
                 <p className="text-sm text-destructive">{resolveError(errors.phone.message)}</p>
               )}
             </div>
-            <UsernameField
-              registration={register("username")}
-              autoComplete="username"
-              required
-              error={errors.username?.message}
-              containerClassName="space-y-2 sm:col-span-2"
-            />
           </div>
-          {errors.root?.message && (
-            <Alert variant="destructive">
-              <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>
-                {t("profile.dialogs.profile.alertTitle", {
-                  defaultValue: "Profile update failed",
-                })}
-              </AlertTitle>
-              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
-            </Alert>
-          )}
           <DialogFooter>
             <Button
               type="button"
@@ -189,6 +173,33 @@ export default function ProfileDetailsDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      <AlertDialog
+        open={Boolean(errorDialogMessage)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setErrorDialogMessage(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("profile.dialogs.profile.alertTitle", { defaultValue: "Profile update failed" })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {resolveError(errorDialogMessage ?? undefined) ??
+                t("profile.messages.requestFailed", {
+                  defaultValue: "We couldn't complete that request right now. Please try again.",
+                })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              {t("common.actions.close", { defaultValue: "Close" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

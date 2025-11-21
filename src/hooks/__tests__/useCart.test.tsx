@@ -5,6 +5,7 @@ import { MemoryRouter } from "react-router"
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest"
 import type { ReactNode } from "react"
 import { AuthContext, type AuthContextValue } from "@/context/auth-context.ts"
+import { I18nProvider } from "@/context/I18nProvider.tsx"
 import useCart from "@/hooks/useCart.ts"
 import type { Cart, CartItem, CartPatchPayload } from "@/types/cart.ts"
 import type { Product } from "@/types/catalog.ts"
@@ -123,9 +124,11 @@ function createWrapper(authOverrides: Partial<AuthContextValue> = {}): {
 
   const Wrapper = ({ children }: { children: ReactNode }) => (
     <MemoryRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
-      </QueryClientProvider>
+      <I18nProvider>
+        <QueryClientProvider client={queryClient}>
+          <AuthContext.Provider value={authValue}>{children}</AuthContext.Provider>
+        </QueryClientProvider>
+      </I18nProvider>
     </MemoryRouter>
   )
 

@@ -55,6 +55,17 @@ export default function AddressSection({
         </Button>
       </CardHeader>
       <CardContent>
+        {deleteDialog.error && (
+          <Alert variant="destructive" className="mb-4">
+            <CircleAlert className="size-5" aria-hidden />
+            <AlertTitle>
+              {t("profile.addresses.deleteErrorTitle", {
+                defaultValue: "Address removal failed",
+              })}
+            </AlertTitle>
+            <AlertDescription>{deleteDialog.error}</AlertDescription>
+          </Alert>
+        )}
         {addresses.length > 0 ? (
           <ul className="grid gap-4">
             {addresses.map((address) => (
@@ -141,25 +152,15 @@ export default function AddressSection({
                 <AlertDialogDescription>
                   {t("profile.addresses.deleteDialogDescription", {
                     defaultValue:
-                      "We'll remove {{street}} {{number}} from your saved addresses. You can add it again at any time.",
+                      'We\'ll remove "{{addressLabel}}" from your saved addresses. You can add it again at any time.',
                     values: {
                       street: deleteDialog.address.street,
                       number: deleteDialog.address.number,
+                      addressLabel: `${deleteDialog.address.street} ${deleteDialog.address.number}`,
                     },
                   })}
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              {deleteDialog.error && (
-                <Alert variant="destructive">
-                  <CircleAlert className="size-5" aria-hidden />
-                  <AlertTitle>
-                    {t("profile.addresses.deleteErrorTitle", {
-                      defaultValue: "Address removal failed",
-                    })}
-                  </AlertTitle>
-                  <AlertDescription>{deleteDialog.error}</AlertDescription>
-                </Alert>
-              )}
               <AlertDialogFooter>
                 <AlertDialogCancel disabled={deleteDialog.isDeleting}>
                   {t("profile.addresses.cancel", { defaultValue: "Cancel" })}
@@ -170,14 +171,12 @@ export default function AddressSection({
                     deleteDialog.onConfirm()
                   }}
                   disabled={deleteDialog.isDeleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  className="bg-destructive text-white hover:bg-destructive/90 justify-center"
                   data-testid="confirm-delete-address"
                 >
                   {deleteDialog.isDeleting ? (
                     <Loader2 className="mr-2 size-4 animate-spin" aria-hidden />
-                  ) : (
-                    <Trash2 className="mr-2 size-4" aria-hidden />
-                  )}
+                  ) : null}
                   {t("profile.addresses.confirm", { defaultValue: "Remove" })}
                 </AlertDialogAction>
               </AlertDialogFooter>

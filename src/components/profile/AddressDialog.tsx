@@ -1,6 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
-import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -11,12 +10,20 @@ import {
 } from "@/components/ui/dialog.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import { Input } from "@/components/ui/input.tsx"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert.tsx"
 import { Button } from "@/components/ui/button.tsx"
-import { Loader2, CircleAlert } from "lucide-react"
+import { Loader2 } from "lucide-react"
 import { type AddressFormValues, addressResolver } from "@/lib/profile-schemas.ts"
 import { useTranslation } from "@/hooks/useTranslation.ts"
 import { translateValidationMessage } from "@/lib/validation-messages.ts"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog.tsx"
 
 type AddressDialogProps = {
   open: boolean
@@ -33,12 +40,12 @@ export default function AddressDialog({
   onOpenChange,
   onSubmit,
 }: AddressDialogProps) {
+  const [errorDialogMessage, setErrorDialogMessage] = useState<string | null>(null)
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
     reset,
-    setError,
   } = useForm<AddressFormValues>({
     defaultValues: initialValues,
     resolver: addressResolver,
@@ -62,11 +69,7 @@ export default function AddressDialog({
           : t("profile.messages.requestFailed", {
               defaultValue: "We couldn't complete that request right now. Please try again.",
             })
-      setError("root", {
-        type: "server",
-        message,
-      })
-      toast.error(message)
+      setErrorDialogMessage(message)
     }
   })
 
@@ -138,6 +141,7 @@ export default function AddressDialog({
               <Input
                 id="zipcode"
                 type="text"
+                inputMode="numeric"
                 {...register("zipcode")}
                 required
                 aria-invalid={errors.zipcode ? "true" : "false"}
@@ -153,6 +157,7 @@ export default function AddressDialog({
               <Input
                 id="latitude"
                 type="text"
+                inputMode="decimal"
                 {...register("latitude")}
                 required
                 aria-invalid={errors.latitude ? "true" : "false"}
@@ -168,6 +173,7 @@ export default function AddressDialog({
               <Input
                 id="longitude"
                 type="text"
+                inputMode="decimal"
                 {...register("longitude")}
                 required
                 aria-invalid={errors.longitude ? "true" : "false"}
@@ -177,17 +183,6 @@ export default function AddressDialog({
               )}
             </div>
           </div>
-          {errors.root?.message && (
-            <Alert variant="destructive">
-              <CircleAlert className="size-5" aria-hidden />
-              <AlertTitle>
-                {t("profile.dialogs.address.alertTitle", {
-                  defaultValue: "Address update failed",
-                })}
-              </AlertTitle>
-              <AlertDescription>{resolveError(errors.root.message)}</AlertDescription>
-            </Alert>
-          )}
           <DialogFooter>
             <Button
               type="button"
@@ -218,6 +213,35 @@ export default function AddressDialog({
           </DialogFooter>
         </form>
       </DialogContent>
+      <AlertDialog
+        open={Boolean(errorDialogMessage)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setErrorDialogMessage(null)
+          }
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {t("profile.dialogs.address.alertTitle", {
+                defaultValue: "Address update failed",
+              })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {resolveError(errorDialogMessage ?? undefined) ??
+                t("profile.messages.requestFailed", {
+                  defaultValue: "We couldn't complete that request right now. Please try again.",
+                })}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>
+              {t("common.actions.close", { defaultValue: "Close" })}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }

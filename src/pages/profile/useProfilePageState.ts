@@ -48,7 +48,6 @@ export default function useProfilePageState() {
       firstName: user?.firstName ?? "",
       lastName: user?.lastName ?? "",
       email: user?.email ?? "",
-      username: user?.username ?? "",
       phone: user?.phone ?? "",
     }),
     [user],
@@ -149,7 +148,6 @@ export default function useProfilePageState() {
 
       const payload: Record<string, unknown> = {
         email: values.email.trim(),
-        username: values.username.trim(),
         first_name: values.firstName.trim(),
         last_name: values.lastName.trim(),
       }
@@ -211,15 +209,6 @@ export default function useProfilePageState() {
       }
 
       await refreshUser()
-      toast.success(
-        isEditMode
-          ? t("profile.toasts.addressUpdated", {
-              defaultValue: "Address updated successfully.",
-            })
-          : t("profile.toasts.addressAdded", {
-              defaultValue: "Address added successfully.",
-            }),
-      )
       setAddressDialogState(null)
     },
     [addressDialogState, authorizedRequest, refreshUser, t, user],
@@ -239,11 +228,6 @@ export default function useProfilePageState() {
         method: "DELETE",
       })
       await refreshUser()
-      toast.success(
-        t("profile.toasts.addressRemoved", {
-          defaultValue: "Address removed successfully.",
-        }),
-      )
       setAddressToDelete(null)
     } catch (error) {
       const message =
@@ -253,7 +237,6 @@ export default function useProfilePageState() {
               defaultValue: "We couldn't remove that address right now. Please try again.",
             })
       setDeleteAddressError(message)
-      toast.error(message)
     } finally {
       setIsDeletingAddress(false)
     }
@@ -302,11 +285,6 @@ export default function useProfilePageState() {
       await authorizedRequest(`/users/${user.id}/`, {
         method: "DELETE",
       })
-      toast.success(
-        t("profile.toasts.accountDeleted", {
-          defaultValue: "Your account has been deleted.",
-        }),
-      )
       setDeleteDialogOpen(false)
       await logout()
       navigate("/", { replace: true })
@@ -318,7 +296,6 @@ export default function useProfilePageState() {
               defaultValue: "We couldn't delete your account right now. Please try again.",
             })
       setDeleteError(message)
-      toast.error(message)
     } finally {
       setIsDeleting(false)
     }
