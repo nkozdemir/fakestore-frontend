@@ -100,7 +100,7 @@ export default function useCart() {
       ...cart,
       items: normalizeCartItems(cart.items),
     }
-  }, [accessToken, userId])
+  }, [accessToken, t, userId])
 
   const cartQuery = useQuery<Cart, Error>({
     queryKey: cartQueryKey(userId, language),
@@ -153,13 +153,14 @@ export default function useCart() {
           },
         })
 
+        const normalizedItems = normalizeCartItems(updatedCart.items)
         const normalizedCart: Cart = {
           ...updatedCart,
-          items: normalizeCartItems(updatedCart.items),
+          items: normalizedItems,
         }
 
         const previousItems = normalizeCartItems(cart.items)
-        const mergedItems = mergeCartItemsWithExistingOrder(normalizedCart.items, previousItems)
+        const mergedItems = mergeCartItemsWithExistingOrder(normalizedItems, previousItems)
 
         return {
           ...normalizedCart,
@@ -208,7 +209,7 @@ export default function useCart() {
         ],
       })
     },
-    [ensureCartData, patchCartMutation],
+    [ensureCartData, patchCartMutation, t],
   )
 
   const removeItem = useCallback(
@@ -230,7 +231,7 @@ export default function useCart() {
         remove: [productId],
       })
     },
-    [ensureCartData, patchCartMutation],
+    [ensureCartData, patchCartMutation, t],
   )
 
   const updateItemQuantity = useCallback(
@@ -271,7 +272,7 @@ export default function useCart() {
         ],
       })
     },
-    [ensureCartData, patchCartMutation, removeItem],
+    [ensureCartData, patchCartMutation, removeItem, t],
   )
 
   const clearCart = useCallback(async () => {

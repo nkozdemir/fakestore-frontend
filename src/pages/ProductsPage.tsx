@@ -9,8 +9,9 @@ import { useProductCatalog, PRODUCTS_PAGE_SIZE } from "@/hooks/useProductCatalog
 import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
 import type { Product } from "@/types/catalog.ts"
-import { toast } from "sonner"
 import { useTranslation } from "@/hooks/useTranslation.ts"
+import { toast } from "sonner"
+import { showSignInPrompt } from "@/components/auth/showSignInPrompt.tsx"
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -95,19 +96,15 @@ export default function ProductsPage() {
     }
 
     if (!isAuthenticated) {
-      toast.info(
-        t("products.toasts.signInRequired", {
+      showSignInPrompt({
+        message: t("products.toasts.signInRequired", {
           defaultValue: "Sign in to add items to your cart.",
         }),
-        {
-          action: {
-            label: t("products.toasts.signInAction", {
-              defaultValue: "Sign in",
-            }),
-            onClick: () => navigate("/login"),
-          },
-        },
-      )
+        actionLabel: t("products.toasts.signInAction", {
+          defaultValue: "Sign in",
+        }),
+        onSignIn: () => navigate("/login"),
+      })
       return
     }
 

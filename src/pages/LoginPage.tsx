@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import PasswordInput from "@/components/ui/password-input.tsx"
 import { Label } from "@/components/ui/label.tsx"
 import UsernameField from "@/components/auth/UsernameField.tsx"
+import AuthBrandLink from "@/components/auth/AuthBrandLink.tsx"
 import useAuth from "@/hooks/useAuth.ts"
 import { createZodResolver } from "@/lib/create-zod-resolver.ts"
 import { usernameRequiredSchema } from "@/lib/username-policy.ts"
@@ -67,7 +68,8 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-6 py-12">
+    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-background px-6 py-12">
+      <AuthBrandLink />
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
           <CardTitle className="text-2xl font-semibold">

@@ -7,6 +7,7 @@ import { fetchJson } from "@/lib/api.ts"
 import useAuth from "@/hooks/useAuth.ts"
 import useCart from "@/hooks/useCart.ts"
 import { toast } from "sonner"
+import { showSignInPrompt } from "@/components/auth/showSignInPrompt.tsx"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -85,19 +86,15 @@ export default function ProductDetailPage() {
 
   const handleAddToCart = (currentProduct: Product) => {
     if (!isAuthenticated) {
-      toast.info(
-        t("products.toasts.signInRequired", {
+      showSignInPrompt({
+        message: t("products.toasts.signInRequired", {
           defaultValue: "Sign in to add items to your cart.",
         }),
-        {
-          action: {
-            label: t("products.toasts.signInAction", {
-              defaultValue: "Sign in",
-            }),
-            onClick: () => navigate("/login"),
-          },
-        },
-      )
+        actionLabel: t("products.toasts.signInAction", {
+          defaultValue: "Sign in",
+        }),
+        onSignIn: () => navigate("/login"),
+      })
       return
     }
 
@@ -133,19 +130,15 @@ export default function ProductDetailPage() {
     }
 
     if (!isAuthenticated) {
-      toast.info(
-        t("productDetail.toasts.signInToRate", {
+      showSignInPrompt({
+        message: t("productDetail.toasts.signInToRate", {
           defaultValue: "Sign in to rate this product.",
         }),
-        {
-          action: {
-            label: t("products.toasts.signInAction", {
-              defaultValue: "Sign in",
-            }),
-            onClick: () => navigate("/login"),
-          },
-        },
-      )
+        actionLabel: t("products.toasts.signInAction", {
+          defaultValue: "Sign in",
+        }),
+        onSignIn: () => navigate("/login"),
+      })
       return
     }
 
@@ -162,19 +155,15 @@ export default function ProductDetailPage() {
     }
 
     if (!isAuthenticated) {
-      toast.info(
-        t("productDetail.toasts.signInToRate", {
+      showSignInPrompt({
+        message: t("productDetail.toasts.signInToRate", {
           defaultValue: "Sign in to rate this product.",
         }),
-        {
-          action: {
-            label: t("products.toasts.signInAction", {
-              defaultValue: "Sign in",
-            }),
-            onClick: () => navigate("/login"),
-          },
-        },
-      )
+        actionLabel: t("products.toasts.signInAction", {
+          defaultValue: "Sign in",
+        }),
+        onSignIn: () => navigate("/login"),
+      })
       return
     }
 
